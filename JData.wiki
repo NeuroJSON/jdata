@@ -1,0 +1,77 @@
+= JData specifications: a general-purpose data storage and interchange interchange format =
+
+;'''Status of This Document''':\
+ This document is current under the state of "Request for Comments". It does not specify a standard of any kind.  Distribution of this\
+ memo is unlimited.
+
+;'''Copyright Notice''':  Copyright (C) Qianqian Fang (2015).
+
+;'''Version''': RFC.pre.0
+
+;'''Last Update''': Jan. 02, 2015
+
+;'''Abstract''':\
+ JData is a general-purpose data interchange format. It was derived from\
+ the JavaScript Object Notation (JSON) [RFC4627] and Universal \
+ Binary JSON specifications. JData defines a list of dedicated "name" \
+ fields to represent a wide range of data structures, including \
+ scalars, arrays, tables, structures, hashes, trees and graphs.
+<toc>
+
+== 1.  Introduction ==
+
+Data are the digital representations of our world. Generating and processing
+data are the essential parts of our daily lives, and are at the very
+foundations of modern sciences, information technologies, businesses, and
+the functions of our global societies.
+
+Data take many different forms. Some data can be represented by simple
+scalars; some others have complex forms with hierarchical structures. An
+efficient representation of data also strongly depends on the
+application needs. In some cases, plain text files with white-space or
+comma-separated numbers are sufficient; however, for performance-sensitive
+applications, compact, binary, and byte-aligned data formats are critical to
+the reduction of the loading and processing time.
+
+It is a challenging task to encapsulate a wide varieties of data forms
+into a single data interchange format. There has been many previous efforts
+in developing a general-purpose data format.
+
+
+=== 1.1.  Conventions Used in This Document ===
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in [RFC2119].
+
+The grammatical rules in this document are to be interpreted as
+described in [RFC4234].
+
+=== 2.  JSON Grammar ===
+
+JSON grammar used in JData is defined in [RFC4627].
+
+=== 3.  JData Keywords ===
+
+=== 3.1  Data Array Storage Keywords ===
+In this document, we consider the following general data storage models:
+*a full array (empty, 1D, 2D, 3D or in higher dimensions)
+*a sparse array (empty, 1D, 2D, 3D or in higher dimensions)
+
+ _ArraySize_, _ArrayType_, _ArrayData_,
+ _ArrayIsComplex_, _ArrayIsSparse_
+
+=== 3.1  Data Representing Keywords ===
+
+All JData keywords are case sensitive.
+
+In this document, we define the meanings for the following JData
+keywords that represents mesh-related data structures:
+
+=== 3.1  Meta-data Keywords ===
+
+In this document, we defines the following JMesh keywords
+to represent non-geometric meta-data:
+
+ Author, CreationTime, Comment
+
