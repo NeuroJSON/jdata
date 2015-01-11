@@ -11,8 +11,8 @@
 ;'''Last Update''': Jan. 02, 2015
 
 ;'''Abstract''':\
- JData is a general-purpose data interchange format. It was derived from\
- the JavaScript Object Notation (JSON) [RFC4627] and Universal \
+ JData is a general-purpose data interchange format. It was derived \
+ from the JavaScript Object Notation (JSON) [RFC4627] and Universal \
  Binary JSON specifications. JData defines a list of dedicated "name" \
  fields to represent a wide range of data structures, including \
  scalars, arrays, tables, structures, hashes, trees and graphs.
@@ -26,16 +26,35 @@ foundations of modern sciences, information technologies, businesses, and
 the functions of our global societies.
 
 Data take many different forms. Some data can be represented by simple
-scalars; some others have complex forms with hierarchical structures. An
-efficient representation of data also strongly depends on the
-application needs. In some cases, plain text files with white-space or
-comma-separated numbers are sufficient; however, for performance-sensitive
-applications, compact, binary, and byte-aligned data formats are critical to
-the reduction of the loading and processing time.
+scalars; some others have complex forms with hierarchical structures.
+An efficient representation of data also strongly depends on the
+application needs. In some cases, plain text files with white-space
+separated fields are sufficient; however, for performance-sensitive
+applications, binary formats are often preferred. The abilities to
+store and parse complex data structures are particularly important
+to the scientific communities.
 
-It is a challenging task to encapsulate a wide varieties of data forms
-into a single data interchange format. There has been many previous efforts
-in developing a general-purpose data format.
+It is a challenging task to encapsulate the wide varieties of data forms
+in a single data interchange format. There has been many previous efforts
+in designing a general-purpose data storage specification. Some of them
+have become popular choices in one or multiple categories of applications.
+Extensible Markup Language (XML), for example, is used as a popular
+data-exchange format, but the verbosity of the syntax, moderate complexity
+for parsing, impeded readability and inefficiency in expressing structured
+data suggested rooms for alternative formats. Comma Separated Value (CSV),
+a rather simple plain-text format, is used among some applications to
+exchange a tabular data structure (such as a spreadsheet); yet, its
+inability to encode more complex data forms, lack of flexibility
+and precision restrict it to specific applications.
+
+Hierarchical Data Format (HDF) is a format targeting at the broad
+needs from the scientific communities. It has an extensible
+hierarchical data model with a large capacity to represent complex
+binary data. However, to effectively use HDF require skillful
+implementation and in-depth understanding to the underlying data
+models. For small projects with non-critical performance needs,
+using such such a non-intuitive data format may requires additional
+development maintenance efforts.
 
 
 === 1.1.  Conventions Used in This Document ===
