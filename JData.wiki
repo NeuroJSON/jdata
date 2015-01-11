@@ -53,8 +53,22 @@ hierarchical data model with a large capacity to represent complex
 binary data. However, to effectively use HDF require skillful
 implementation and in-depth understanding to the underlying data
 models. For small projects with non-critical performance needs,
-using such such a non-intuitive data format may requires additional
-development maintenance efforts.
+using and advanced data format such as HDF may requires additional
+development maintenance efforts. Similar arguments can be made to
+the Common Data Format (CDF) or Network Common Data Format (netCDF)
+that are partly derived from HDF. In addition, the MATLAB mat-file
+format and Tecplot data format are also used among the research
+communities. Because of the requirement of propitiatory
+software or libraries, these formats also have difficulties to find
+wide-spread use outside of the user communities of the associated
+software.
+
+The JavaScript Object Notation (JSON) format is a text-based data
+format that is known for its capability of storing complex data,
+excellent portability and human-readability. JSON is widely adopted
+among modern web applications, and is gradually becoming popular
+in local applications.
+
 
 
 === 1.1.  Conventions Used in This Document ===
@@ -72,6 +86,13 @@ JSON grammar used in JData is defined in [RFC4627].
 
 === 3.  JData Keywords ===
 
+=== 3.1  Data Representing Keywords ===
+
+All JData keywords are case sensitive.
+
+In this document, we define the meanings for the following JData
+keywords that represents mesh-related data structures:
+
 === 3.1  Data Array Storage Keywords ===
 In this document, we consider the following general data storage models:
 *a full array (empty, 1D, 2D, 3D or in higher dimensions)
@@ -79,13 +100,6 @@ In this document, we consider the following general data storage models:
 
  _ArraySize_, _ArrayType_, _ArrayData_,
  _ArrayIsComplex_, _ArrayIsSparse_
-
-=== 3.1  Data Representing Keywords ===
-
-All JData keywords are case sensitive.
-
-In this document, we define the meanings for the following JData
-keywords that represents mesh-related data structures:
 
 === 3.1  Meta-data Keywords ===
 
