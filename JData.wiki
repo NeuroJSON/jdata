@@ -1,14 +1,15 @@
-= JData specifications: a general-purpose data storage and interchange interchange format =
+= JData: a general-purpose data storage and interchange interchange format =
 
 ;'''Status of This Document''':\
- This document is current under the state of "Request for Comments". It does not specify a standard of any kind.  Distribution of this\
- memo is unlimited.
+ This document is current under the state of "Request for Comments". It does not specify a standard of any kind.
 
 ;'''Copyright Notice''':  Copyright (C) Qianqian Fang (2015).
 
 ;'''Version''': RFC.pre.0
 
 ;'''Last Update''': Jan. 02, 2015
+
+;'''License''': Apache License, Version 2.0
 
 ;'''Abstract''':\
  JData is a general-purpose data interchange format. It was derived \
@@ -18,12 +19,14 @@
  scalars, arrays, tables, structures, hashes, trees and graphs.
 <toc>
 
-== 1.  Introduction ==
+== #  Introduction ==
 
-Data are the digital representations of our world. Generating and processing
-data are the essential parts of our daily lives, and are at the very
-foundations of modern sciences, information technologies, businesses, and
-the functions of our global societies.
+=== # Background ===
+
+Data are the digital representations of our world. Generating and
+processing data are the essential parts of our daily lives, and are
+at the very foundations of modern sciences, information technologies,
+businesses, and the functions of our global societies.
 
 Data take many different forms. Some data can be represented by simple
 scalars; some others have complex forms with hierarchical structures.
@@ -63,24 +66,104 @@ software or libraries, these formats also have difficulties to find
 wide-spread use outside of the user communities of the associated
 software.
 
+=== # JSON and UBJSON ===
+
 The JavaScript Object Notation (JSON) format is a text-based data
 format that is known for its capability of storing complex data,
 excellent portability and human-readability. JSON is widely adopted
-among modern web applications, and is gradually becoming popular
-in local applications.
+in modern web applications, and is becoming popular in local/native
+applications. The key advantages of JSON include:
 
+#'''simplicity''': JSON data are composed by a list of <tt>"name":value</tt> \
+pairs; such a simple grammar greatly eases the use and parsing of \
+the data file; free JSON-encoders and decoders are widely available \
+for most popular programming languages;
+#'''human readability''': the text-based nature of JSON and it's \
+clean, easy-to-read format make it intuitively readable without \
+in-depth knowledge of the format itself;
+#'''hierarchical data support''': JSON has a tree-like data storage \
+paradigm which has the native capacity to support complex hierarchical \
+data structures; there is no inherent data size limit imposed by the \
+format itself;
+#'''web ready''': because JSON can be readily parsed by JavaScript, \
+a JSON-encoded data file can be directly invoked (inline or load from \
+remote site) from a JavaScript based web-application.
 
+JSON also has limitations. JSON's "value" fields are weakly-typed.
+They only support strings, numbers, and Boolean types, but lack of
+the the fine-granularity to represent various numerical types of
+different byte-lengths (in C-language, for example, short, int, long int,
+float, double, long double) and their signs (signed and unsigned).
+Because JSON is a text-based format, the size of the data file can be
+significantly larger than a binary format and requires additional
+conversion when used in an application. This introduces overhead
+in both storage and processing.
 
-=== 1.1.  Conventions Used in This Document ===
+The Universal Binary JSON (UBJSON) is a binary counterpart to the
+JSON format. It specifically addresses the above mentioned limitations,
+yet, adheres to a simple grammar similar to the text-based JSON.
+As a trade-off, it does lose the "human readability" to a certain
+extend. Although the implemented parsers for UBJSON are not as
+abundant as JSON, but due to the simplicity of the format itself,
+the cost for writing a parser for a programming language is
+significantly lower than other more complex data formats.
+
+With the ease-of-use, superior portability and parser availability,
+JSON and UBJSON have the potentials to serve as the main-stream
+data storage and interchange formats for general needs, especially
+for the scientific communities. A combination of JSON and it's binary
+counterpart offers features that are not currently available with
+the existing data storage schemes. Yet they do not offer all the
+advanced features found in the more sophisticated formats, their
+greatly simplified encoding and decoding strategies permit efficient
+data sharing among the general audiences.
+
+=== # Specification Summary ===
+
+JData is a specification for storing, exchanging and processing
+general-purpose data that are commonly encountered in information
+technology industries and research communities. It has a text/UNICODE
+format derived from the JSON specification and a binary format derived
+from the UBJSON specification. JData is designed to represent the
+commonly used data structures including arrays, structures, trees
+and graphs. A round-trip conversion is defined between the text and
+binary versions of JData files.
+
+The purpose of this document is to define the text and binary JData
+format specifications. This is achieved through the definition of a
+semantic layer over the JSON/UBJSON data storage syntax to map various
+types of complex data structures. Such semantic layer includes
+
+# a list of reserved "name" fields, or keywords, that define the characteristics \
+of various data types,
+# a list of reserved "name" fields to facilitate the grouping and \
+organization of hierarchical data,
+# a list of format properties for the associated "value" field to \
+store the specific metadata of the data points,
+
+and, in addition,
+# a set of conversion rules between the text and binary forms.
+
+In the following sections, we will define the JData keywords
+for data grouping and various data types, including scalars,
+1,2,3 and N-dimensional arrays, sparse and complex arrays,
+structures, hashes/associative arrays, trees and graphs. The
+expressions of these data structures in both text and binary
+forms are specified and exemplified.
+
+=== #  Conventions Used in This Document ===
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
 document are to be interpreted as described in [RFC2119].
 
 The grammatical rules in this document are to be interpreted as
-described in [RFC4234].
+described in [RFC4627].
 
-=== 2.  JSON Grammar ===
+=== # Recommended Data Representation Grammar ===
+
+
+=== #  JSON Grammar ===
 
 JSON grammar used in JData is defined in [RFC4627].
 
@@ -106,5 +189,5 @@ In this document, we consider the following general data storage models:
 In this document, we defines the following JMesh keywords
 to represent non-geometric meta-data:
 
- Author, CreationTime, Comment
+ _Author_, _CreationTime_, _Comment_
 
