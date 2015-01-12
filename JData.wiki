@@ -1,15 +1,15 @@
-= JData: a general-purpose data storage and interchange interchange format =
+= JData: a general-purpose data storage and interchange format =
 
 ;'''Status of This Document''':\
  This document is current under the state of "Request for Comments". It does not specify a standard of any kind.
 
 ;'''Copyright Notice''':  Copyright (C) Qianqian Fang (2015).
 
+;'''License''': Apache License, Version 2.0
+
 ;'''Version''': RFC.pre.0
 
 ;'''Last Update''': Jan. 02, 2015
-
-;'''License''': Apache License, Version 2.0
 
 ;'''Abstract''':\
  JData is a general-purpose data interchange format. It was derived \
@@ -104,9 +104,9 @@ JSON format. It specifically addresses the above mentioned limitations,
 yet, adheres to a simple grammar similar to the text-based JSON.
 As a trade-off, it does lose the "human readability" to a certain
 extend. Although the implemented parsers for UBJSON are not as
-abundant as JSON, but due to the simplicity of the format itself,
-the cost for writing a parser for a programming language is
-significantly lower than other more complex data formats.
+abundant as JSON, due to the simplicity of the format itself,
+the development cost for implementing a parser for a new programming
+language is significantly lower than other more complex data formats.
 
 With the ease-of-use, superior portability and parser availability,
 JSON and UBJSON have the potentials to serve as the main-stream
@@ -118,7 +118,7 @@ advanced features found in the more sophisticated formats, their
 greatly simplified encoding and decoding strategies permit efficient
 data sharing among the general audiences.
 
-=== # Specification Summary ===
+=== # JData Specification Summary ===
 
 JData is a specification for storing, exchanging and processing
 general-purpose data that are commonly encountered in information
@@ -149,7 +149,9 @@ for data grouping and various data types, including scalars,
 1,2,3 and N-dimensional arrays, sparse and complex arrays,
 structures, hashes/associative arrays, trees and graphs. The
 expressions of these data structures in both text and binary
-forms are specified and exemplified.
+forms are specified and exemplified, and their conversion rules
+are defined.
+
 
 === #  Conventions Used in This Document ===
 
@@ -160,12 +162,62 @@ document are to be interpreted as described in [RFC2119].
 The grammatical rules in this document are to be interpreted as
 described in [RFC4627].
 
-=== # Recommended Data Representation Grammar ===
-
+== # Data Storage Grammar ==
 
 === #  JSON Grammar ===
 
 JSON grammar used in JData is defined in [RFC4627].
+
+
+== #  Data Storage Models ==
+
+In JData, a significant datum, either in the form of a simple
+data point or a complex structure, is referred to as a '''"data record"''';
+a set of logically connected data records, such as the citation
+information of a paper, is referred to as a '''"dataset"'''; a
+group of datasets of similar meanings is referred to as a
+'''"data group"'''. The top-most level of the data structure is referred
+to as a '''"root object"'''.
+
+A dataset can be stored directly at any level under the root object
+and does not have to be a member of a data group. One dataset can be
+embedded inside another dataset. Datasets that are part of a data
+group are organized in the form of a JSON array (for un-named datasets) or
+JSON object (for named datasets).
+
+Multiple data groups can be stored at any level under the root object.
+A data group can not be a member, at any level, of a dataset.
+
+<pre>
+super-root{
+    root1{
+        group1{
+            dataset1{
+                dataset1.1{...}
+                ...
+                ... other auxiliary data ...
+            }
+            dataset2{...}
+        },
+        group2{
+            dataset3{...}
+        }
+        dataset4{...}
+        ... other auxiliary data ...
+    }
+    root2{
+        ...
+    }
+}
+</pre>
+
+== #  Data Storage Keywords ==
+
+=== #  Data Group Keywords ===
+
+
+=== #  Data Record Keywords ===
+
 
 === 3.  JData Keywords ===
 
@@ -190,4 +242,6 @@ In this document, we defines the following JMesh keywords
 to represent non-geometric meta-data:
 
  _Author_, _CreationTime_, _Comment_
+
+=== # Comments ===
 
