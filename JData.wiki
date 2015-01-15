@@ -164,26 +164,74 @@ described in [RFC4627].
 
 == # Data Storage Grammar ==
 
-=== #  JSON Grammar ===
+== # Text-based JData Storage Grammar ==
 
-JSON grammar used in JData is defined in [RFC4627].
+The text-based JData grammar is identical to the JSON grammar defined
+in [RFC4627], except that JData also accepts the Appendable JSON Object
+Collection (AJOC) in the following form:
+
+<pre>
+{
+   "object1":{}
+}
+{
+   "object2":{}
+}
+...
+</pre>
+
+In AJOC, multiple JSON objects can be included inside a single file or stream,
+separated by 0 or multiple permitted white spaces, namely
+
+ LF (U+000A), CR (U+000D), tab (U+0009), or space (U+0020)
+
+In the case where JSON Reference is used, the document must have only
+one root object, and is not an AJOC.
+
+== # Binary JData Storage Grammar ==
+
+The binary JData grammar is identical to the UBJSON grammar defined in [http://ubjson.org ubjson.org (Draft 12)],
+with the array grammar extension to support N-dimensional arrays:
+
+ [[] [$] [type] [#] [[] [$] [a integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
+
+where the integer type can be one of the UBJSON integer types (i,U,I,l,L), and
+nx, ny, and nz ... are all non-negative numbers specifying the dimensions of the N-dimensional
+array. The binary data of the N-dimensional array is then serialized in the '''column-major'''
+format (similar to MATLAB or FORTRAN) order.
+
+As a special note, all UBJSON integer types must be stored in the Big-Endian format,
+according to the specification; the storage to the floating point types (d,D) follows
+the IEEE 754 specification.
 
 
 == #  Data Storage Models ==
 
-In JData, a significant datum, either in the form of a simple
-data point or a complex structure, is referred to as a '''"data record"''';
-a set of logically connected data records, such as the citation
-information of a paper, is referred to as a '''"dataset"'''; a
-group of datasets of similar meanings is referred to as a
-'''"data group"'''. The top-most level of the data structure is referred
-to as a '''"root object"'''.
+In JData, an element with no child (the first-level sub-item) element is
+called a '''"leaf"'''. A meaningful datum, either in the form of a simple
+data point or a complex structure, is referred to as a '''"data record"'''.
+A data record can be a single leaf, or a
+collection of leaves. A set of logically connected data records, such as
+the citation information of a paper, is referred to as a '''"dataset"''';
+a group of datasets of logical connections is referred to as a
+'''"data group"'''. The top-most level of the JSON object is referred
+to as the '''"root"'''. If a JData document contains multiple JSON/UBJSON
+objects in the form of an AJOC, the upper-most level is referred to as a
+"super-root". The leaves that contain weakly-relevant or irrelevant data
+to the processing is referred to as the "auxiliary data". The auxiliary data
+can appear at any level under the root or super-root.
+
+In the above definitions, only "leaf", "root" and "super-root" have
+specific meanings. The interpretations to the "meaningful datum", "logically
+connected data", and "weakly-relevant or irrelevant data" are application
+dependent.
 
 A dataset can be stored directly at any level under the root object
 and does not have to be a member of a data group. One dataset can be
-embedded inside another dataset. Datasets that are part of a data
-group are organized in the form of a JSON array (for un-named datasets) or
-JSON object (for named datasets).
+embedded at any level inside another dataset.
+
+A data group must be either empty, or contains at least one dataset, or
+sub-data group as its direct child.
 
 Multiple data groups can be stored at any level under the root object.
 A data group can not be a member, at any level, of a dataset.
