@@ -26,25 +26,25 @@
 Data are the digital representations of our world. Generating and
 processing data are the essential parts of our daily lives, and are
 at the very foundations of modern sciences, information technologies,
-businesses, and the functions of our global societies.
+businesses, and the interactions between our global societies.
 
 Data take many different forms. Some data can be represented by simple
 scalars; some others have complex forms with hierarchical structures.
 An efficient representation of data also strongly depends on the
 application needs. In some cases, plain text files with white-space
 separated fields are sufficient; however, for performance-sensitive
-applications, binary formats are often preferred. The abilities to
-store and parse complex data structures are particularly important
-to the scientific communities.
+applications, using binary formats can significantly reduce loading and
+processing time. The abilities to store and parse complex data structures
+are particularly important to the scientific communities.
 
 It is a challenging task to encapsulate the wide varieties of data forms
 in a single data interchange format. There has been many previous efforts
 in designing a general-purpose data storage specification. Some of them
 have become popular choices in one or multiple categories of applications.
-Extensible Markup Language (XML), for example, is used as a popular
+Extensible Markup Language (XML), for example, is ubiquitously used as a
 data-exchange format, but the verbosity of the syntax, moderate complexity
 for parsing, impeded readability and inefficiency in expressing structured
-data suggested rooms for alternative formats. Comma Separated Value (CSV),
+data suggested room for alternative formats. Comma Separated Value (CSV),
 a rather simple plain-text format, is used among some applications to
 exchange a tabular data structure (such as a spreadsheet); yet, its
 inability to encode more complex data forms, lack of flexibility
@@ -57,13 +57,13 @@ binary data. However, to effectively use HDF require skillful
 implementation and in-depth understanding to the underlying data
 models. For small projects with non-critical performance needs,
 using and advanced data format such as HDF may requires additional
-development maintenance efforts. Similar arguments can be made to
+development and maintenance efforts. Similar arguments can be made to
 the Common Data Format (CDF) or Network Common Data Format (netCDF)
 that are partly derived from HDF. In addition, the MATLAB mat-file
 format and Tecplot data format are also used among the research
 communities. Because of the requirement of propitiatory
-software or libraries, these formats also have difficulties to find
-wide-spread use outside of the user communities of the associated
+software or libraries, these formats have also found difficulties to
+achieve wide-spread use outside of the user communities of the associated
 software.
 
 === # JSON and UBJSON ===
@@ -71,7 +71,7 @@ software.
 The JavaScript Object Notation (JSON) format is a text-based data
 format that is known for its capability of storing complex data,
 excellent portability and human-readability. JSON is widely adopted
-in modern web applications, and is becoming popular in local/native
+in modern web applications, and is becoming popular among local/native
 applications. The key advantages of JSON include:
 
 #'''simplicity''': JSON data are composed by a list of <tt>"name":value</tt> \
@@ -86,12 +86,12 @@ paradigm which has the native capacity to support complex hierarchical \
 data structures; there is no inherent data size limit imposed by the \
 format itself;
 #'''web ready''': because JSON can be readily parsed by JavaScript, \
-a JSON-encoded data file can be directly invoked (inline or load from \
+most JSON-encoded data file can be directly invoked (inline or load from \
 remote site) from a JavaScript based web-application.
 
 JSON also has limitations. JSON's "value" fields are weakly-typed.
 They only support strings, numbers, and Boolean types, but lack of
-the the fine-granularity to represent various numerical types of
+the  fine-granularity to represent various numerical types of
 different byte-lengths (in C-language, for example, short, int, long int,
 float, double, long double) and their signs (signed and unsigned).
 Because JSON is a text-based format, the size of the data file can be
@@ -113,7 +113,7 @@ JSON and UBJSON have the potentials to serve as the main-stream
 data storage and interchange formats for general needs, especially
 for the scientific communities. A combination of JSON and it's binary
 counterpart offers features that are not currently available with
-the existing data storage schemes. Yet they do not offer all the
+the existing data storage schemes. Yet they do not provide all the
 advanced features found in the more sophisticated formats, their
 greatly simplified encoding and decoding strategies permit efficient
 data sharing among the general audiences.
@@ -127,44 +127,34 @@ format derived from the JSON specification and a binary format derived
 from the UBJSON specification. JData is designed to represent the
 commonly used data structures including arrays, structures, trees
 and graphs. A round-trip conversion is defined between the text and
-binary versions of JData files.
+binary versions of JData documents.
 
 The purpose of this document is to define the text and binary JData
 format specifications. This is achieved through the definition of a
 semantic layer over the JSON/UBJSON data storage syntax to map various
 types of complex data structures. Such semantic layer includes
 
-# a list of reserved "name" fields, or keywords, that define the characteristics \
-of various data types,
-# a list of reserved "name" fields to facilitate the grouping and \
-organization of hierarchical data,
+# a list of reserved "name" fields, or keywords, that define the \
+containers of various data types that are commonly used in research,
+# a list of reserved "name" fields and formats to facilitate the grouping \
+and organization of hierarchical data,
 # a list of format properties for the associated "value" field to \
 store the specific metadata of the data points,
 
 and, in addition,
 # a set of conversion rules between the text and binary forms.
 
-In the following sections, we will define the JData keywords
-for data grouping and various data types, including scalars,
-1,2,3 and N-dimensional arrays, sparse and complex arrays,
-structures, hashes/associative arrays, trees and graphs. The
-expressions of these data structures in both text and binary
-forms are specified and exemplified, and their conversion rules
-are defined.
-
-
-=== #  Conventions Used in This Document ===
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [RFC2119].
-
-The grammatical rules in this document are to be interpreted as
-described in [RFC4627].
+In the following sections, we will define the basic JData grammar,
+data models, followed by the keywords for data grouping and various
+data types, including scalars, 1,2,3 and N-dimensional arrays,
+sparse and complex arrays, structures, hashes/associative arrays,
+trees and graphs. The expressions of these data structures in both
+text and binary forms are specified and exemplified, and their
+conversion rules are defined.
 
 == # Data Storage Grammar ==
 
-== # Text-based JData Storage Grammar ==
+=== # Text-based JData Storage Grammar ===
 
 The text-based JData grammar is identical to the JSON grammar defined
 in [RFC4627], except that JData also accepts the Appendable JSON Object
@@ -185,10 +175,10 @@ separated by 0 or multiple permitted white spaces, namely
 
  LF (U+000A), CR (U+000D), tab (U+0009), or space (U+0020)
 
-In the case where JSON Reference is used, the document must have only
-one root object, and is not an AJOC.
+In the case where [http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03 JSONReference] is used, the document must have only
+one root object, and must not contain an AJOC.
 
-== # Binary JData Storage Grammar ==
+=== # Binary JData Storage Grammar ===
 
 The binary JData grammar is identical to the UBJSON grammar defined in [http://ubjson.org ubjson.org (Draft 12)],
 with the array grammar extension to support N-dimensional arrays:
@@ -204,10 +194,9 @@ As a special note, all UBJSON integer types must be stored in the Big-Endian for
 according to the specification; the storage to the floating point types (d,D) follows
 the IEEE 754 specification.
 
-
 == #  Data Storage Models ==
 
-In JData, an element with no child (the first-level sub-item) element is
+In JData, an element with no child (the first-level sub-item) is
 called a '''"leaf"'''. A meaningful datum, either in the form of a simple
 data point or a complex structure, is referred to as a '''"data record"'''.
 A data record can be a single leaf, or a
@@ -261,22 +250,74 @@ super-root{
 
 == #  Data Storage Keywords ==
 
-=== #  Data Group Keywords ===
-
-
-=== #  Data Record Keywords ===
-
-
-=== 3.  JData Keywords ===
-
-=== 3.1  Data Representing Keywords ===
-
 All JData keywords are case sensitive.
 
-In this document, we define the meanings for the following JData
-keywords that represents mesh-related data structures:
+=== #  Data Group Keywords ===
 
-=== 3.1  Data Array Storage Keywords ===
+The use of data grouping keywords is not mandatory in a JData document. Nonetheless,
+properly partitioning and grouping the data based on their logical connections and
+name the components accordingly can greatly enhance the portability and readability of
+the data, and thus, are strongly recommended.
+
+==== # Data Group ===
+
+A data group is marked by
+
+ "_DataGroup_": { ... }
+
+or
+
+  "_DataGroup_": [ ... ]
+
+The data group tag can contain an optional name parameter, specified in the following format
+
+ "_DataGroup_,name='name of the data group'"
+
+one or more above mentioned white spaces may be inserted before or after "," and "=".
+
+A unique name parameter must be given when multiple data groups appear under the same parent.
+The parameterized name tag must be a valid JSON string, consisting of any validUNICODE
+characters or one of the 9 escape formats [RFC4627]. The "name" parameter must be enclosed
+by a pair of single quotes.
+
+Removing the optional white spaces, the name parameter of the data group must be unique
+among the sub-items of it's parent. Although it is not required, it is recommended
+to specify a name that is unique throughout the JData document (including the linked/reference
+documents if present).
+
+==== # Dataset ===
+
+Similarly, a dataset is specified by
+
+ "_Dataset_": { ... }
+
+or
+
+  "_Dataset_": [ ... ]
+
+with an optional name parameter in the following format:
+
+ "_Dataset_,name='name of the dataset'"
+
+==== # Data record ===
+
+Similarly, a dataset is specified by
+
+ "_DataRecord_": { ... }
+
+or
+
+  "_DataRecord_": [ ... ]
+
+with an optional name parameter in the following format:
+
+ "_DataRecord_,name='name of the data record'"
+
+
+=== #  Data Presentation Keywords ===
+
+==== #1  Data Array Storage Keywords ====
+
 In this document, we consider the following general data storage models:
 *a full array (empty, 1D, 2D, 3D or in higher dimensions)
 *a sparse array (empty, 1D, 2D, 3D or in higher dimensions)
@@ -284,12 +325,16 @@ In this document, we consider the following general data storage models:
  _ArraySize_, _ArrayType_, _ArrayData_,
  _ArrayIsComplex_, _ArrayIsSparse_
 
-=== 3.1  Meta-data Keywords ===
+==== # Meta-data Keywords ====
 
 In this document, we defines the following JMesh keywords
 to represent non-geometric meta-data:
 
  _Author_, _CreationTime_, _Comment_
 
-=== # Comments ===
+== # Recommended File Specifiers ==
+
+For the text-based JData file, the recommended file suffix is '''".jdat"'''; for the binary JData file, the recommended file suffix is '''".ubjd"'''.
+
+The MIME type for the text-based JData document is '''"application/jdata-text"'''; that for the binary JData document is '''"application/jdata-binary"'''
 
