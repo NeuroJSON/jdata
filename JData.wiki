@@ -14,9 +14,9 @@
 ;'''Abstract''':\
  JData is a general-purpose data interchange format. It was derived \
  from the JavaScript Object Notation (JSON) [RFC4627] and Universal \
- Binary JSON specifications. JData defines a list of dedicated "name" \
+ Binary JSON specifications (Draft 12). JData defines a list of dedicated "name" \
  fields to represent a wide range of data structures, including \
- scalars, arrays, tables, structures, hashes, trees and graphs.
+ scalars, arrays, tables, structures, hashes, links, trees and graphs.
 <toc>
 
 == #  Introduction ==
@@ -157,8 +157,9 @@ conversion rules are defined.
 === # Text-based JData Storage Grammar ===
 
 The text-based JData grammar is identical to the JSON grammar defined
-in [RFC4627], except that JData also accepts the Appendable JSON Object
-Collection (AJOC) in the following form:
+in [RFC4627], except that JData also accepts the Concatenated JSON Object
+Collection (CJOC), also known as the Concatenated JSON streaming format, 
+in the following form:
 
 <pre>
 {
@@ -170,7 +171,7 @@ Collection (AJOC) in the following form:
 ...
 </pre>
 
-In AJOC, multiple JSON objects can be included inside a single file or stream,
+In CJOC, multiple JSON objects can be included inside a single file or stream,
 separated by 0 or multiple permitted white spaces, namely
 
  LF (U+000A), CR (U+000D), tab (U+0009), or space (U+0020)
@@ -183,7 +184,7 @@ one root object, and must not contain an AJOC.
 The binary JData grammar is identical to the UBJSON grammar defined in [http://ubjson.org ubjson.org (Draft 12)],
 with the array grammar extension to support N-dimensional arrays:
 
- [[] [$] [type] [#] [[] [$] [a integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
+ [[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
 
 where the integer type can be one of the UBJSON integer types (i,U,I,l,L), and
 nx, ny, and nz ... are all non-negative numbers specifying the dimensions of the N-dimensional
@@ -205,7 +206,7 @@ the citation information of a paper, is referred to as a '''"dataset"''';
 a group of datasets of logical connections is referred to as a
 '''"data group"'''. The top-most level of the JSON object is referred
 to as the '''"root"'''. If a JData document contains multiple JSON/UBJSON
-objects in the form of an AJOC, the upper-most level is referred to as a
+objects in the form of an CJOC, the upper-most level is referred to as a
 "super-root". The leaves that contain weakly-relevant or irrelevant data
 to the processing is referred to as the "auxiliary data". The auxiliary data
 can appear at any level under the root or super-root.
@@ -242,7 +243,7 @@ super-root{
         dataset4{...}
         ... other auxiliary data ...
     }
-    root2{
+    root2{A data object that does not have meta-data
         ...
     }
 }
@@ -250,7 +251,32 @@ super-root{
 
 == #  Data Storage Keywords ==
 
-All JData keywords are case sensitive.
+All JData keywords are case sensitive. Data groups, datasets and data record can contain 
+metadata at the begining of the record to include additional information regarding the 
+data, such as name, create date and user-defined headers.
+
+=== #  Metadata ===
+
+Metadata records can be associated with a data group, dataset or data record. It is 
+optional, but if appears, it must be defined as the 1st child (sub-item) of the data object.
+
+A metadata record looks like the following
+
+"_MetaData_": {
+    "_Name_": "...",
+    "_CreateTime_": "...",
+    "_UniqueID_": "...",
+    "_SequenceID_": "...",
+    "UserDefinedTag1": "...",
+    "UserDefinedTag2": "...",
+    ...
+}
+
+The only required sub-field of the meta-data is "_Name_". All other metadata sub-field
+are optional. The JData metadata record supports user-defined keywords.
+
+A data object that does not contain metadata record is called "anonymous" object.
+Otherwise, it is called a "named" object.
 
 === #  Data Group Keywords ===
 
@@ -261,22 +287,31 @@ the data, and thus, are strongly recommended.
 
 ==== # Data Group ===
 
-A data group is marked by
+A data group can contain a metadata header
 
- "_DataGroup_": { ... }
+ "_DataGroup_": { 
+     "_MetaData_":{
+         ...
+     }
+     ...
+ }
+
+or "anonymous" data group
+
+  "_DataGroup_": { ... }
 
 or
 
   "_DataGroup_": [ ... ]
 
-The data group tag can contain an optional name parameter, specified in the following format
+The data group tag can contain an optional id parameter, specified in the following format
 
- "_DataGroup_,name='name of the data group'"
+ "_DataGroup_,id='name of the data group'"
 
 one or more above mentioned white spaces may be inserted before or after "," and "=".
 
-A unique name parameter must be given when multiple data groups appear under the same parent.
-The parameterized name tag must be a valid JSON string, consisting of any validUNICODE
+A unique id parameter must be given when multiple data groups appear under the same parent.
+The parameterized name tag must be a valid JSON string, consisting of any valid UNICODE
 characters or one of the 9 escape formats [RFC4627]. The "name" parameter must be enclosed
 by a pair of single quotes.
 
