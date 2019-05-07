@@ -1,22 +1,18 @@
  JData: a general-purpose data storage and interchange format
 ============================================================
 
-**Status of This Document**:
-
-*This document is current under the state of "Request for Comments". 
-It does not specify a standard of any kind.*
-
-- **Copyright Notice**: Copyright (C) Qianqian Fang (2015).
+- **Status of This Document**: *This document is current under the state of "Request for Comments". 
+It does not specify a standard of any kind.*
+- **Copyright Notice**: Copyright (C) Qianqian Fang (2015-2019).
 - **License**: Apache License, Version 2.0
 - **Version**: RFC.pre.0
-- **Last Update**: Jan. 02, 2015
 - **Abstract**:
 
-JData is a general-purpose data interchange format. It was derived
-from the JavaScript Object Notation (JSON) [RFC4627] and Universal 
-Binary JSON specifications (Draft 12). JData defines a list of dedicated "name" 
-fields to represent a wide range of data structures, including 
-scalars, arrays, tables, structures, hashes, links, trees and graphs.
+JData is a general-purpose data interchange format. It was derived
+from the JavaScript Object Notation (JSON) [RFC4627] and Universal 
+Binary JSON specifications (Draft 12). JData defines a list of dedicated "name" 
+fields to represent a wide range of data structures, including 
+scalars, arrays, tables, structures, hashes, links, trees and graphs.
 
 
 Introduction
@@ -39,7 +35,7 @@ significantly reduce loading and processing time. The abilities to store and
 parse complex data structures are particularly important to the scientific 
 communities.
 
-It is a challenging task to encapsulate the wide varieties of data forms in a 
+It is a challenging task to encapsulate wide varieties of data forms in a 
 single data interchange format. There has been many previous efforts in 
 designing a general-purpose data storage specification. Some of them have 
 become popular choices in one or multiple categories of applications. 
@@ -129,9 +125,12 @@ specifications. This is achieved through the definition of a semantic layer
 over the JSON/UBJSON data storage syntax to map various types of complex data 
 structures. Such semantic layer includes
 
-- a list of reserved "name" fields, or keywords, that define the containers of various data types that are commonly used in research,
-- a list of reserved "name" fields and formats to facilitate the grouping and organization of hierarchical data,
-- a list of format properties for the associated "value" field to store the specific metadata of the data points, and, in addition,
+- a list of reserved "name" fields, or keywords, that define the containers 
+of various data types that are commonly used in research,
+- a list of reserved "name" fields and formats to facilitate the grouping and 
+organization of hierarchical data,
+- a list of format properties for the associated "value" field to store the 
+specific metadata of the data points, and, in addition,
 - a set of conversion rules between the text and binary forms.
 
 In the following sections, we will define the basic JData grammar, data models, 
@@ -141,7 +140,7 @@ hashes/associative arrays, trees and graphs. The expressions of these data
 structures in both text and binary forms are specified and exemplified, and 
 their conversion rules are defined.
 
-Data Storage Grammar
+Grammar
 ------------------------
 
 ### Text-based JData Storage Grammar
@@ -150,7 +149,7 @@ The text-based JData grammar is identical to the JSON grammar defined in
 [RFC4627], except that JData also accepts the Concatenated JSON Object 
 Collection (CJOC), also known as the Concatenated JSON streaming format, in the 
 following form:
-```javascript
+```
     {
        "object1":{}
     }
@@ -163,11 +162,11 @@ following form:
 In CJOC, multiple JSON objects can be included inside a single file or stream, 
 separated by 0 or multiple permitted white spaces, namely
 
-`LF (U+000A), CR (U+000D), tab (U+0009), or space (U+0020)`
+`LF (U+000A), CR (U+000D), tab (U+0009), or space (U+0020)`
 
 In the case where 
 [JSONReference](http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03) is 
-used, the document must have only one root object, and must not contain an AJOC.
+used, the document must have only one root object, and must not contain an CJOC.
 
 ### Binary JData Storage Grammar
 
@@ -175,7 +174,7 @@ The binary JData grammar is identical to the UBJSON grammar defined in
 [ubjson.org (Draft 12)](http://ubjson.org), with the array grammar extension to 
 support N-dimensional arrays:
 
-`[[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]`
+`[[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]`
 
 where the integer type can be one of the UBJSON integer types (i,U,I,l,L), and 
 nx, ny, and nz ... are all non-negative numbers specifying the dimensions of 
@@ -186,37 +185,71 @@ As a special note, all UBJSON integer types must be stored in the Big-Endian
 format, according to the specification; the storage to the floating point types 
 (d,D) follows the IEEE 754 specification.
 
-Data Storage Models
+Data Models
 ----------------------
 
-In JData, an element with no child (the first-level sub-item) is called a 
-**"leaf"**. A meaningful datum, either in the form of a simple data point or a 
-complex structure, is referred to as a **"data record"**. A data record can be 
-a single leaf, or a collection of leaves. A set of logically connected data 
-records, such as the citation information of a paper, is referred to as a 
-**"dataset"**; a group of datasets of logical connections is referred to as a 
-**"data group"**. The top-most level of the JSON object is referred to as the 
+### Topological model
+
+Topologically, an element with no child (the first-level sub-item) is called a 
+**"leaflet"**. A multi-element data unit completely made of leaflets, or empty, is called a 
+**"compound leaf"**, or **"leaf"** in short. A multi-element data unit made of both 
+leaves and leaflets is called a **"branch"**.The top-most level of a JSON object is referred to as the 
 **"root"**. If a JData document contains multiple JSON/UBJSON objects in the 
-form of an CJOC, the upper-most level is referred to as a "super-root". The 
-leaves that contain weakly-relevant or irrelevant data to the processing is 
-referred to as the "auxiliary data". The auxiliary data can appear at any level 
-under the root or super-root.
+form of an CJOC, the upper-most level is referred to as a **"super-root"**. A root
+can be a branch or a leaf, but not a leaflet. A super-root must contain at least two
+roots.
 
-In the above definitions, only "leaf", "root" and "super-root" have specific 
-meanings. The interpretations to the "meaningful datum", "logically connected 
-data", and "weakly-relevant or irrelevant data" are application dependent.
+A leaflet can only take one of the two possible forms: `value`, referred to as the
+"index leaflet", and a `"name": value` pair, referred to as the "named leaflet". 
+Here `value` should not contain any sub-element. A leaf can only take one of the 
+two forms:
 
-A dataset can be stored directly at any level under the root object and does 
-not have to be a member of a data group. One dataset can be embedded at any 
-level inside another dataset.
+a structure - a leaf made of named leaflets:
+```
+   {
+       named_leaflet1, named_leaflet2, ...
+   }
+```
+or an array - a leaf made of indexed leaflets
+```
+   [
+       indexed_leaflet1, indexed_leaflet2, ...
+   ]
+```
+A leaf can be named, such as `"name":{...}` or `"name":[]`, or unnamed (i.e. indexed), i.e. `{...}` or `[...]`.
 
-A data group must be either empty, or contains at least one dataset, or 
-sub-data group as its direct child.
+Similar to a leaf, a branch can also have 4 fours: named structure/array, 
+or index structure/array, with the difference that the element of the branch
+can be other branches or leaves.
 
-Multiple data groups can be stored at any level under the root object. A data 
-group can not be a member, at any level, of a dataset.
+The topological elements - "leaflet", "leaf", "branch", "root" and "super-root" - have 
+specific meanings according to the definitions above.
 
-```javascript
+### Semantic model
+
+Semantically, a "meaningful" datum, either in the form of a simple data point or a 
+complex structure, is referred to as a **"data record"**. A data record can be 
+a leaflet, a leaf, or a collection of leaflets or leaves. A set of "logically connected" data 
+records, such as the citation information of a paper, is referred to as a 
+**"dataset"**; a group of datasets of "logical connections" is referred to as a 
+**"data group"**. The leaves that contain "weakly-relevant" or "irrelevant" data to the processing is 
+referred to as the **"auxiliary data"**. The auxiliary data can appear at any 
+level in the data annotation hierarchy.
+
+The interpretations to the "meaningful datum", "logically connected data", and 
+"weakly-relevant or irrelevant data" are application dependent.
+
+The data organization annotations are ranked in the below order, from the highest 
+level to the lowest level:
+
+` super-root > root >=  data group >= dataset >= data record >= leaf > leaflet `
+
+for each annotation level, it can only contain elements annotated of the same 
+level or lower levels, but not the upper level annotations. All data annotation
+objects can be empty, i.e. do not contain any element. An example JData 
+organization schematic is shown below
+
+```
     super-root{
         root1{
             group1{
@@ -230,6 +263,7 @@ group can not be a member, at any level, of a dataset.
             group2{
                 dataset3{...}
             }
+	        group3{}
             dataset4{...}
             ... other auxiliary data ...
         }
@@ -238,35 +272,53 @@ group can not be a member, at any level, of a dataset.
         }
     }
 ```
+A data group, dataset or data record can be topologically presented as a branch 
+(including root) or a leaf, but not a leaflet.
 
-Data Storage Keywords
+
+Data Annotation Keywords
 ------------------------
 
-All JData keywords are case sensitive. Data groups, datasets and data record 
+All JData keywords are case sensitive. Data groups, datasets and data records 
 can contain metadata at the begining of the record to include additional 
 information regarding the data, such as name, create date and user-defined 
-headers.
+headers. However, metadata can also present in any branch or leaf.
 
 ### Metadata
 
-Metadata records can be associated with a data group, dataset or data record. 
-It is optional, but if appears, it must be defined as the 1st child (sub-item) 
-of the data object.
+Metadata records can be associated with a data group, dataset or data record
+(or any branch or leaf). It is optional, but if appears, it must be defined 
+as the 1st child (sub-item) of the data object.
 
-A metadata record looks like the following
+If the data to be annotated is a structure, the metadata record is defined 
+by a named leaf with a specific keyword "\_MetaData\_". An example can be 
+found below:
 
-```javascript
-"\_MetaData\_": {
+```
+  {
+    "_MetaData_": {
+       "_Name_": "...",
+       "_CreateTime_": "...",
+       "_UniqueID_": "...",
+       "_SequenceID_": "...",
+       "UserDefinedTag1": "...",
+       "UserDefinedTag2": "...",
+       ...
+    },
+    ...
+  }
+```
+If the data to be annotated is an array, the metadata record is an indexed leaf as
 
-   "_Name_": "...",
-   "_CreateTime_": "...",
-   "_UniqueID_": "...",
-   "_SequenceID_": "...",
-   "UserDefinedTag1": "...",
-   "UserDefinedTag2": "...",
-   ...
-
-}
+```
+  [
+    {
+      "_Name_": "...",
+      "_CreateTime_": "...",
+     ...
+    }
+    ...
+  ]
 ```
 
 The only required sub-field of the meta-data is "\_Name\_". All other metadata 
@@ -279,35 +331,34 @@ object. Otherwise, it is called a "named" object.
 ### Data Group Keywords
 
 The use of data grouping keywords is not mandatory in a JData document. 
-Nonetheless, properly partitioning and grouping the data based on their logical 
-connections and name the components accordingly can greatly enhance the 
+Nonetheless, properly partitioning and grouping the data based on their semantic 
+relationships and name the components accordingly can greatly enhance the 
 portability and readability of the data, and thus, are strongly recommended.
 
 #### Data Group
 
 A data group can contain a metadata header
 
-```javascript
-"_DataGroup_": { 
-    "_MetaData_":{
-        ...
-    }
-    ...
+```
+"_DataGroup_": { 
+    "_MetaData_":{
+        ...
+    }
+    ...
 }
 ```
-
 or "anonymous" data group
 
-` "_DataGroup_": { ... }`
+` "_DataGroup_": { ... }`
 
 or
 
-` "_DataGroup_": [ ... ]`
+` "_DataGroup_": [ ... ]`
 
 The data group tag can contain an optional id parameter, specified in the 
 following format
 
-`"_DataGroup_,id='name of the data group'"`
+`"_DataGroup_,id='name of the data group'"`
 
 one or more above mentioned white spaces may be inserted before or after "," 
 and "=".
@@ -326,29 +377,29 @@ is recommended to specify a name that is unique throughout the JData document
 
 Similarly, a dataset is specified by
 
-`"_Dataset_": { ... }`
+`"_Dataset_": { ... }`
 
 or
 
-` "_Dataset_": [ ... ]`
+` "_Dataset_": [ ... ]`
 
 with an optional name parameter in the following format:
 
-`"_Dataset_,name='name of the dataset'"`
+`"_Dataset_,name='name of the dataset'"`
 
 ####  Data record
 
 Similarly, a dataset is specified by
 
-`"_DataRecord_": { ... }`
+`"_DataRecord_": { ... }`
 
 or
 
-` "_DataRecord_": [ ... ]`
+` "_DataRecord_": [ ... ]`
 
 with an optional name parameter in the following format:
 
-`"_DataRecord_,name='name of the data record'"`
+`"_DataRecord_,name='name of the data record'"`
 
 ### Data Presentation Keywords
 
@@ -359,15 +410,15 @@ In this document, we consider the following general data storage models:
 -   a full array (empty, 1D, 2D, 3D or in higher dimensions)
 -   a sparse array (empty, 1D, 2D, 3D or in higher dimensions)
 
-`_ArraySize_, _ArrayType_, _ArrayData_,`
-`_ArrayIsComplex_, _ArrayIsSparse_`
+`_ArraySize_, _ArrayType_, _ArrayData_,`
+`_ArrayIsComplex_, _ArrayIsSparse_`
 
 #### Meta-data Keywords
 
 In this document, we defines the following JMesh keywords to represent 
 non-geometric meta-data:
 
-`_Author_, _CreationTime_, _Comment_`
+`_Author_, _CreationTime_, _Comment_`
 
 
 Recommended File Specifiers
