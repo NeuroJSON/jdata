@@ -190,51 +190,48 @@ Data Models
 
 ### Topological model
 
-Topologically, an element with no child (the first-level sub-item) is called a 
-**"leaflet"**. A multi-element data unit completely made of leaflets, or empty, is called a 
-**"compound leaf"**, or **"leaf"** in short. A multi-element data unit made of both 
-leaves and leaflets is called a **"branch"**.The top-most level of a JSON object is referred to as the 
-**"root"**. If a JData document contains multiple JSON/UBJSON objects in the 
-form of an CJOC, the upper-most level is referred to as a **"super-root"**. A root
-can be a branch or a leaf, but not a leaflet. A super-root must contain at least two
-roots.
+Topologically, we define different parts of a JData document using the below nomenclatures
+
+* **"leaflet"** : an element with no child
+* **"compound leaf"**, or **"leaf"**: a multi-element data unit completely made of leaflets, or empty
+* **"branch"**: a multi-element data unit made of both leaves and leaflets.
+* **node**: a leaflet, a leaf or a branch
+* **composite node**: a leaf or a branch
+* **root**: the top-most node of a JSON object
+* **super-root**: the top level node in a JData document containing multiple 
+JSON/UBJSON objects in the form of an CJOC
+* **named node**: a node in the form of `"name":{...}` or `"name":[]`, in the case 
+of named and index leaves and branches, respectively, or `"name":value` in the case
+of a leaflet
+* **index node**: a node in the form of `{...}` or `[]`, in the case of named 
+and index leaves and branches, respectively, or a single `value` in the case
+of a leaflet
+* **a structure**: a named or index node made of named sub-nodes, represented by `{...}`, 
+a structure can be empty
+* **an array**: a named or index node made of index sub-nodes, represented by `[...]`,
+an array can be empty
 
 A leaflet can only take one of the two possible forms: `value`, referred to as the
 "index leaflet", and a `"name": value` pair, referred to as the "named leaflet". 
-Here `value` should not contain any sub-element. A leaf can only take one of the 
-two forms:
+Here `value` should not contain any sub-element.
 
-a structure - a leaf made of named leaflets:
-```
-   {
-       named_leaflet1, named_leaflet2, ...
-   }
-```
-or an array - a leaf made of indexed leaflets
-```
-   [
-       indexed_leaflet1, indexed_leaflet2, ...
-   ]
-```
-A leaf can be named, such as `"name":{...}` or `"name":[]`, or unnamed (i.e. indexed), i.e. `{...}` or `[...]`.
-
-Similar to a leaf, a branch can also have 4 fours: named structure/array, 
-or index structure/array, with the difference that the element of the branch
-can be other branches or leaves.
-
-The topological elements - "leaflet", "leaf", "branch", "root" and "super-root" - have 
-specific meanings according to the definitions above.
+The topological elements of a JData document - "leaflet", "leaf", "branch", "root" 
+and "super-root" - have specific meanings according to the definitions above.
 
 ### Semantic model
 
-Semantically, a "meaningful" datum, either in the form of a simple data point or a 
-complex structure, is referred to as a **"data record"**. A data record can be 
-a leaflet, a leaf, or a collection of leaflets or leaves. A set of "logically connected" data 
-records, such as the citation information of a paper, is referred to as a 
-**"dataset"**; a group of datasets of "logical connections" is referred to as a 
-**"data group"**. The leaves that contain "weakly-relevant" or "irrelevant" data to the processing is 
-referred to as the **"auxiliary data"**. The auxiliary data can appear at any 
-level in the data annotation hierarchy.
+To more efficiently process the represented data, we can semantically annotate the 
+underying data stucture and organize them for finer granularity. The data grouping 
+annotations are
+
+* **"data record"**: a "meaningful" datum, either in the form of a simple data point 
+(leaflet) or a complex structure (a composite node); a data record can be a leaflet, 
+a leaf, or a collection of leaflets or leaves. 
+* **"dataset"**: a set of "logically connected" data records, such as the citation 
+information of a paper
+* **"data group"**: a group of datasets of "logical connections" 
+* **"auxiliary data"**: nodes that store "weakly-relevant" or "irrelevant" data to 
+the processing. the auxiliary data can appear at any level in the data annotation hierarchy.
 
 The interpretations to the "meaningful datum", "logically connected data", and 
 "weakly-relevant or irrelevant data" are application dependent.
@@ -280,53 +277,10 @@ Data Annotation Keywords
 ------------------------
 
 All JData keywords are case sensitive. Data groups, datasets and data records 
-can contain metadata at the begining of the record to include additional 
-information regarding the data, such as name, create date and user-defined 
-headers. However, metadata can also present in any branch or leaf.
+can contain metadata to include additional information regarding the data, 
+such as name, create date and user-defined headers. However, metadata can 
+also present in any branch or leaf.
 
-### Metadata
-
-Metadata records can be associated with a data group, dataset or data record
-(or any branch or leaf). It is optional, but if appears, it must be defined 
-as the 1st child (sub-item) of the data object.
-
-If the data to be annotated is a structure, the metadata record is defined 
-by a named leaf with a specific keyword "\_MetaData\_". An example can be 
-found below:
-
-```
-  {
-    "_MetaData_": {
-       "_Name_": "...",
-       "_CreateTime_": "...",
-       "_UniqueID_": "...",
-       "_SequenceID_": "...",
-       "UserDefinedTag1": "...",
-       "UserDefinedTag2": "...",
-       ...
-    },
-    ...
-  }
-```
-If the data to be annotated is an array, the metadata record is an indexed leaf as
-
-```
-  [
-    {
-      "_Name_": "...",
-      "_CreateTime_": "...",
-     ...
-    }
-    ...
-  ]
-```
-
-The only required sub-field of the meta-data is "\_Name\_". All other metadata 
-sub-field are optional. The JData metadata record supports user-defined 
-keywords.
-
-A data object that does not contain metadata record is called "anonymous" 
-object. Otherwise, it is called a "named" object.
 
 ### Data Group Keywords
 
@@ -337,17 +291,7 @@ portability and readability of the data, and thus, are strongly recommended.
 
 #### Data Group
 
-A data group can contain a metadata header
-
-```
-"_DataGroup_": { 
-    "_MetaData_":{
-        ...
-    }
-    ...
-}
-```
-or "anonymous" data group
+A data group can be stored in the form of a named node, either 
 
 ` "_DataGroup_": { ... }`
 
@@ -355,23 +299,45 @@ or
 
 ` "_DataGroup_": [ ... ]`
 
-The data group tag can contain an optional id parameter, specified in the 
-following format
+A data group annotation can have a name in the below form
 
-`"_DataGroup_,id='name of the data group'"`
+` "_DataGroup_(a name string): {}`
 
-one or more above mentioned white spaces may be inserted before or after "," 
-and "=".
+or
 
-A unique id parameter must be given when multiple data groups appear under the 
-same parent. The parameterized name tag must be a valid JSON string, consisting 
-of any valid UNICODE characters or one of the 9 escape formats [RFC4627]. The 
-"name" parameter must be enclosed by a pair of single quotes.
+` "_DataGroup_(a name string): []`
 
-Removing the optional white spaces, the name parameter of the data group must 
-be unique among the sub-items of it's parent. Although it is not required, it 
-is recommended to specify a name that is unique throughout the JData document 
-(including the linked/reference documents if present).
+If multiple data groups are stored inside a structure, a unique name 
+string must be provided for each data group. For example
+
+```
+  {
+      "_DataGroup_(name1)":{...},
+      "_DataGroup_(name2)":{...},
+      "_DataGroup_(name3)":[...],
+      ...
+  }
+```
+When defining one of the elements of an array object as a data group, one 
+must convert that index node into a structure. For example, in the below
+array
+```
+  [
+      indexed_node1, indexed_node2, indexed_node3,...
+  ]
+```
+if one needs to define the `indexed_node2` into a data group, one must define
+```
+  [
+      indexed_node1,
+      {
+          "_DataGroup_(name1)": [index_node2]
+      },
+      index_node3,
+      ...
+  ]
+```
+where the name is optional.
 
 #### Dataset
 
@@ -385,11 +351,11 @@ or
 
 with an optional name parameter in the following format:
 
-`"_Dataset_,name='name of the dataset'"`
+`"_Dataset_(a name string)": ...`
 
 ####  Data record
 
-Similarly, a dataset is specified by
+Also similarly, a dataset is specified by
 
 `"_DataRecord_": { ... }`
 
@@ -399,7 +365,76 @@ or
 
 with an optional name parameter in the following format:
 
-`"_DataRecord_,name='name of the data record'"`
+`"_DataRecord_(a name string)"`
+
+
+### Metadata
+
+Metadata records can be associated with a data group, dataset or data record
+(or any branch or leaf). It is optional. Metadata can have two forms
+
+* **inline metadata**: metadata defined as part of the annotation tag string, and
+* **metadata node**: a metadata structure added as the first element of a node (named or indexed)
+
+The inline metadata is defined by attaching a series of comma-separated `property=value` 
+strings to the data group keywords (_DataGroup_,_Dataset_,_DataRecord_), separated by "::".
+For example
+
+`"_{DataGroup,Dataset,DataRecord}_(name)::Property1=...,Property2=...,..."`
+
+The `property` name should not contain space or comma. If comma appears inside the `value`,
+it must be escaped using the form `\,`. 
+
+An inline metadata can be attached to any named node, for example
+
+`"name::Property1=...,Property2=...,..."`
+
+One or more above mentioned white spaces may be inserted before or after separators "::", "," 
+and "=".
+
+The inline metadata is primarily used to store simple properties. When storage of more complex 
+metadata is needed, a dedicated "metadata node" shall be inserted to the data object as the
+first element of the annotated object. 
+
+For example, if the data to be annotated is a structure, the metadata node is defined 
+by a named leaf with a specific keyword "\_MetaData\_". An example can be 
+found below:
+
+```
+  {
+    "_MetaData_": {
+       "Property1": "...",
+       "Property2": "...",
+       "Property3": "...",
+       ...
+    },
+    named_node1,
+    named_node2,
+    ...
+  }
+```
+If the data to be annotated is an array, the metadata record is an indexed leaf as
+
+```
+  [
+    {
+       "_MetaData_": {
+         "Property1": "...",
+         "Property2": "...",
+         "Property3": "...",
+         ...
+       },
+    }
+    indexed_node1,
+    indexed_node2,
+    ...
+  ]
+```
+
+The only required sub-field of the meta-data is "\_Name\_". All other metadata 
+sub-field are optional. The JData metadata record supports user-defined 
+keywords.
+
 
 ### Data Presentation Keywords
 
