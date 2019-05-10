@@ -1,11 +1,10 @@
  JData: a general-purpose data storage and interchange format
 ============================================================
 
-- **Status of This Document**: *This document is current under development.
-It does not specify a standard of any kind.*
+- **Status of This Document**: This document is current under development.
 - **Copyright Notice**: Copyright (C) Qianqian Fang (2015, 2019).
 - **License**: Apache License, Version 2.0
-- **Version**: RFC.pre.0
+- **Version**: 0.4.8
 - **Abstract**:
 
 JData is a general-purpose data interchange format. It was derived
@@ -176,14 +175,14 @@ support N-dimensional arrays:
 
 `[[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]`
 
-where the integer type can be one of the UBJSON integer types (i,U,I,l,L), and 
-nx, ny, and nz ... are all non-negative numbers specifying the dimensions of 
+where the integer type can be one of the UBJSON integer types (`i,U,I,l,L`), and 
+`nx`, `ny`, and `nz` ... are all non-negative numbers specifying the dimensions of 
 the N-dimensional array. The binary data of the N-dimensional array is then 
 serialized in the **column-major** format (similar to MATLAB or FORTRAN) order.
 
 As a special note, all UBJSON integer types must be stored in the Big-Endian 
 format, according to the specification; the storage to the floating point types 
-(d,D) follows the IEEE 754 specification.
+(`d,D`) follows the IEEE 754 specification.
 
 Data Models
 ----------------------
@@ -192,9 +191,9 @@ Data Models
 
 Topologically, we define different parts of a JData document using the below nomenclatures
 
-* **"leaflet"** : an element with no child
-* **"compound leaf"**, or **"leaf"**: a multi-element data unit completely made of leaflets, or empty
-* **"branch"**: a multi-element data unit made of both leaves and leaflets.
+* **leaflet** : an element with no child
+* **compound leaf**, or **"leaf"**: a multi-element data unit completely made of leaflets, or empty
+* **branch**: a multi-element data unit made of both leaves and leaflets.
 * **node**: a leaflet, a leaf or a branch
 * **composite node**: a leaf or a branch
 * **root**: the top-most node of a JSON object
@@ -224,13 +223,13 @@ To more efficiently process the represented data, we can semantically annotate t
 underying data stucture and organize them for finer granularity. The data grouping 
 annotations are
 
-* **"data record"**: a "meaningful" datum, either in the form of a simple data point 
+* **data record**: a "meaningful" datum, either in the form of a simple data point 
 (leaflet) or a complex structure (a composite node); a data record can be a leaflet, 
 a leaf, or a collection of leaflets or leaves. 
-* **"dataset"**: a set of "logically connected" data records, such as the citation 
+* **dataset**: a set of "logically connected" data records, such as the citation 
 information of a paper
-* **"data group"**: a group of datasets of "logical connections" 
-* **"auxiliary data"**: nodes that store "weakly-relevant" or "irrelevant" data to 
+* **data group**: a group of datasets of "logical connections" 
+* **auxiliary data**: nodes that store "weakly-relevant" or "irrelevant" data to 
 the processing. the auxiliary data can appear at any level in the data annotation hierarchy.
 
 The interpretations to the "meaningful datum", "logically connected data", and 
@@ -260,7 +259,7 @@ organization schematic is shown below
             group2{
                 dataset3{...}
             }
-	        group3{}
+	    group3{}
             dataset4{...}
             ... other auxiliary data ...
         }
@@ -281,6 +280,17 @@ can contain metadata to include additional information regarding the data,
 such as name, create date and user-defined headers. However, metadata can 
 also present in any branch or leaf.
 
+Below is a short summary of the JData data annotation/storage keywords to be introduced
+
+* **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
+* **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, `_ArrayIsSparse_`,`_ArrayData_`,`_ArrayCompressionMethod_`,`_ArrayCompressionSize_`, 
+`_ArrayCompressedData_`
+* **Tree**: `_TreeNode_`,`_TreeChildren_`,`_TreeData_`
+* **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
+* **Graph**: `_GraphNodes_`,`_GraphEdges_`,`_GraphMatrix_`,`_GraphData_`
+* **Table**: `_TableData_`
+* **Inline metadata**: `"item_name::Property1=value1,Property2=value2,...": ...`
+* **Metadata record**: `{"_DataInfo_":{...}}`
 
 ### Data Group Keywords
 
@@ -337,7 +347,7 @@ if one needs to define the `indexed_node2` into a data group, one must define
       ...
   ]
 ```
-where the name "(name1)" is optional.
+where the name `"(name1)"` is optional.
 
 #### Dataset
 
@@ -377,32 +387,32 @@ Metadata records can be associated with a data group, dataset or data record
 * **metadata node**: a metadata structure added as the first element of a node (named or indexed)
 
 The inline metadata is defined by attaching a series of comma-separated `property=value` 
-strings to the data group keywords (_DataGroup_,_Dataset_,_DataRecord_), separated by 
-two colons, i.e. "::", for example
+strings to the data group keywords (`_DataGroup_`,`_Dataset_`,`_DataRecord_`), separated by 
+two colons, i.e. `"::"`, for example
 
 `"_{DataGroup,Dataset,DataRecord}_(name)::Property1=...,Property2=...,..."`
 
 The `property` name should not contain space or comma. If comma appears inside the `value`,
-it must be escaped using the form `\,`. 
+it must be escaped using the form `"\,"`. 
 
 An inline metadata can be attached to any named node, for example
 
 `"name::Property1=...,Property2=...,..."`
 
-One or more above mentioned white spaces may be inserted before or after separators "::", "," 
-and "=".
+One or more above mentioned white spaces may be inserted before or after separators `"::"`, `","` 
+and `"="`.
 
 The inline metadata is primarily used to store simple properties. When storage of more complex 
 metadata is needed, a dedicated "metadata node" shall be inserted to the data object as the
 first element of the annotated object. 
 
 For example, if the data to be annotated is a structure, the metadata node is defined 
-by a named leaf with a specific keyword "\_MetaData\_". An example can be 
+by a named leaf with a specific keyword `"_DataInfo_"`. An example can be 
 found below:
 
 ```
   {
-    "_MetaData_": {
+    "_DataInfo_": {
        "Property1": "...",
        "Property2": "...",
        "Property3": "...",
@@ -418,7 +428,7 @@ If the data to be annotated is an array, the metadata record is an indexed leaf 
 ```
   [
     {
-       "_MetaData_": {
+       "_DataInfo_": {
          "Property1": "...",
          "Property2": "...",
          "Property3": "...",
@@ -452,10 +462,10 @@ The following constants are supported by this version of JData specification
 
 * NaN: An NaN defined by the IEEE 754 standard shall be stored as `"_NaN_"` as a string leaflet
 * +/-Inf: A +infinity or -infinity defined by the IEEE 754 standard shall be stored as a 
-string leaflet `"+_Inf_"` and `"-_Inf"`, respectively
-* logical true/false: A logical true/false should be represented by the JSON true/false 
-logical values, or [T]/[F] markers in UBJSON
-* Null: a Null (empty) value can be stored as null in JSON and [Z] in UBJSON
+string leaflet `"+_Inf_"` and `"-_Inf_"`, respectively
+* logical `true`/`false`: A logical `true`/`false` should be represented by the JSON true/false 
+logical values, or `[T]`/`[F]` markers in UBJSON
+* Null: a Null (empty) value can be stored as null in JSON and `[Z]` in UBJSON
 
 
 #### N-Dimensional Array Storage Keywords
@@ -486,13 +496,13 @@ Below is an example of 4x3x2 3D array
   [
       [
           [1,9,6,0],
-	  [2,9,3,1],
-	  [8,0,9,6]
+          [2,9,3,1],
+          [8,0,9,6]
       ],
       [
           [6,4,2,7],
-	  [8,5,1,2],
-	  [3,3,2,6]
+          [8,5,1,2],
+          [3,3,2,6]
       ]
   ]
 ```
@@ -509,7 +519,7 @@ to facilitate storage and loading of N-D arrays in the binary format. Please ref
 In the annotated array storage format, one shall use a structure to store an N-D array. This
 allows one to use additional fields to store additional information regarding the input array.
 
-The annotated array format is shown below for a solid 2x3 array a=[[1,2],[3,4],[5,6]]
+The annotated array format is shown below for a solid 2x3 array `a=[[1,2],[3,4],[5,6]]`
 ```
    {
        "_ArrayType_": "typename",
@@ -518,14 +528,15 @@ The annotated array format is shown below for a solid 2x3 array a=[[1,2],[3,4],[
    }
 ```
 Here, the array annotation keywords are defined below:
-* **"_ArrayType_"**: (required) a case-insensitive string value to specify the type of the data, see below
-* **"_ArraySize_"**: (required) an integer-valued (see below) 1D column vector, storing the dimensions 
+
+* **`"_ArrayType_"`**: (required) a case-insensitive string value to specify the type of the data, see below
+* **`"_ArraySize_"`**: (required) an integer-valued (see below) 1D column vector, storing the dimensions 
 of the N-D array
-* **"_ArrayData_"**: (required) a 1D column vector storing the serialized array values, using the 
+* **`"_ArrayData_"`**: (required) a 1D column vector storing the serialized array values, using the 
 column-major element order
 
 To facilitate pre-allocation of the buffer for storage of the array, it is required that 
-the "_ArrayType_" and "_ArraySize_" nodes must be presented before "_ArrayData_".
+the `"_ArrayType_"` and `"_ArraySize_"` nodes must be presented before `"_ArrayData_"`.
 
 The supported data types are similar to those supported by the UBJSON format, i.e.
 
@@ -543,11 +554,12 @@ The supported data types are similar to those supported by the UBJSON format, i.
 The first 8 data types are considered "integer" types, and the last two types are considered 
 "floating-point" types.
 
+
 ##### Complex-valued arrays
 
 JData supports the storage of complex values or arrays using only the annotated N-D array storage
 format. In this case, a named node `"_ArrayIsComplex_":true` or `"_ArrayIsComplex_":1` 
-is added into the structure. In the meantime, the "_ArrayData_" becomes the concatenation of the
+is added into the structure. In the meantime, the `"_ArrayData_"` becomes the concatenation of the
 serialized real and imaginary parts of the complex array, with the real-part in the first half, and
 the imaginary-part in the 2nd half.
 
@@ -562,7 +574,7 @@ For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+
    }
 ```
 
-The "_ArrayIsComplex" node must be presented before "_ArrayData_".
+The `"_ArrayIsComplex_"` node must be presented before `"_ArrayData_"`.
 
 ##### Sparse arrays
 
@@ -593,13 +605,13 @@ it can be saved as the following JSON format
    }
 ```
 
-The "_ArrayIsSparse_" node must be presented before "_ArrayData_".
+The `"_ArrayIsSparse_"` node must be presented before `"_ArrayData_"`.
 
 ##### Sparse complex-valued arrays
 
 Using the combination of `"_ArrayIsComplex_"` and `"_ArrayIsSparse_"`, one can store
 a complex valued sparse array using JData. In this case, both `"_ArrayIsComplex_":true` 
-and `"_ArrayIsSparse_":true` shall be presented in the structure, with "_ArrayData_" 
+and `"_ArrayIsSparse_":true` shall be presented in the structure, with `"_ArrayData_"` 
 ordered by serialized non-zero element indices (left-most first, and so on), followed
 by the serialized real-values of the 
 
@@ -628,19 +640,85 @@ JData supports in-file data compression to enhance space-efficiency of the gener
 files. Compressed data format is only supported in the annotated array storage format.
 
 Two additional nodes are added to the annotated array structure
-* **_ArrayCompressionMethod_**: a string leaflet to store the compression method, for
-example, "zlib", "gzip" or "lzma"
-* **_ArrayCompressionSize_**: the pre-processed array size, in the format specified by
-"_ArrayType_", before the array binary stream casted to byte stream and compression
 
-In addition, the "_ArrayData_" node is replaced by "_ArrayCompressedData_". In the 
-case of JSON flavored JData files, "_ArrayCompressedData_" has a string value storing
+* **`_ArrayCompressionMethod_`**: a string leaflet to store the compression method, for
+example, "zlib", "gzip" or "lzma"
+* **`_ArrayCompressionSize_`**: the pre-processed array size, in the format specified by
+`"_ArrayType_"`, before the array binary stream casted to byte stream and compression
+
+In addition, the `"_ArrayData_"` node is replaced by `"_ArrayCompressedData_"`. In the 
+case of JSON flavored JData files, `"_ArrayCompressedData_"` has a string value storing
 the "Base64" encoded compressed byte-stream of the pre-processed array. In the case of
-UBJSON flavored JData, "_ArrayCompressedData_" directly stores the compressed byte 
+UBJSON flavored JData, `"_ArrayCompressedData_"` directly stores the compressed byte 
 stream of the pre-processed array without "Base64" encoding.
 
-When a compressed array format is used, "_ArrayCompressionMethod_" and 
-"_ArrayCompressionSize_" must appear before "_ArrayCompressedData_".
+When a compressed array format is used, `"_ArrayCompressionMethod_"` and 
+`"_ArrayCompressionSize_"` must appear before `"_ArrayCompressedData_"`.
+
+
+#### Associative or hashed arrays
+
+In an associative array or hashed array, the element can be accessed using a string-valued
+key. For example, the below pseudo code defines a 3-element associative array `@a` with
+3 unique keys
+```
+   @a={'Mike'->21, 'Julia'->25, 'Steve'->26}
+```
+Such data structure can be conveniently represented using JSON/UBJSON as
+```
+   {
+       "Mike":  21,
+       "Julia": 25,
+       "Steve": 26
+   }
+```
+In an associative array, the keys are supposed to be unique. If the keys are defined by 
+numerical values or complex data structures, a user-defined hash function must be applied
+to the key to convert those to a unique string for each entry and ensure the mapping 
+is unchanged.
+
+#### Tables
+
+A table data structrure is defined by a 2-dimensional grid of data indexed by the table
+columns (fields) and rows (records). For example
+
+```
+  Name   Age   Degree  Height
+  ----  ------ ------  ------
+  Mike   21     BS      71.2
+  Julia  25     MS      67.0
+  Steve  26     BE      69.1
+```
+Such data can also be stored in JSON/UBJSON in two forms: 
+
+* **Array of structs**: the table data can be serialized by grouping records in rows, such as
+
+```
+   [
+       {"Name": "Mike",  "Age": 21, "Degree": "BS", "Height": 71.2},
+       {"Name": "Julia", "Age": 25, "Degree": "MS", "Height": 67.0},
+       {"Name": "Steve", "Age": 26, "Degree": "BE", "Height": 69.1},
+   ]
+```
+
+* **Struct of arrays**: the table data can also be organized in columns, where often 
+* contains the same datatypes. Using the same above example, one can write the following 
+* JData form
+```
+   {
+       "Name":   ["Mike","Julia","Steve"],
+       "Age":    [21,25,26],
+       "Degree": ["BS","MS","BE"],
+       "Height": [71.2,67.0,69.1]
+   }
+```
+
+The choice of the conversion form is user dependent. Typically, the "structure of array" forms 
+may have smaller in file sizes.
+
+The above JData table can be enclosed inside an optional field `"_TableData_(table_name)":{...}` 
+(if inside a structure) or `{"_TableData_":{...}}` (if inside an array) to inform the 
+parser the start of the data structure.
 
 
 #### Trees
@@ -679,13 +757,13 @@ can be represented by the below JSON structure
      "_TreeNode_(root)": data0,
      "_TreeChildren_": [
          {"_TreeNode_(node1)": data1},
-	 {
-	     "_TreeNode_(node2)": data2,
-	     "_TreeChildren_": [
-	         {"_TreeNode_(node2.1): data2.1},
-	         {"_TreeNode_(node2.2): data2.2}
-	     ]
-	 },
+         {
+             "_TreeNode_(node2)": data2,
+             "_TreeChildren_": [
+                 {"_TreeNode_(node2.1): data2.1},
+                 {"_TreeNode_(node2.2): data2.2}
+             ]
+         },
          {"_TreeNode_(node3)": data3},
      ]
   }
@@ -701,21 +779,27 @@ about the tree nodes, for example
      "_TreeNode_(root)::NodeID=1,ParentID=0,Path=#root": data0,
      "_TreeChildren_": [
          {"_TreeNode_(node1)::NodeID=2,ParentID=1,Path=#root#node1": data1},
-	 {
-	     "_TreeNode_(node2)::NodeID=3,ParentID=1": data2,
-	     "_TreeChildren_": [
-	         {"_TreeNode_(node2.1)::NodeID=4,ParentID=3": data2.1},
-	         {"_TreeNode_(node2.2)::NodeID=5,ParentID=3": data2.2}
-	     ]
-	 },
+         {
+             "_TreeNode_(node2)::NodeID=3,ParentID=1": data2,
+             "_TreeChildren_": [
+                 {"_TreeNode_(node2.1)::NodeID=4,ParentID=3": data2.1},
+                 {"_TreeNode_(node2.2)::NodeID=5,ParentID=3": data2.2}
+             ]
+         },
          {"_TreeNode_(node3)::NodeID=6,ParentID=1": data3},
      ]
   }
 ```
 Auxiliary data can be inserted to different levels of the above JData tree document
 as named nodes, as long as the name of the auxiliary node does not conflict with
-the "_TreeNode_(name)" and "_TreeChildren_" of the same level. Behaviors for parsing 
+the `"_TreeNode_(name)"` and `"_TreeChildren_"` of the same level. Behaviors for parsing 
 the auxiliary data are application dependent.
+
+The above JData tree can be enclosed inside an optional field `"_TreeData_(tree_name)":{...}` 
+(if inside a structure) or `{"_TreeData_":{...}}` (if inside an array) to inform the 
+parser the start of the data structure.
+
+
 
 #### Singly and doubly linked lists
 
@@ -756,16 +840,226 @@ shall be stored as
      }
   }
 ```
-If a node does not have next or prior element, the "_LinkNext_" or "_LinkPrior_" value should be 
-set to null.
+If a node does not have a next or prior element, the `"_LinkNext_"` or `"_LinkPrior_"` value 
+should be set to `null`.
 
+The name label referred in the `"_LinkNext_"` or `"_LinkPrior_"` fields has a scope limited to 
+the current list, i.e. the parent array one-level above the node. Multiple linked lists can 
+share the same names if they are stored in a parallel or nested fashion.
+
+The above linked list can be enclosed inside an optional field `"_LinkedList_(list_name)":[...]` 
+(if inside a structure) or `{"_LinkedList_":[...]}` (if inside an array) to inform the parser 
+the start of the data structure.
+
+
+#### Directed and undirected graphs
+
+In JData, we use the below keywords to encapsulate a graph data structure
+
+* **`"_GraphNodes_"`**: a JData array object to store the serialized node data
+* **`"_GraphEdges_"`**: a JData array object to store the connections between nodes. Each edge 
+is represented by a triplet in an array `["start node id", "end node id", "(optional) edge data"]`.
+
+For example, if we modify the above linked list by adding a directed edge from "node1" to 
+"node3" and from "node3" to "node2", such as the data suggested by this diagram
+
+```
+                    |---------------------------
+                    |                          V
+   head(data0)->node1(data1)->node2(data2)->node3(data3)
+                                 ^             |
+                                 |-------------|
+```
+we can then store this data structure as
+
+```
+    {
+        "_GraphNodes_":[
+              "head":  data0,
+              "node1": data1,
+              "node2": data2,
+              "node3": data3
+        ],
+        "_GraphEdges_":[
+               ["head",  "node1", edgedata01],
+               ["node1", "node2", edgedata12],
+               ["node1", "node3", edgedata13],
+               ["node2", "node3", edgedata23],
+               ["node3", "node2", edgedata32]
+        ]
+    }
+```
+The data associated with each edge (edgedata) in this example is optional and 
+
+By default, the graph is assumed to be a directed graph. If a user intends to store undirected 
+graph using the above format, one must use `"_GraphEdges_(false)"` or `"_GraphEdges_(0)"` to 
+enclose the edge data.
+
+The above graph data can be enclosed inside an optional field `"_GraphData_(graph_name)":{...}` 
+(if inside a structure) or `{"_GraphData_":{...}}` (if inside an array) to inform the parser the 
+start of the data structure.
+
+When no data or metadata are associated with the edges, one can also use the graph's adjacency 
+matrix to represent the connections between graph nodes. The adjacency matrix must only have 0 
+and 1 values, with a 1 at A(i,j) indicating a directed edge from the i-th node in the 
+`_GraphNode_` list to the j-th node in that list, and 0 indicating no connection.
+
+For example, the adjacency matrix of the above graph can be written as
+```
+           head    node1   node2   node3
+  head       0       1       0       0
+  node1      0       0       1       1
+  node2      0       0       0       1
+  node3      0       0       1       0
+```
+In this case, instead of using `_GraphEdges_`, we use `_GraphMatrix_` to store the
+adjacency matrix using the N-D array syntax above. For example, for the same graph, 
+we can write this matrix using direct form
+
+```
+    {
+        "_GraphNodes_":[
+              "head":  data0,
+              "node1": data1,
+              "node2": data2,
+              "node3": data3
+        ],
+        "_GraphMatrix_":[
+          [0,0,0,0],
+          [1,0,0,0],
+          [0,1,0,1],
+          [0,1,1,0]
+        ]
+    }
+```
+Notice that the matrix is serialized in the column-major order in the above example. Alternatively, one
+can also use the annotated array format to take advantage of the sparsity of the data:
+```
+    {
+        "_GraphNodes_":[
+              "head":  data0,
+              "node1": data1,
+              "node2": data2,
+              "node3": data3
+        ],
+        "_GraphMatrix_":{
+             "_ArrayTye_": "uint8",
+             "_ArraySize": [4,4],
+             "_ArrayIsSparse": true,
+             "_ArrayData_": [1,2,2,3,4, 2,3,4,4,2, 1,1,1,1,1]
+        }
+    }
+```
+One can also apply array compression, as explained above, to further reduce the file size
+```
+  {
+    ...
+	"_GraphMatrix_": {
+		"_ArrayType_": "uint8",
+		"_ArraySize_": [4,4],
+		"_ArrayCompressionSize_": [1,16],
+		"_ArrayCompressionMethod_": "zlib",
+		"_ArrayCompressedData_": "eJxjYGBgYGQAE0DIyAAAAC0ABg=="
+	}
+  }
+```
+here the `"_ArrayCompressedData_"` stores the column-major-serialized, byte-typecasted,
+zlib-compressed and lastly base64-encoded adjacency matrix.
+
+
+Indexing and Accessing JData
+------------------------------
+
+
+### Index vector
+
+Essentially, JData stores a serialized version of the complex data using collections 
+of sequential or nested nodes, either in the named or indexed form. To access
+any element (a leaflet, leaf or branch) of the JData document, one should use a vector 
+of indices that points to the specific node. 
+
+A JData-compliant library must be able to retrive JData elements via the below pseudo-code 
+interface using a linear index vector
+```
+   JD_Node item = JD_Get(JD_Node root, [i1, i2, i3, i4, ...])
+```
+where `i1` is the index of the data on the top-most level (relative to the root level of the 
+`"root"` object), `i2`, is the index along the 2nd level, and so on. Each index is an 
+integer, starting from 1, denoting the order
+of the data element among the serialized elements of the same level. In order words, if
+the current level is an array object, the index is the count of the elements before this data
+element plus 1; if the curernt level is a structure, the index is the count of the named 
+nodes appearing before this data plus 1. Using the tree data structure above, the linear index
+of each node is listed below on the right side:
+
+```
+  {
+     "_TreeNode_(root)": data0,                     <- [1]
+     "_TreeChildren_": [                            <- [2]
+         {"_TreeNode_(node1)": data1},              <- [2,1]
+         {                                          <- [2,2]
+             "_TreeNode_(node2)": data2,            <- [2,2,1]
+             "_TreeChildren_": [                    <- [2,2,2]
+                 {"_TreeNode_(node2.1): data2.1},   <- [2,2,2,1]
+                 {"_TreeNode_(node2.2): data2.2}    <- [2,2,2,2]
+             ]
+         },
+         {"_TreeNode_(node3)": data3},              <- [2,3]
+     ]
+  }
+```
+One can insert 0s to the right-side of the indexing vector if the array storing the vector
+has a length longer than the depth of the assessed node. In this case, the first 0 scanning
+from left to right of the indexing vector is considered the termination flag of the index.
+In other words, index vectors `[2,2]`, `[2,2,0]` and `[2,2,0,0]` are equivalent. 
+
+
+An optional alternative indexing vector definition allows to replace the index within a 
+structure by a corresponding string, can be the name of the data item or a hashed version. 
+For example, the item `{"_TreeNode_(node2.1): data2.1}` in the above may also be accessed 
+via `["_TreeChildren_",2,"_TreeChildren_",1]`. This alternative indexing scheme is less 
+sensitive to data serialization orders, but requires the parser to handle both string
+and integer inputs.
+
+
+### Data query
+
+For each JData item identified via an indexing vector, a JData-compliant library must be able 
+retrive the "name" and "data" properties of the object via the below pseudo-code interface 
+```
+    string   name=JD_GetName(JDataNode item)
+    JD_Node  data=JD_GetData(JDataNode item)
+```
+here "name" is a string variable recording the full item name, including the inline metadata
+if present; "data" is the "value" of the object. When the inquired data object is an element 
+in an array, the returned name must be empty.
+
+A JData-compliant library should also allow users to retrieve the type and the children count
+of the node via the below interfaces
+```
+    JD_NodeType type = JD_GetType(JD_Node item)
+```
+The type must be able to distinguish the below 3 basic types 
+
+1. a leaflet, 
+2. a structure, 
+3. an array
+
+Combining with the `JD_GetName`, one can also see if the element is a named one or indexed one.
+
+Additionally, JData-compliant library must provide the below interface to obtain the count of
+the childrens for each data item. A leaflet, an empty structure or an empty array should return
+a length of 0.
+```
+    integer length   = JD_GetLength(JD_Node item)
+```
 
 Recommended File Specifiers
 ------------------------------
 
-For the text-based JData file, the recommended file suffix is **".jdat"**; for 
-the binary JData file, the recommended file suffix is **".ubjd"**.
+For the text-based JData file, the recommended file suffix is **`".jdat"`**; for 
+the binary JData file, the recommended file suffix is **`".ubjd"`**.
 
 The MIME type for the text-based JData document is 
-**"application/jdata-text"**; that for the binary JData document is 
-**"application/jdata-binary"**
+**`"application/jdata-text"`**; that for the binary JData document is 
+**`"application/jdata-binary"`**
