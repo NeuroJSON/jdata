@@ -1,9 +1,9 @@
  JData: a general-purpose data storage and interchange format
 ============================================================
 
-- **Status of This Document**: *This document is current under the state of "Request for Comments". 
+- **Status of This Document**: *This document is current under development.
 It does not specify a standard of any kind.*
-- **Copyright Notice**: Copyright (C) Qianqian Fang (2015-2019).
+- **Copyright Notice**: Copyright (C) Qianqian Fang (2015, 2019).
 - **License**: Apache License, Version 2.0
 - **Version**: RFC.pre.0
 - **Abstract**:
@@ -337,7 +337,7 @@ if one needs to define the `indexed_node2` into a data group, one must define
       ...
   ]
 ```
-where the name is optional.
+where the name "(name1)" is optional.
 
 #### Dataset
 
@@ -377,8 +377,8 @@ Metadata records can be associated with a data group, dataset or data record
 * **metadata node**: a metadata structure added as the first element of a node (named or indexed)
 
 The inline metadata is defined by attaching a series of comma-separated `property=value` 
-strings to the data group keywords (_DataGroup_,_Dataset_,_DataRecord_), separated by "::".
-For example
+strings to the data group keywords (_DataGroup_,_Dataset_,_DataRecord_), separated by 
+two colons, i.e. "::", for example
 
 `"_{DataGroup,Dataset,DataRecord}_(name)::Property1=...,Property2=...,..."`
 
@@ -430,30 +430,334 @@ If the data to be annotated is an array, the metadata record is an indexed leaf 
     ...
   ]
 ```
+The property names are user-defined. Recommended properties include but not limited
+to the following list
+```
+  Version
+  Author
+  Comment
+  UniqueID
+  ModifiedTime
+  CreateTime
+```
 
-The only required sub-field of the meta-data is "\_Name\_". All other metadata 
-sub-field are optional. The JData metadata record supports user-defined 
-keywords.
+### Data Storage Keywords
+
+JData is designed to store wide varieties of data forms. The most common data strctures
+used in the scientific communities include special constants, arrays, trees, and graphs.
+
+#### Special constants
+
+The following constants are supported by this version of JData specification
+
+* NaN: An NaN defined by the IEEE 754 standard shall be stored as `"_NaN_"` as a string leaflet
+* +/-Inf: A +infinity or -infinity defined by the IEEE 754 standard shall be stored as a 
+string leaflet `"+_Inf_"` and `"-_Inf"`, respectively
+* logical true/false: A logical true/false should be represented by the JSON true/false 
+logical values, or [T]/[F] markers in UBJSON
+* Null: a Null (empty) value can be stored as null in JSON and [Z] in UBJSON
 
 
-### Data Presentation Keywords
+#### N-Dimensional Array Storage Keywords
 
-#### Data Array Storage Keywords
+An N-dimensional is serialized using the column-major format (i.e. the fastest index
+is the left-most index, similar to arrays in MATLAB and FORTRAN; in comparison, C arrays
+are row-majored).
 
-In this document, we consider the following general data storage models:
+A solid (non-sparse) N-dimensional array can be represented in two forms in JData.
 
--   a full array (empty, 1D, 2D, 3D or in higher dimensions)
--   a sparse array (empty, 1D, 2D, 3D or in higher dimensions)
+##### Direct storage of N-D arrays
 
-`_ArraySize_, _ArrayType_, _ArrayData_,`
-`_ArrayIsComplex_, _ArrayIsSparse_`
+A solid array can be stored directly using JSON/UBJSON nested array constructs. For example, 
+a 1D column vector can be stored as
 
-#### Meta-data Keywords
+`[1,2,11,9,2.1,10,...]`
 
-In this document, we defines the following JMesh keywords to represent 
-non-geometric meta-data:
+while a 1D row-vector can be stored as
 
-`_Author_, _CreationTime_, _Comment_`
+```
+[[1],[2],[11],[9],[2.1],[10],...]
+```
+in the JSON flavor of JData.
+
+Below is an example of 4x3x2 3D array
+
+```
+  [
+      [
+          [1,9,6,0],
+	  [2,9,3,1],
+	  [8,0,9,6]
+      ],
+      [
+          [6,4,2,7],
+	  [8,5,1,2],
+	  [3,3,2,6]
+      ]
+  ]
+```
+The direct storage format of a solid N-D array does not have the ability to store information
+regarding the type of the original binary data if using the JSON (text-based) format, however, 
+such information can be stored when choosing the UBJSON format. 
+
+Please be aware that the UBJSON format supported by JData includes an extended syntax 
+to facilitate storage and loading of N-D arrays in the binary format. Please refer to the 
+"Grammar" section for details.
+
+##### Annotated storage of N-D arrays
+
+In the annotated array storage format, one shall use a structure to store an N-D array. This
+allows one to use additional fields to store additional information regarding the input array.
+
+The annotated array format is shown below for a solid 2x3 array a=[[1,2],[3,4],[5,6]]
+```
+   {
+       "_ArrayType_": "typename",
+       "_ArraySize": [N1,N2,N3,...],
+       "_ArrayData": [1,2,3,4,5,6]
+   }
+```
+Here, the array annotation keywords are defined below:
+* **"_ArrayType_"**: (required) a case-insensitive string value to specify the type of the data, see below
+* **"_ArraySize_"**: (required) an integer-valued (see below) 1D column vector, storing the dimensions 
+of the N-D array
+* **"_ArrayData_"**: (required) a 1D column vector storing the serialized array values, using the 
+column-major element order
+
+To facilitate pre-allocation of the buffer for storage of the array, it is required that 
+the "_ArrayType_" and "_ArraySize_" nodes must be presented before "_ArrayData_".
+
+The supported data types are similar to those supported by the UBJSON format, i.e.
+
+* **uint8**: unsigned byte (8-bit)
+* **int8**: signed byte (8-bit)
+* **uint16**: unsigned short (16-bit)
+* **int16**: signed short (16-bit)
+* **uint32**: unsigned integer (32-bit)
+* **int32**: signed integer (32-bit)
+* **uint64**: unsigned long long integer (64-bit)
+* **int64**: signed long long integer (64-bit)
+* **single**: single-precision floating point (32-bit)
+* **double**: double-precision floating point (64-bit)
+
+The first 8 data types are considered "integer" types, and the last two types are considered 
+"floating-point" types.
+
+##### Complex-valued arrays
+
+JData supports the storage of complex values or arrays using only the annotated N-D array storage
+format. In this case, a named node `"_ArrayIsComplex_":true` or `"_ArrayIsComplex_":1` 
+is added into the structure. In the meantime, the "_ArrayData_" becomes the concatenation of the
+serialized real and imaginary parts of the complex array, with the real-part in the first half, and
+the imaginary-part in the 2nd half.
+
+For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+9.7*i]` can be stored as
+
+```
+   {
+       "_ArrayType_": "double",
+       "_ArraySize": [1, 3],
+       "_ArrayIsComplex": true,
+       "_ArrayData": [2,4,1.2,6,3.2,9.7]
+   }
+```
+
+The "_ArrayIsComplex" node must be presented before "_ArrayData_".
+
+##### Sparse arrays
+
+JData also supports the storage of N-D sparse arrays using the annotated N-D array storage
+format. In this case, a named node `"_ArrayIsSparse_":true` or `"_ArrayIsSparse_":1` 
+is added into the structure. In the meantime, the "_ArrayData_" becomes the concatenation 
+of the serialized N-element integer indices, followed by the non-zero array elements. For a
+N-D sparse array, each non-zero value requires an N-integer index to specify its location.
+
+For example, if a 3D sparse array has the following non-zero element at the specified locations:
+
+```
+  a: i1, i2, i3, value
+      2   3   1   10.1
+      3   1   1   9.0
+      3   3   1   8.1
+      5   1   2   17
+      5   2   2   9.4
+      2   2   3   20.5
+```
+it can be saved as the following JSON format
+```
+   {
+       "_ArrayType_": "double",
+       "_ArraySize": [5, 4, 3],
+       "_ArrayIsSparse_": true,
+       "_ArrayData": [2,3,3,5,5,2, 3,1,3,1,2,2, 1,1,1,2,2,3, 10.1,9.0,8.1,17,9.4,20.5]
+   }
+```
+
+The "_ArrayIsSparse_" node must be presented before "_ArrayData_".
+
+##### Sparse complex-valued arrays
+
+Using the combination of `"_ArrayIsComplex_"` and `"_ArrayIsSparse_"`, one can store
+a complex valued sparse array using JData. In this case, both `"_ArrayIsComplex_":true` 
+and `"_ArrayIsSparse_":true` shall be presented in the structure, with "_ArrayData_" 
+ordered by serialized non-zero element indices (left-most first, and so on), followed
+by the serialized real-values of the 
+
+For example, if a 3D sparse array has the following non-zero element at the specified locations:
+
+```
+  a: i1, i2, i3, value
+      2   3   1   10.1+19.0*i
+      3   1   1   9.0+11*i
+      3   3   2   8.1+8.2*i
+```
+it can be saved as the following JSON format
+```
+   {
+       "_ArrayType_": "double",
+       "_ArraySize": [4, 3, 2],
+       "_ArrayIsComplex": true,
+       "_ArrayIsSparse_": true,
+       "_ArrayData": [2,3,3, 3,1,3, 1,1,2, 10.1,9.0,8.1, 19.0,11,8.2]
+   }
+```
+
+##### Compressed array storage format
+
+JData supports in-file data compression to enhance space-efficiency of the generated
+files. Compressed data format is only supported in the annotated array storage format.
+
+Two additional nodes are added to the annotated array structure
+* **_ArrayCompressionMethod_**: a string leaflet to store the compression method, for
+example, "zlib", "gzip" or "lzma"
+* **_ArrayCompressionSize_**: the pre-processed array size, in the format specified by
+"_ArrayType_", before the array binary stream casted to byte stream and compression
+
+In addition, the "_ArrayData_" node is replaced by "_ArrayCompressedData_". In the 
+case of JSON flavored JData files, "_ArrayCompressedData_" has a string value storing
+the "Base64" encoded compressed byte-stream of the pre-processed array. In the case of
+UBJSON flavored JData, "_ArrayCompressedData_" directly stores the compressed byte 
+stream of the pre-processed array without "Base64" encoding.
+
+When a compressed array format is used, "_ArrayCompressionMethod_" and 
+"_ArrayCompressionSize_" must appear before "_ArrayCompressedData_".
+
+
+#### Trees
+
+A tree-like data structure can be conveniently represented by JSON/UBJSON formatted files
+due to the similar underlying structures. In JData, we use two keywords to encapsulate a 
+tree-like data structure. 
+
+The tree-node name and the associated data are stored using a named node with a keyword
+`_TreeNode_`:
+
+`"_TreeNode_(node_name)": node_data`
+
+If a tree-node contains children, we use a named array to store the children data:
+
+```
+"_TreeChildren_":[
+     {"_TreeNode_(child1)":data1},
+     {"_TreeNode_(child1)":data2},
+     ...
+]
+```
+
+For example, a tree data structure 
+```
+   root(data0)
+     |-----node1(data1)
+     |-----node2(data2)
+     |       |----node2.1(data2.1)
+     |       |----node2.2(data2.2)
+     |-----node3(data3)
+```
+can be represented by the below JSON structure
+```
+  {
+     "_TreeNode_(root)": data0,
+     "_TreeChildren_": [
+         {"_TreeNode_(node1)": data1},
+	 {
+	     "_TreeNode_(node2)": data2,
+	     "_TreeChildren_": [
+	         {"_TreeNode_(node2.1): data2.1},
+	         {"_TreeNode_(node2.2): data2.2}
+	     ]
+	 },
+         {"_TreeNode_(node3)": data3},
+     ]
+  }
+```
+and the corresponding UBJSON equivallents. The notations "data0", "data1" etc are parsed
+node data in JData format according to the rules defined in this section, depending on
+the type of the data.
+
+One can add either inline or dedicated metadata record to store additional information
+about the tree nodes, for example
+```
+  {
+     "_TreeNode_(root)::NodeID=1,ParentID=0,Path=#root": data0,
+     "_TreeChildren_": [
+         {"_TreeNode_(node1)::NodeID=2,ParentID=1,Path=#root#node1": data1},
+	 {
+	     "_TreeNode_(node2)::NodeID=3,ParentID=1": data2,
+	     "_TreeChildren_": [
+	         {"_TreeNode_(node2.1)::NodeID=4,ParentID=3": data2.1},
+	         {"_TreeNode_(node2.2)::NodeID=5,ParentID=3": data2.2}
+	     ]
+	 },
+         {"_TreeNode_(node3)::NodeID=6,ParentID=1": data3},
+     ]
+  }
+```
+Auxiliary data can be inserted to different levels of the above JData tree document
+as named nodes, as long as the name of the auxiliary node does not conflict with
+the "_TreeNode_(name)" and "_TreeChildren_" of the same level. Behaviors for parsing 
+the auxiliary data are application dependent.
+
+#### Singly and doubly linked lists
+
+Similar to the storage of trees, in JData, we use additional keywords to encapsulate a singly 
+or doubly linked list inside a JSON/UBJSON array construct. The relevant keywards are
+
+`"_ListNode_(unique_name)": node_data`
+
+and
+
+`"_ListNext_": "unique_name_of_next_node"`
+`"_ListPrior_": "unique_name_of_prior_node"`
+
+For example, the below linked list
+
+```
+   head(data0)->node1(data1)->node2(data2)->node3(data3)
+```
+
+shall be stored as
+```
+  [
+     {
+         "_ListNode_(head)": data0,
+         "_ListNext_": "node1"
+     },
+     {
+         "_ListNode_(node1)": data1,
+         "_ListNext_": "node2"
+     },
+     {
+         "_ListNode_(node2)": data2,
+         "_ListNext_": "node3"
+     },
+     {
+         "_ListNode_(node3)": data3,
+         "_ListNext_": null
+     }
+  }
+```
+If a node does not have next or prior element, the "_LinkNext_" or "_LinkPrior_" value should be 
+set to null.
 
 
 Recommended File Specifiers
