@@ -13,52 +13,55 @@ readability and simplicity. It utilizes the JavaScript Object Notation
 store complex hierarchical data in both text and binary formats. In this 
 specification, we define a list of JSON-compatible constructs to store
 a wide range of data structures, including scalars, arrays, structures, 
-tables, hashes, links, trees and graphs, including optional metadata
-for each data element. The generated data files are compatible with 
-JSON/UBJSON specifications and can be readily processed by most 
-existing parsers. Advanced features such as array compression, data 
+tables, hashes, linked lists, trees and graphs, including optional data
+grouping and metadata for each data element. The generated data files are 
+compatible with JSON/UBJSON specifications and can be readily processed by 
+most existing parsers. Advanced features such as array compression, data 
 links and anchors were supported to greatly enhance portability and 
 scalability of the generated data files.
 
+
+
 ## Table of Content
 
-* [Introduction](#introduction)
+- [Introduction](#introduction)
     * [Background](#background)
-    * [JSON and UBJSON](#json_ubjson)
-    * [JData specification overview](#overview)
-* [Grammar](#grammar)
-    * [Text-based JData Storage Grammar](#textformat)
-    * [Binary-based JData Storage Grammar](#binaryformat)
-* [Data Models](#model)
-    * [Topological models](#topology)
-    * [Semantic models](#semantics)
-* [Data Annotation Keywords](#annotation)
-    * [Data group keywords](#datagrouping)
-        * [Data groups](#datagroup)
-        * [Datasets](#dataset)
-        * [Data records](#datarecord)
-        * [Metadata](#metadata)
-    * [ Data Storage Keywords](#background)
-        * [Special constants](#background)
-        * [N-Dimensional array storage keywords](#arrays)
-              * [Direct storage of N-D arrays](#directarray)
-              * [Annotated storage of N-D arrays](#annotatedarray)
-              * [Complex-valued arrays](#complexarray)
-              * [Sparse arrays](#sparsearray)
-              * [Sparse complex-valued arrays](#sparsecomplexarray)
-              * [Compressed array storage format](#)
-        * [Associative or hashed arrays](#hash)
-        * [Tables](#table)
-        * [Singly and doubly linked lists](#linkedlist)
-        * [Trees](#tree)
-        * [Directed and undirected graphs](#graph)
-* [Indexing and Accessing JData](#indexing)
-    * [Index vector](#indexvector)
-    * [Data query](#query)
-* [Conversions Between JData Files](#conversion)
-* [Data Referencing and Links](#links)
-* [Recommended File Specifiers](#suffix)
-* [Summary](#summary)
+    * [JSON and UBJSON](#json-and-ubjson)
+    * [JData specification overview](#jdata-specification-summary)
+- [Grammar](#grammar)
+    * [Text-based JData storage grammar](#text-based-jdata-storage-grammar)
+    * [Binary JData storage grammar](#binary-jdata-storage-grammar)
+- [Data Models](#data-models)
+    * [Topological models](#topological-models)
+    * [Semantic models](#semantic-models)
+- [Data Annotation Keywords](#data-annotation-keywords)
+    * [Data group keywords](#data-group-keywords)
+        + [Data Group](#data-group)
+        + [Dataset](#dataset)
+        + [Data record](#data-record)
+    * [Metadata](#metadata)
+    * [Data storage leywords](#data-storage-keywords)
+        + [Special constants](#special-constants)
+        + [N-Dimensional array storage keywords](#n-dimensional-array-storage-keywords)
+            - [Direct storage of N-D arrays](#direct-storage-of-n-d-arrays)
+            - [Annotated storage of N-D arrays](#annotated-storage-of-n-d-arrays)
+            - [Complex-valued arrays](#complex-valued-arrays)
+            - [Sparse arrays](#sparse-arrays)
+            - [Sparse complex-valued arrays](#sparse-complex-valued-arrays)
+            - [Compressed array storage format](#compressed-array-storage-format)
+        + [Associative or hashed arrays](#associative-or-hashed-arrays)
+        + [Tables](#tables)
+        + [Trees](#trees)
+        + [Singly and doubly linked lists](#singly-and-doubly-linked-lists)
+        + [Directed and undirected graphs](#directed-and-undirected-graphs)
+- [Indexing and Accessing JData](#indexing-and-accessing-jdata)
+    * [Index vector](#index-vector)
+    * [Data query](#data-query)
+- [Conversions Between JData Files](#conversions-between-jdata-files)
+- [Data Referencing and Links](#data-referencing-and-links)
+- [Recommended File Specifiers](#recommended-file-specifiers)
+- [Summary](#summary)
+
 
 
 Introduction
@@ -130,7 +133,7 @@ include:
   JSON-encoded data file can be directly invoked (inline or load from remote 
   site) from a JavaScript based web-application.
 
-JSON also has limitations. JSON's "value" fields are weakly-typed. They only 
+JSON also has limitations. JSON's `"value"` fields are weakly-typed. They only 
 support strings, numbers, and Boolean types, but lack of the fine-granularity 
 to represent various numerical types of different byte-lengths (in C-language, 
 for example, short, int, long int, float, double, long double) and their signs 
@@ -142,7 +145,7 @@ both storage and processing.
 The Universal Binary JSON (UBJSON) is one of the binary counterparts to the JSON format. 
 It specifically addresses the above mentioned limitations, yet, adheres to a 
 simple grammar similar to the text-based JSON. As a trade-off, it loses the 
-"human readability" to a certain extend. Although the implemented parsers for 
+"human-readability" to a certain extend. Although the implemented parsers for 
 UBJSON are not as abundant as JSON, due to the simplicity of the format itself, 
 the development cost for implementing a parser for a new programming language 
 is significantly lower than other more complex data formats.
@@ -156,7 +159,7 @@ they do not provide all the advanced features found in the more sophisticated
 formats, their greatly simplified encoding and decoding strategies permit 
 efficient data sharing among the general audiences.
 
-### JData Specification Summary
+### JData specification overview
 
 JData is a specification for storing, exchanging and processing general-purpose 
 data that are commonly encountered in information technology (IT) industries and 
@@ -171,7 +174,7 @@ specifications. This is achieved through the definition of a semantic layer
 over the JSON/UBJSON data storage syntax to map various types of complex data 
 structures. Such semantic layer includes
 
-- a list of dedicated "name" fields, or keywords, that define the containers 
+- a list of dedicated `"name"` fields, or keywords, that define the containers 
   of various data types that are commonly used in research,
 - a list of dedicated "name" fields and formats to facilitate the grouping and 
   organization of hierarchical data,
@@ -213,11 +216,13 @@ separated by 0 or multiple permitted white spaces, namely
 ### Binary JData Storage Grammar
 
 The binary JData grammar is identical to the UBJSON grammar defined in 
-[ubjson.org (Draft 12)](http://ubjson.org), with the array grammar extension to 
-support N-dimensional arrays:
+[ubjson.org (Draft 12)](http://ubjson.org), with the following two exceptions
 
-`[[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]`
-
+1. JData does not support [N] (`"no-op"`) record, and
+2. optimized array container grammar was extensed to support N-dimensional dense arrays:
+```
+[[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
+```
 where the integer type can be one of the UBJSON integer types (`i,U,I,l,L`), and 
 `nx`, `ny`, and `nz` ... are all non-negative numbers specifying the dimensions of 
 the N-dimensional array. The binary data of the N-dimensional array is then 
@@ -330,7 +335,7 @@ Below is a short summary of the JData data annotation/storage keywords to be int
 * **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
 * **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, 
   `_ArrayIsSparse_`,`_ArrayData_`,`_ArrayCompressionMethod_`,`_ArrayCompressionSize_`, 
-  `_ArrayCompressedData_`
+  `_ArrayCompressionEndian_`, `_ArrayCompressedData_`
 * **Tree**: `_TreeNode_`,`_TreeChildren_`,`_TreeData_`
 * **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
 * **Graph**: `_GraphNodes_`,`_GraphEdges_`,`_GraphMatrix_`,`_GraphData_`
@@ -691,13 +696,16 @@ or the corresponding UBJSON equivalents.
 JData supports node-based data compression to enhance space-efficiency of the generated
 files. Compressed data format is only supported in the annotated array storage format.
 
-Three additional nodes are added to the annotated array structure
+Four additional nodes are added to the annotated array structure
 
 * **`_ArrayCompressionMethod_`**: a string-valued leaflet to store the compression 
   method, for example, "zlib", "gzip" or "lzma"
 * **`_ArrayCompressionSize_`**: the dimensions of the pre-processed array, i.e. the data
   originally stored in `_ArrayData_` in the format specified by `"_ArrayType_"`, 
   before the array binary stream typecasted to byte stream and compression.
+* **`_ArrayCompressionEndian_`**: a case-insensitive string, either "little" or "big",
+  indicating the endianness of the byte-stream before compression; if missing, assume
+  to be "little"
 * **`_ArrayCompressedData_`**: in addition, the `"_ArrayData_"` node is replaced by 
   `"_ArrayCompressedData_"`. In the case of JSON-formatted JData files, 
   `"_ArrayCompressedData_"` has a string value storing the "Base64" encoded compressed 
@@ -909,17 +917,17 @@ In JData, we use the below keywords to encapsulate a graph data structure
 
 * **`"_GraphNodes_"`**: a JData array object to store the serialized node data
 * **`"_GraphEdges_"`**: a JData array object to store the connections between nodes. Each edge 
-is represented by a triplet in an array `["start node id", "end node id", "(optional) edge data"]`.
+is represented by a triplet in an array `["start node name", "end node name", (optional) edge data]`.
 
 For example, if we modify the above linked list by adding a directed edge from "node1" to 
 "node3" and from "node3" to "node2", such as the data suggested by this diagram
 
 ```
-                    ┌──────────────────────────┐
+                    ┌--------------------------┐
                     │                          V
    head(data0)->node1(data1)->node2(data2)->node3(data3)
                                  ^             │
-                                 └─────────────┘
+                                 └-------------┘
 ```
 we can then store this data structure as
 
@@ -1010,12 +1018,13 @@ One can also apply array compression, as explained above, to further reduce the 
 		"_ArraySize_": [4,4],
 		"_ArrayCompressionSize_": [1,16],
 		"_ArrayCompressionMethod_": "zlib",
+		"_ArrayCompressionEndian_": "little",
 		"_ArrayCompressedData_": "eJxjYGBgYGQAE0DIyAAAAC0ABg=="
 	}
   }
 ```
 here the `"_ArrayCompressedData_"` stores the column-major-serialized, byte-typecasted,
-zlib-compressed and lastly base64-encoded adjacency matrix.
+zlib-compressed and finally base64-encoded adjacency matrix.
 
 
 Indexing and Accessing JData
