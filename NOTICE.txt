@@ -1,0 +1,5 @@
+JData Specification
+
+Copyright (C) 2015,2019 Qianqian Fang <q.fang at neu.edu>
+
+License: Apache License Version 2.0, please see LICENSE_Apache-2.0.txt for details
