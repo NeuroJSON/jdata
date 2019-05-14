@@ -577,8 +577,8 @@ The annotated array format is shown below for a solid 2x3 array `a=[[1,2],[3,4],
 ```
    {
        "_ArrayType_": "typename",
-       "_ArraySize": [N1,N2,N3,...],
-       "_ArrayData": [1,2,3,4,5,6]
+       "_ArraySize_": [N1,N2,N3,...],
+       "_ArrayData_": [1,2,3,4,5,6]
    }
 ```
 Here, the array annotation keywords are defined below:
@@ -623,9 +623,9 @@ For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+
 ```
    {
        "_ArrayType_": "double",
-       "_ArraySize": [1, 3],
-       "_ArrayIsComplex": true,
-       "_ArrayData": [2,4,1.2,6,3.2,9.7]
+       "_ArraySize_": [1, 3],
+       "_ArrayIsComplex_": true,
+       "_ArrayData_": [2,4,1.2,6,3.2,9.7]
    }
 ```
 
@@ -655,9 +655,9 @@ it can be saved as the following JSON format
 ```
    {
        "_ArrayType_": "double",
-       "_ArraySize": [5, 4, 3],
+       "_ArraySize_": [5, 4, 3],
        "_ArrayIsSparse_": true,
-       "_ArrayData": [2,3,3,5,5,2, 3,1,3,1,2,2, 1,1,1,2,2,3, 10.1,9.0,8.1,17,9.4,20.5]
+       "_ArrayData_": [2,3,3,5,5,2, 3,1,3,1,2,2, 1,1,1,2,2,3, 10.1,9.0,8.1,17,9.4,20.5]
    }
 ```
 The `"_ArrayIsSparse_"` node must be presented before `"_ArrayData_"`.
@@ -683,10 +683,10 @@ it can be saved as the following JSON format
 ```
    {
        "_ArrayType_": "double",
-       "_ArraySize": [4, 3, 2],
-       "_ArrayIsComplex": true,
+       "_ArraySize_": [4, 3, 2],
+       "_ArrayIsComplex_": true,
        "_ArrayIsSparse_": true,
-       "_ArrayData": [2,3,3, 3,1,3, 1,1,2, 10.1,9.0,8.1, 19.0,11,8.2]
+       "_ArrayData_": [2,3,3, 3,1,3, 1,1,2, 10.1,9.0,8.1, 19.0,11,8.2]
    }
 ```
 or the corresponding UBJSON equivalents.
@@ -917,10 +917,10 @@ In JData, we use the below keywords to encapsulate a graph data structure
 
 * **`"_GraphNodes_"`**: a JData array object to store the serialized node data
 * **`"_GraphEdges_"`**: a JData array object to store the connections between nodes. Each edge 
-is represented by a triplet in an array `["start node name", "end node name", (optional) edge data]`.
+is represented by a 2 or 3-element array `["start node name", "end node name", (optional) edge data]`.
 
-For example, if we modify the above linked list by adding a directed edge from "node1" to 
-"node3" and from "node3" to "node2", such as the data suggested by this diagram
+For example, if we modify the above linked list by adding a directed edge from `"node1"` to 
+`"node3"` and from `"node3"` to `"node2"`, such as the data suggested by this diagram
 
 ```
                     ┌--------------------------┐
@@ -1304,5 +1304,5 @@ and data linking/referencing mechanisms.
 Although JData does not have all the sophisticated features as other advanced binary 
 data exchange formats, such as HDF5, it is well suited for storage of small to medium
 sized datasets generated in many scientific domains or IT applications. Combined with 
-the excellent availability of parsers and web-friendliness, JData is expected to easily
-adopted and extended.
+the excellent availability of parsers and web-friendliness, JData is expected to be 
+easily adopted and extended in the future.
