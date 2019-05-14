@@ -40,7 +40,7 @@ scalability of the generated data files.
         + [Dataset](#dataset)
         + [Data record](#data-record)
     * [Metadata](#metadata)
-    * [Data storage leywords](#data-storage-keywords)
+    * [Data storage keywords](#data-storage-keywords)
         + [Special constants](#special-constants)
         + [N-Dimensional array storage keywords](#n-dimensional-array-storage-keywords)
             - [Direct storage of N-D arrays](#direct-storage-of-n-d-arrays)
@@ -219,7 +219,7 @@ The binary JData grammar is identical to the UBJSON grammar defined in
 [ubjson.org (Draft 12)](http://ubjson.org), with the following two exceptions
 
 1. JData does not support [N] (`"no-op"`) record, and
-2. optimized array container grammar was extensed to support N-dimensional dense arrays:
+2. optimized array container grammar was extended to support N-dimensional dense arrays:
 ```
 [[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
 ```
@@ -269,7 +269,7 @@ and "super-root" - have specific meanings according to the definitions above.
 ### Semantic models
 
 To efficiently process the represented data, we can semantically annotate the 
-underying data stucture and organize them for fine granularity. The data grouping 
+underlying data structure and organize them for fine granularity. The data grouping 
 annotations supported in JData include
 
 * **data record**: a "meaningful" datum, either in the form of a simple data point 
@@ -504,7 +504,7 @@ to the following list
 
 ### Data Storage Keywords
 
-JData is designed to store wide varieties of data forms. The most common data strctures
+JData is designed to store wide varieties of data forms. The most common data structures
 used in the scientific communities include scalars, constants, arrays, structures, 
 tables, associative arrays, trees, and graphs.
 
@@ -702,7 +702,7 @@ Four additional nodes are added to the annotated array structure
   method, for example, "zlib", "gzip" or "lzma"
 * **`_ArrayCompressionSize_`**: the dimensions of the pre-processed array, i.e. the data
   originally stored in `_ArrayData_` in the format specified by `"_ArrayType_"`, 
-  before the array binary stream typecasted to byte stream and compression.
+  before the array binary stream type-casted to byte stream and compression.
 * **`_ArrayCompressionEndian_`**: a case-insensitive string, either "little" or "big",
   indicating the endianness of the byte-stream before compression; if missing, assume
   to be "little"
@@ -738,7 +738,7 @@ arrays are supported in JData.
 
 #### Tables
 
-A table data structrure is defined by a 2-dimensional grid of data indexed by the table
+A table data structure is defined by a 2-dimensional grid of data indexed by the table
 columns (fields) and rows (records). For example
 
 ```
@@ -761,7 +761,7 @@ Such data can also be stored in JSON/UBJSON in two forms:
 ```
 
 * **Structure of arrays**: the table data can also be organized in columns, where often 
-  contains the same datatypes. Using the same above example, one can write the following 
+  contains the same data types. Using the same above example, one can write the following 
   JData form
 ```
    {
@@ -827,7 +827,7 @@ can be represented by the below JSON structure
      ]
   }
 ```
-and the corresponding UBJSON equivallents. The notations "data0", "data1" etc are parsed
+and the corresponding UBJSON equivalents. The notations "data0", "data1" etc are parsed
 node data in JData format according to the rules defined in this section, depending on
 the type of the data.
 
@@ -863,7 +863,7 @@ parser the start of the data structure.
 #### Singly and doubly linked lists
 
 Similar to the storage of trees, in JData, we use additional keywords to encapsulate a singly 
-or doubly linked list inside a JSON/UBJSON array construct. The relevant keywards are
+or doubly linked list inside a JSON/UBJSON array construct. The relevant keywords are
 
 `"_ListNode_(unique_name)": node_data`
 
@@ -1048,7 +1048,7 @@ of sequential or nested nodes, either in the named or indexed form. To access
 any element (a leaflet, leaf or branch) of the JData document, one should use a vector 
 of indices that points to the specific node. 
 
-A JData-compliant parser must be able to retrive JData elements via the below pseudo-code 
+A JData-compliant parser must be able to retrieve JData elements via the below pseudo-code 
 interface using a linear index vector
 ```
    JD_Node item = JD_GetNode(JD_Node root, [i1, i2, i3, i4, ...], is_compact)
@@ -1058,7 +1058,7 @@ where `i1` is the index of the data on the top-most level (relative to the root 
 integer, starting from 1, denoting the order
 of the data element among the serialized elements of the same level. In order words, if
 the current level is an array object, the index is the count of the elements before this data
-element plus 1; if the curernt level is a structure, the index is the count of the named 
+element plus 1; if the current level is a structure, the index is the count of the named 
 nodes appearing before this data plus 1. Using the tree data structure above, the linear index
 of each node is listed below on the right side:
 
@@ -1105,7 +1105,7 @@ and integer inputs.
 ### Data query
 
 For each JData item identified via an indexing vector, a JData-compliant library must be able 
-retrive the `"name"` and `"data"` properties of the object via the below pseudo-code interface 
+retrieve the `"name"` and `"data"` properties of the object via the below pseudo-code interface 
 ```
     string   name=JD_GetName(JDataNode item)
     JD_Node  data=JD_GetData(JDataNode item)
@@ -1147,7 +1147,7 @@ UBJSON, and between JSON and UBJSON files.
 * **lossless conversion**: the input data are preserved after a save-load 
   round-trip conversion to and from one of the JData formats; type-casting 
   from low precision to high precision types is permitted
-* **lossy conversion**: the input data may loose precision during the 
+* **lossy conversion**: the input data may lose precision during the 
   save-load round-trip conversion but the loss of precision shall be limited
   to the level that is tolerable by the application.
 
@@ -1163,7 +1163,7 @@ some general recommendations to best preserve data precision:
   binary type information
 * When parsing numerical arrays stored in the direct storage format in text-based
   JSON, one should consider using double-precision as the read-buffer to avoid
-  trunctation of input data and loss of precision.
+  truncation of input data and loss of precision.
 
 In addition, if a transformation to the data does not alter the (full or compact) 
 indexing vector to all leaflets in a JData document, it is referred to as an 
