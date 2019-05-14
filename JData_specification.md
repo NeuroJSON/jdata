@@ -342,6 +342,7 @@ Below is a short summary of the JData data annotation/storage keywords to be int
 * **Table**: `_TableData_`
 * **Inline metadata**: `"item_name::Property1=value1,Property2=value2,...": ...`
 * **Metadata record**: `{"_DataInfo_":{...}}`
+* **Data links and anchors**: `_DataLink_`, `_DataAnchor_`
 
 ### Data Group Keywords
 
@@ -1204,12 +1205,12 @@ Data Referencing and Links
 JData files support referencing and internal/external linking via the definitions of
 data links and anchors. 
 
-A link is defined by a named leaflet or leaf as shown below
+A link is defined by a named leaflet or leaf as shown in the below two styles
 ```
-   {
+   "link_style1": {
        "_DataLink_": "path"
    },
-   {
+   "link_style2": {
        "_DataLink_": {
            "URI": "path",
            "Parameters": [...],
@@ -1230,11 +1231,11 @@ asks the parser to read a local file located at "/space/test/jdfiles/tree.jdat" 
 load the node specified by indexing vector `[1,2,2]`, starting from the root (or super-root
 if containing CJSON) to replace the `"_DataLink_"` node in the current document.
 
-If using a `"_DataLink"` structure, additional parameters can be specified via
-user defined parameters, such as `"Parameters"` and `"MaxRecursion"` to fine tune
+If using a `"_DataLink_"` structure, additional parameters can be specified via
+user-defined parameters, such as `"Parameters"` and `"MaxRecursion"` to fine-tune
 the linking behavior.
 
-For easy referencing, JData permits the definitions of named anchors inside the 
+For easy referencing, JData permits the definitions of **named anchors** inside the 
 "metadata" section for each node using the following format
 ```
     "obj::_DataAnchor_=a_unique_anchor_name": ...
