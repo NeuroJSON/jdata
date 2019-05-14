@@ -176,7 +176,7 @@ structures. Such semantic layer includes
 
 - a list of dedicated `"name"` fields, or keywords, that define the containers 
   of various data types that are commonly used in research,
-- a list of dedicated "name" fields and formats to facilitate the grouping and 
+- a list of dedicated `"name"` fields and formats to facilitate the grouping and 
   organization of hierarchical data,
 - a list of format properties for the associated "value" field to store the 
   specific metadata of the data points, and, in addition,
@@ -671,7 +671,7 @@ ordered by serialized non-zero element indices (left-most index first, and so on
 by the serialized real-values of the non-zero elements, and lastly the imaginary-values of 
 the non-zero elements.
 
-For example, if a 3D sparse array has the following non-zero complex element at the 
+For example, if a 3-D sparse array has the following non-zero complex element at the 
 specified indices `(i1, i2, i3)`
 ```
   a: i1, i2, i3,  complex values
@@ -897,7 +897,7 @@ shall be stored as
          "_ListNode_(node3)": data3,
          "_ListNext_": null
      }
-  }
+  ]
 ```
 If a node does not have a next or prior element, the `"_LinkNext_"` or `"_LinkPrior_"` value 
 should be set to `null`.
@@ -948,7 +948,8 @@ we can then store this data structure as
         ]
     }
 ```
-The data associated with each edge (edgedata) in this example is optional and 
+The data associated with each edge (edgedata) in this example is optional and can be any JData 
+structure supported in this document.
 
 By default, the graph is assumed to be a directed graph. If a user intends to store undirected 
 graph using the above format, one must use `"_GraphEdges_(false)"` or `"_GraphEdges_(0)"` to 
@@ -1104,13 +1105,13 @@ and integer inputs.
 ### Data query
 
 For each JData item identified via an indexing vector, a JData-compliant library must be able 
-retrive the "name" and "data" properties of the object via the below pseudo-code interface 
+retrive the `"name"` and `"data"` properties of the object via the below pseudo-code interface 
 ```
     string   name=JD_GetName(JDataNode item)
     JD_Node  data=JD_GetData(JDataNode item)
 ```
-here "name" is a string variable recording the full item name, including the inline metadata
-if present; "data" is the "value" of the object. When the inquired data object is an element 
+here `"name"` is a string variable recording the full item name, including the inline metadata
+if present; `"data"` is the "value" of the object. When the inquired data object is an element 
 in an array, the returned name must be empty.
 
 A JData-compliant parser should also allow users to retrieve the type and the children count
@@ -1166,7 +1167,7 @@ some general recommendations to best preserve data precision:
 
 In addition, if a transformation to the data does not alter the (full or compact) 
 indexing vector to all leaflets in a JData document, it is referred to as an 
-`isometric transform`, and is permitted. An example of an isometric transform 
+**"isometric transform"**, and is permitted. An example of an isometric transform 
 is the conversion from a structure to an array as shown in the below example:
 ```
    {
