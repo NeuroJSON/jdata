@@ -221,14 +221,14 @@ The binary JData grammar is identical to the UBJSON grammar defined in
 1. JData does not support [N] (`"no-op"`) record, and
 2. optimized array container header was extended to support N-dimensional dense arrays:
 ```
-[[] [$] [type] [#] [[] [$] [integer type] [#] [integer type for ndims] [ndim] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
-  or
-[[] [$] [type] [#] [[] [intger type] [nx] [integer type] [ny] [integer type] [nz] ... []] [nx*ny*nz*...*sizeof(type) ] []]
+[[] [$] [type] [#] [[] [$] [nx/ny/nz type] [#] [ndims type] [ndim] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
+   or
+[[] [$] [type] [#] [[] [nx type] [nx] [ny type] [ny] [nz type] [nz] ... []] [nx*ny*nz*...*sizeof(type) ] []]
 ```
-where the integer type can be one of the UBJSON integer types (`i,U,I,l,L`), `ndim` 
-is the number of dimensions, and `nx`, `ny`, and `nz` ... are all non-negative 
-numbers specifying the dimensions of the N-dimensional array. The binary data 
-of the N-dimensional array is then serialized in the **column-major** format 
+where `ndim` is the number of dimensions, and `nx`, `ny`, and `nz` ... are 
+all non-negative numbers specifying the dimensions of the N-dimensional array,
+`nz/ny/nz/ndim` types must be one of the UBJSON integer types (`i,U,I,l,L`), . 
+The binary data of the N-dimensional array is then serialized in the **column-major** format 
 (similar to MATLAB or FORTRAN) order.
 
 As a special note, all UBJSON integer types must be stored in the Big-Endian 
