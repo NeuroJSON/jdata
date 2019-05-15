@@ -1183,7 +1183,8 @@ is the conversion from a structure to an array as shown in the below example:
          "name1": value1,      <- [1,1] or ["a","name1"]
          "name2": value2,      <- [1,2] or ["a","name2"]
          "name3": value3       <- [1,3] or ["a","name3"]
-      }
+      },
+      "b": "value4"            <- [2] or ["b"]
    }
 ```
 to
@@ -1199,7 +1200,8 @@ to
          {
              "name3": value3   <- [[1,3]] or [["a","name3"]]
          }
-      ]
+      ],
+      "b": "value4"            <- [2] or ["b"]
    }
 ```
 The only permitted "non-isometric transform" is the conversion between a direct
