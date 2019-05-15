@@ -219,14 +219,17 @@ The binary JData grammar is identical to the UBJSON grammar defined in
 [ubjson.org (Draft 12)](http://ubjson.org), with the following two exceptions
 
 1. JData does not support [N] (`"no-op"`) record, and
-2. optimized array container grammar was extended to support N-dimensional dense arrays:
+2. optimized array container header was extended to support N-dimensional dense arrays:
 ```
-[[] [$] [type] [#] [[] [$] [an integer type] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
+[[] [$] [type] [#] [[] [$] [integer type] [#] [integer type for ndims] [ndim] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type) ] []]
+  or
+[[] [$] [type] [#] [[] [intger type] [nx] [integer type] [ny] [integer type] [nz] ... []] [nx*ny*nz*...*sizeof(type) ] []]
 ```
-where the integer type can be one of the UBJSON integer types (`i,U,I,l,L`), and 
-`nx`, `ny`, and `nz` ... are all non-negative numbers specifying the dimensions of 
-the N-dimensional array. The binary data of the N-dimensional array is then 
-serialized in the **column-major** format (similar to MATLAB or FORTRAN) order.
+where the integer type can be one of the UBJSON integer types (`i,U,I,l,L`), `ndim` 
+is the number of dimensions, and `nx`, `ny`, and `nz` ... are all non-negative 
+numbers specifying the dimensions of the N-dimensional array. The binary data 
+of the N-dimensional array is then serialized in the **column-major** format 
+(similar to MATLAB or FORTRAN) order.
 
 As a special note, all UBJSON integer types must be stored in the Big-Endian 
 format, according to the specification; the storage to the floating point types 
@@ -596,16 +599,16 @@ it is required that the `"_ArrayType_"` and `"_ArraySize_"` nodes must appear be
 
 The supported data types are similar to those supported by the UBJSON format, i.e.
 
-* **uint8**: unsigned byte (8-bit)
-* **int8**: signed byte (8-bit)
-* **uint16**: unsigned short (16-bit)
-* **int16**: signed short (16-bit)
-* **uint32**: unsigned integer (32-bit)
-* **int32**: signed integer (32-bit)
-* **uint64**: unsigned long long integer (64-bit)
-* **int64**: signed long long integer (64-bit)
-* **single**: single-precision floating point (32-bit)
-* **double**: double-precision floating point (64-bit)
+* **uint8**: unsigned byte (8-bit), [U] in UBJSON
+* **int8**: signed byte (8-bit), [i] in UBJSON
+* **uint16**: unsigned short (16-bit),  no correspondance in UBJSON, map to [I]
+* **int16**: signed short (16-bit), [I] in UBJSON
+* **uint32**: unsigned integer (32-bit),  no correspondance in UBJSON, map to [l]
+* **int32**: signed integer (32-bit), [l] in UBJSON
+* **uint64**: unsigned long long integer (64-bit), no correspondance in UBJSON, map to [L]
+* **int64**: signed long long integer (64-bit), [L] in UBJSON
+* **single**: single-precision floating point (32-bit), [d] in UBJSON
+* **double**: double-precision floating point (64-bit), [D] in UBJSON
 
 The first 8 data types are considered "integer" types, and the last two types are considered 
 "floating-point" types.
