@@ -21,14 +21,22 @@ draft of this file specification, including
     question, report a bug, provide a feature request, or simply propose
     general discussions. Please use URLs or keywords to link your discussion 
     to a specific line/section/topic in the document.
-- [Write short comments on past commits](https://github.com/fangq/jdata/commits/master)
-  - Clicking on any of the past commit links will display the line-changes 
-    for each past modification of this document.
+- [Write short comments on Request for Comments (RFC) commits](https://github.com/fangq/jdata/commit/1a21709efcaf7fc554b95c81d355fdf9253d3e23)
+  - A milestone version of the specification will be associated with an
+    RFC (Request for comments) commit (where the entire file is removed
+    and re-added so that every line appears in such comment). One can
+    write short comments as well as post replies on this RFC page. 
+  - The latest RFC commit is based on version v0.5. Please use
+    [this link](https://github.com/fangq/jdata/commit/1a21709efcaf7fc554b95c81d355fdf9253d3e23) to comment.
   - To add a comment, you need to first register a github account, and then 
-    browse the above commit history page, select a particular commit. On the commit 
-    page, hovering your cursor over each modified line, a "plus" icon is displayed, 
-    clicking it will allow one to comment on a specific line (or reply to 
-    other's comments).
+    browse the above RFC page. When hovering your cursor over each line, a 
+    "plus" icon is displayed, clicking it will allow one to comment on a 
+    specific line (or reply to other's comments).
+  - The RFC page can get busy if too many comments appear. Please consider 
+    using the [Issues section](https://github.com/fangq/jdata/issues) if this happens.
+  - One can browse the commit history of the specification document. If
+    anyone is interested in commenting on a particular updated, you can also
+    comment on any of the commit page using the same method.
 - [Use the JData mailing list](https://groups.google.com/forum/#!forum/openjdata)
   - You may send your comments to the jdata mailing list (openjdata at googlegroups.com). 
     Subscribers will discuss by emails, and if a motion is reached, proposals
