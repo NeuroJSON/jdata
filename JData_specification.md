@@ -518,12 +518,14 @@ tables, associative arrays, trees, and graphs.
 
 The following constants are supported by this version of the specification
 
-* NaN: An NaN defined by the IEEE 754 standard shall be stored as `"_NaN_"` as a string leaflet
-* +/-Inf: A +infinity or -infinity defined by the IEEE 754 standard shall be stored as a 
-string leaflets `"+_Inf_"` and `"-_Inf_"`, respectively
-* logical `true`/`false`: A logical `true`/`false` should be represented by the JSON true/false 
-logical values, or `[T]`/`[F]` markers in UBJSON
-* Null: a Null (empty) value can be stored as `null` in JSON and `[Z]` in UBJSON
+* `NaN`: An `NaN` defined by the IEEE 754 standard shall be stored as `"_NaN_"` as a string 
+  leaflet in text-based JData; in the binary JData, it should be stored in the IEEE 754 format
+* `+/-Inf`: A `+infinity` or `-infinity` defined by the IEEE 754 standard shall be stored as a 
+  string leaflets `"+_Inf_"` and `"-_Inf_"`, respectively, in the text-based JData ("+" sign
+  can be omitted); in the binary JData, they should be stored in the IEEE 754 format
+* logical `true`/`false`: A logical `true`/`false` should be represented by the JSON `true/false` 
+  logical values, or `[T]`/`[F]` markers in UBJSON
+* `Null`: a `Null` (empty) value can be stored as `null` in JSON and `[Z]` in UBJSON
 
 
 #### N-Dimensional Array Storage Keywords
@@ -601,16 +603,16 @@ it is required that the `"_ArrayType_"` and `"_ArraySize_"` nodes must appear be
 
 The supported data types are similar to those supported by the UBJSON format, i.e.
 
-* **uint8**: unsigned byte (8-bit), `U` in UBJSON
-* **int8**: signed byte (8-bit), `i` in UBJSON
-* **uint16**: unsigned short (16-bit),  no correspondance in UBJSON, map to `I`
-* **int16**: signed short (16-bit), `I` in UBJSON
-* **uint32**: unsigned integer (32-bit),  no correspondance in UBJSON, map to `l`
-* **int32**: signed integer (32-bit), `l` in UBJSON
-* **uint64**: unsigned long long integer (64-bit), no correspondance in UBJSON, map to `L`
-* **int64**: signed long long integer (64-bit), `L` in UBJSON
-* **single**: single-precision floating point (32-bit), `d` in UBJSON
-* **double**: double-precision floating point (64-bit), `D` in UBJSON
+* **uint8**: unsigned byte (8-bit), `[U]` in UBJSON
+* **int8**: signed byte (8-bit), `[i]` in UBJSON
+* **uint16**: unsigned short (16-bit),  no correspondance in UBJSON, map to `[I]`
+* **int16**: signed short (16-bit), `[I]` in UBJSON
+* **uint32**: unsigned integer (32-bit),  no correspondance in UBJSON, map to `[l]`
+* **int32**: signed integer (32-bit), `[l]` in UBJSON
+* **uint64**: unsigned long long integer (64-bit), no correspondance in UBJSON, map to `[L]`
+* **int64**: signed long long integer (64-bit), `[L]` in UBJSON
+* **single**: single-precision floating point (32-bit), `[d]` in UBJSON
+* **double**: double-precision floating point (64-bit), `[D]` in UBJSON
 
 The first 8 data types are considered "integer" types, and the last two types are considered 
 "floating-point" types.
