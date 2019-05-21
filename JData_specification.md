@@ -4,7 +4,7 @@
 - **Status of this document**: This document is current under development.
 - **Copyright**: (C) Qianqian Fang (2015, 2019) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
-- **Version**: 0.5
+- **Version**: 0.5.1
 - **Abstract**:
 
 > JData is a general-purpose data interchange format aimed for portability,
@@ -341,9 +341,10 @@ Below is a short summary of the JData data annotation/storage keywords to be int
 * **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, 
   `_ArrayIsSparse_`,`_ArrayData_`,`_ArrayCompressionMethod_`,`_ArrayCompressionSize_`, 
   `_ArrayCompressionEndian_`, `_ArrayCompressedData_`
-* **Tree**: `_TreeNode_`,`_TreeChildren_`,`_TreeData_`
+* **Hash/Map**: `_MapData_`
+* **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
 * **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
-* **Graph**: `_GraphNodes_`,`_GraphEdges_`,`_GraphMatrix_`,`_GraphData_`
+* **Graph**: `_GraphData_`,`_GraphNodes_`,`_GraphEdges_`,`_GraphMatrix_`
 * **Table**: `_TableData_`
 * **Inline metadata**: `"item_name::Property1=value1,Property2=value2,...": ...`
 * **Metadata record**: `{"_DataInfo_":{...}}`
@@ -725,9 +726,9 @@ When a compressed array format is used, `"_ArrayCompressionMethod_"` and
 `"_ArrayCompressionSize_"` must appear before `"_ArrayCompressedData_"`.
 
 
-#### Associative or hashed arrays
+#### Associative arrays or Maps
 
-In an associative array or hashed array, the element can be accessed using a string-valued
+In a map or an associative/hashed array, the element can be accessed using a unique
 key. For example, the below pseudo code defines a 3-element associative array `@a` with
 3 unique keys
 ```
@@ -741,8 +742,20 @@ Such data structure can be conveniently represented using JSON/UBJSON as
        "Steve": 26
    }
 ```
-In an associative array, the keys are supposed to be unique. Only string-keyed associative 
-arrays are supported in JData.
+
+To store maps with non-string valued keys, one can use a 2xN array enclosed inside 
+a `"_MapData_"` construct, for example
+```
+   "_MapData_": [
+       ["Mike",  21],
+       ["Julia", 25],
+       ["Steve", 26],
+       [120, 30],
+       [2.9  45]
+   ]
+```
+Each element of the `_MapData_` array may contain more than 2 elements; the additional 
+elements will be treated as auxiliary data.
 
 #### Tables
 
