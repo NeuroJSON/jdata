@@ -49,7 +49,7 @@ scalability of the generated data files.
             - [Sparse arrays](#sparse-arrays)
             - [Sparse complex-valued arrays](#sparse-complex-valued-arrays)
             - [Compressed array storage format](#compressed-array-storage-format)
-        + [Associative or hashed arrays](#associative-or-hashed-arrays)
+        + [Associative arrays or maps](#associative-arrays-or-maps)
         + [Tables](#tables)
         + [Trees](#trees)
         + [Singly and doubly linked lists](#singly-and-doubly-linked-lists)
