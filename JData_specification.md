@@ -732,14 +732,14 @@ In a map or an associative/hashed array, the element can be accessed using a uni
 key. For example, the below pseudo code defines a 3-element associative array `@a` with
 3 unique keys
 ```
-   @a = {'Mike'->21, 'Julia'->25, 'Steve'->26}
+   @a = {'Andy'->21, 'William'->21, 'Om'->22}
 ```
 Such data structure can be conveniently represented using JSON/UBJSON as
 ```
    {
-       "Mike":  21,
-       "Julia": 25,
-       "Steve": 26
+       "Andy":    21,
+       "William": 21,
+       "Om":      22
    }
 ```
 
@@ -747,11 +747,11 @@ To store maps with non-string valued keys, one can use a 2xN array enclosed insi
 a `"_MapData_"` construct, for example
 ```
    "_MapData_": [
-       ["Mike",  21],
-       ["Julia", 25],
-       ["Steve", 26],
+       ["Andy",   21],
+       ["William",21],
+       ["Om",     22],
        [120, 30],
-       [2.9  45]
+       [2.9, 45]
    ]
 ```
 Each element of the `_MapData_` array may contain more than 2 elements; the additional 
@@ -763,11 +763,11 @@ A table data structure is defined by a 2-dimensional grid of data indexed by the
 columns (fields) and rows (records). For example
 
 ```
-  Name   Age   Degree  Height
-  ----  ------ ------  ------
-  Mike   21     BS      71.2
-  Julia  25     MS      67.0
-  Steve  26     BE      69.1
+  Name    Age   Degree  Height
+  ----  ------- ------  ------
+  Andy    21     BS      69.2
+  William 21     MS      71.0
+  Om      22     BE      67.1
 ```
 Such data can also be stored in JSON/UBJSON in two forms: 
 
@@ -775,9 +775,9 @@ Such data can also be stored in JSON/UBJSON in two forms:
 
 ```
    [
-       {"Name": "Mike",  "Age": 21, "Degree": "BS", "Height": 71.2},
-       {"Name": "Julia", "Age": 25, "Degree": "MS", "Height": 67.0},
-       {"Name": "Steve", "Age": 26, "Degree": "BE", "Height": 69.1},
+       {"Name": "Andy",   "Age": 21, "Degree": "BS", "Height": 69.2},
+       {"Name": "William","Age": 21, "Degree": "MS", "Height": 71.0},
+       {"Name": "Om",     "Age": 22, "Degree": "BE", "Height": 67.1},
    ]
 ```
 
@@ -786,10 +786,10 @@ Such data can also be stored in JSON/UBJSON in two forms:
   JData form
 ```
    {
-       "Name":   ["Mike","Julia","Steve"],
-       "Age":    [21,25,26],
+       "Name":   ["Andy","William","Om"],
+       "Age":    [21,21,22],
        "Degree": ["BS","MS","BE"],
-       "Height": [71.2,67.0,69.1]
+       "Height": [69.2,71.0,67.1]
    }
 ```
 
