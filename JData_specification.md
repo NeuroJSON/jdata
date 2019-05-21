@@ -726,7 +726,7 @@ When a compressed array format is used, `"_ArrayCompressionMethod_"` and
 `"_ArrayCompressionSize_"` must appear before `"_ArrayCompressedData_"`.
 
 
-#### Associative arrays or Maps
+#### Associative arrays or maps
 
 In a map or an associative/hashed array, the element can be accessed using a unique
 key. For example, the below pseudo code defines a 3-element associative array `@a` with
@@ -743,7 +743,7 @@ Such data structure can be conveniently represented using JSON/UBJSON as
    }
 ```
 
-To store maps with non-string valued keys, one can use a 2xN array enclosed inside 
+To store maps with non-string valued keys, one can use a 2-D array enclosed inside 
 a `"_MapData_"` construct, for example
 ```
    "_MapData_": [
@@ -755,7 +755,7 @@ a `"_MapData_"` construct, for example
    ]
 ```
 Each element of the `_MapData_` array may contain more than 2 elements; the additional 
-elements will be treated as auxiliary data.
+elements shall be treated as auxiliary data.
 
 #### Tables
 
