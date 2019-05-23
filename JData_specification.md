@@ -13,7 +13,7 @@ readability and simplicity. It utilizes the JavaScript Object Notation
 store complex hierarchical data in both text and binary formats. In this 
 specification, we define a list of JSON-compatible constructs to store
 a wide range of data structures, including scalars, arrays, structures, 
-tables, hashes, linked lists, trees and graphs, including optional data
+tables, hashes, linked lists, trees and graphs, and support for optional data
 grouping and metadata for each data element. The generated data files are 
 compatible with JSON/UBJSON specifications and can be readily processed by 
 most existing parsers. Advanced features such as array compression, data 
@@ -1111,10 +1111,10 @@ The third parameter, `is_compact` is a boolean flag. If set to `true`, `JD_GetNo
 shall skip the index if any of the dimensions along the indexing vector is a singlet, 
 i.e. the child count is 1. The compact indexing vector, enclosed by double-square-brackets 
 as `[[...]]`, shall be passed to `JD_GetNode` as the 2nd input when `is_compact` is `true`.
-Using the above example, both index vectors [[2,3]] and [2,3,1] refers to 
+Using the above example, both index vectors [[2,3]] and [2,3,1] refer to 
 `"_TreeNode_(node3)": data3`. Please be aware that the compact indexing vector can not
 distinguish between row and column vectors, as the row vector in JData has a trailing 
-singlet dimension (see N-D array section).
+singlet dimension ([see N-D array section](#direct-storage-of-n-d-arrays)).
 
 An optional alternative indexing vector definition allows to replace the index within a 
 structure by a corresponding string, can be the name of the data item or a hashed version. 
