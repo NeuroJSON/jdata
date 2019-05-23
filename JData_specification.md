@@ -216,16 +216,17 @@ separated by 0 or multiple permitted white spaces, namely
 ### Binary JData Storage Grammar
 
 The binary JData grammar is identical to the UBJSON grammar defined in 
-[ubjson.org (Draft 12)](http://ubjson.org), with the following two exceptions
+[ubjson.org (Draft 12)](http://ubjson.org), with the following three exceptions
 
-1. JData does not support `[N]` (`"no-op"`) record, and
-2. optimized array container header was extended to support N-dimensional dense arrays:
+1. JData stores an `[N]` (`"no-op"`) record as `null` when saving the data in the text-format,
+2. JData uses IEEE 754 binary form to store +/-Infinity, instead of converting to [Z], and
+3. optimized array container header was extended to support N-dimensional dense arrays:
 ```
-[[] [$] [type] [#] [[] [$] [nx type] [#] [ndim type] [ndim] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type)] []]
+[[] [$] [type] [#] [[] [$] [nx type] [#] [ndim type] [ndim] [nx ny nz ...] [nx*ny*nz*...*sizeof(type)]
 ```
    or
 ```
-[[] [$] [type] [#] [[] [nx type] [nx] [ny type] [ny] [nz type] [nz] ... []] [nx*ny*nz*...*sizeof(type) ] []]
+[[] [$] [type] [#] [[] [nx type] [nx] [ny type] [ny] [nz type] [nz] ... []] [nx*ny*nz*...*sizeof(type) ]
 ```
 where `ndim` is the number of dimensions, and `nx`, `ny`, and `nz` ... are 
 all non-negative numbers specifying the dimensions of the N-dimensional array,
