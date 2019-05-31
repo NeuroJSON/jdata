@@ -711,20 +711,27 @@ files. Compressed data format is only supported in the annotated array storage f
 
 Four additional nodes are added to the annotated array structure
 
-* **`_ArrayCompressionMethod_`**: a string-valued leaflet to store the compression 
+* **`_ArrayCompressionMethod_`**: (required) a string-valued leaflet to store the compression 
   method, for example, "zlib", "gzip" or "lzma"
-* **`_ArrayCompressionSize_`**: the dimensions of the pre-processed array, i.e. the data
+* **`_ArrayCompressionSize_`**: (required) the dimensions of the pre-processed array, i.e. the data
   originally stored in `_ArrayData_` in the format specified by `"_ArrayType_"`, 
   before the array binary stream type-casted to byte stream and compression.
-* **`_ArrayCompressionEndian_`**: a case-insensitive string, either "little" or "big",
-  indicating the endianness of the byte-stream before compression; if missing, assume
-  to be "little"
-* **`_ArrayCompressedData_`**: in addition, the `"_ArrayData_"` node is replaced by 
+* **`_ArrayCompressedData_`**: (required) in addition, the `"_ArrayData_"` node is replaced by 
   `"_ArrayCompressedData_"`. In the case of JSON-formatted JData files, 
   `"_ArrayCompressedData_"` has a string value storing the "Base64" encoded compressed 
   byte-stream of the pre-processed array. In the case of UBJSON flavored JData, 
   `"_ArrayCompressedData_"` directly stores the compressed byte stream of the 
   pre-processed array without "Base64" encoding.
+
+In addition, the following optional parameters may also be used
+
+* **`_ArrayCompressionEndian_`**: (optional) a case-insensitive string, either "little" or "big",
+  indicating the endianness of the byte-stream before compression; if missing, assume
+  to be "little"
+* **`_ArrayCompressionLevel_`**: (optional) a numerical value, typically an integer between
+  0 and 9, specifying the level of the compression (interpretation is method/library-dependent)
+* **`_ArrayCompressionOptions_`**: (optional) an array object allowing users to specify
+  additional compression-method specific parameters (interpretation is method/library-dependent)
 
 When a compressed array format is used, `"_ArrayCompressionMethod_"` and 
 `"_ArrayCompressionSize_"` must appear before `"_ArrayCompressedData_"`.
