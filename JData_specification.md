@@ -623,10 +623,11 @@ The first 8 data types are considered "integer" types, and the last two types ar
 ##### Complex-valued arrays
 
 JData supports the storage of complex values or arrays using only the annotated N-D array storage
-format. In this case, a named node `"_ArrayIsComplex_":true` or `"_ArrayIsComplex_":1` 
-is added into the structure. In the meantime, the `"_ArrayData_"` becomes the concatenation of the
-serialized real and imaginary parts of the complex array, with the real-part in the first half, and
-the imaginary-part in the 2nd half.
+format. In this case, a named node `"_ArrayIsComplex_":true` must be added into the 
+structure. In the meantime, `"_ArrayData_"` shall be defined as a 2-D array by concatenating the
+serialized real and imaginary parts of the complex array as column vectors, with the real-part 
+as the first column vector, and the imaginary-part in the 2nd column vector. The two  column 
+vectors must have the same length.
 
 For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+9.7*i]` can be stored as
 
@@ -635,7 +636,7 @@ For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+
        "_ArrayType_": "double",
        "_ArraySize_": [1, 3],
        "_ArrayIsComplex_": true,
-       "_ArrayData_": [2,4,1.2,6,3.2,9.7]
+       "_ArrayData_": [[2, 4, 1.2], [6, 3.2, 9.7]]
    }
 ```
 
@@ -644,14 +645,15 @@ The `"_ArrayIsComplex_"` node must be presented before `"_ArrayData_"`.
 ##### Sparse arrays
 
 JData also supports the storage of N-D sparse arrays using the annotated N-D array storage
-format. In this case, a named node `"_ArrayIsSparse_":true` or `"_ArrayIsSparse_":1` 
-is added into the structure. In the meantime, the "_ArrayData_" becomes the concatenations 
-of the serialized N-tuple integer indices, followed by the non-zero array element values. 
-For an N-D sparse array, each non-zero value requires an N-tuple index to specify its 
-location.
+format. In this case, a named node `"_ArrayIsSparse_":true` must be added into 
+the structure. In the meantime, the `"_ArrayData_"` shall be defined as a 2-D array by 
+concatenating the N-tuple integer indices (left-most index first, and so on), each as a
+column vector, followed by the column vector of the serialized non-zero array element 
+values. For an N-D sparse array, each non-zero value requires an N-tuple index to specify 
+its location.
 
 For example, if a 3-D sparse array has the following non-zero element at the specified 
-locations by a triplets `[i1, i2, i3]`:
+locations by a triplet `(i1, i2, i3)`:
 ```
   a: i1, i2, i3, value
       2   3   1   10.1
@@ -667,7 +669,7 @@ it can be saved as the following JSON format
        "_ArrayType_": "double",
        "_ArraySize_": [5, 4, 3],
        "_ArrayIsSparse_": true,
-       "_ArrayData_": [2,3,3,5,5,2, 3,1,3,1,2,2, 1,1,1,2,2,3, 10.1,9.0,8.1,17,9.4,20.5]
+       "_ArrayData_": [[2,3,3,5,5,2], [3,1,3,1,2,2], [1,1,1,2,2,3], [10.1,9.0,8.1,17,9.4,20.5]]
    }
 ```
 The `"_ArrayIsSparse_"` node must be presented before `"_ArrayData_"`.
@@ -676,10 +678,11 @@ The `"_ArrayIsSparse_"` node must be presented before `"_ArrayData_"`.
 
 Using the combination of `"_ArrayIsComplex_"` and `"_ArrayIsSparse_"`, one can store
 a complex-valued sparse array using JData. In this case, both `"_ArrayIsComplex_":true` 
-and `"_ArrayIsSparse_":true` shall be presented in the structure, with `"_ArrayData_"` 
-ordered by serialized non-zero element indices (left-most index first, and so on), followed
-by the serialized real-values of the non-zero elements, and lastly the imaginary-values of 
-the non-zero elements.
+and `"_ArrayIsSparse_":true` must be presented in the structure, with `"_ArrayData_"` 
+ordered by the N-tuple non-zero element indices (left-most index first, and so on), 
+each as a column vector, followed by a column vector for the real-values of the non-zero elements, and 
+lastly the column vector for the imaginary-values of the non-zero elements. All column vectors
+of `"_ArrayData_"` must have the same length.
 
 For example, if a 3-D sparse array has the following non-zero complex element at the 
 specified indices `(i1, i2, i3)`
@@ -696,7 +699,7 @@ it can be saved as the following JSON format
        "_ArraySize_": [4, 3, 2],
        "_ArrayIsComplex_": true,
        "_ArrayIsSparse_": true,
-       "_ArrayData_": [2,3,3, 3,1,3, 1,1,2, 10.1,9.0,8.1, 19.0,11,8.2]
+       "_ArrayData_": [[2,3,3], [3,1,3], [1,1,2], [10.1,9.0,8.1], [19.0,11,8.2]]
    }
 ```
 or the corresponding UBJSON equivalents.
