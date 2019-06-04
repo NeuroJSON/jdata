@@ -2,7 +2,7 @@
 ============================================================
 
 - **Status of this document**: This document is current under development.
-- **Copyright**: (C) Qianqian Fang (2015, 2019) <q.fang at neu.edu>
+- **Copyright**: (C) Qianqian Fang (2011, 2015, 2019) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
 - **Version**: 0.6 (Draft 1)
 - **Abstract**:
@@ -344,10 +344,11 @@ Below is a short summary of the JData data annotation/storage keywords to be int
   `_ArrayIsSparse_`,`_ArrayData_`,`_ArrayCompressionMethod_`,`_ArrayCompressionSize_`, 
   `_ArrayCompressionEndian_`, `_ArrayCompressedData_`
 * **Hash/Map**: `_MapData_`
+* **Table**: `_TableData_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
 * **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
 * **Graph**: `_GraphData_`,`_GraphNodes_`,`_GraphEdges_`,`_GraphMatrix_`
-* **Table**: `_TableData_`
+* **Byte-stream**: `_ByteStream_`
 * **Inline metadata**: `"item_name::Property1=value1,Property2=value2,...": ...`
 * **Metadata record**: `{"_DataInfo_":{...}}`
 * **Data links and anchors**: `_DataLink_`, `_DataAnchor_`
