@@ -26,7 +26,7 @@ draft of this file specification, including
     RFC (Request for comments) commit (where the entire file is removed
     and re-added so that every line appears in such comment). One can
     write short comments as well as post replies on this RFC page. 
-  - The latest RFC commit is based on Draft 1 (version v0.6). Please use
+  - The latest RFC commit is based on **Draft 1 (version v0.6)**. Please use
     [this link](https://github.com/fangq/jdata/commit/f8fc8f1b814e7a4654b7b0092de15eaafa94d3da) to comment.
   - To add a comment, you need to first register a github account, and then 
     browse the above RFC page. When hovering your cursor over each line, a 
