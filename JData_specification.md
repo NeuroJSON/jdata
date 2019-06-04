@@ -216,8 +216,8 @@ separated by 0 or multiple permitted white spaces, namely
 
 ### Binary JData Storage Grammar
 
-The binary JData grammar is identical to the UBJSON grammar defined in 
-[ubjson.org (Draft 12)](http://ubjson.org), with the following three exceptions
+The binary JData grammar is identical to the UBJSON grammar defined in the
+[UBJSON Specification (Draft 12)](http://ubjson.org), with the following three exceptions
 
 1. JData stores an `[N]` (`"no-op"`) record as `null` when saving the data in the text-format,
 2. JData uses IEEE 754 binary form to store +/-Infinity, instead of converting to [Z], and
@@ -1077,7 +1077,8 @@ valued byte-stream "JData specification" shall be stored as
 `"_ByteStream_":"SkRhdGEgc3BlY2lmaWNhdGlvbg=="`
 
 In the binary JData, a byte-stream shall be encoded using a similar `"name":value` pair where the 
-`value` is reprented by an `[H]` marker. As specified in the UBJSON specification (Draft 12), 
+`value` is reprented by an `[H]` marker. As specified in the 
+[UBJSON Specification (Draft 12)](http://ubjson.org/type-reference/value-types/#numeric-gt-64bit), 
 the `[H]` marker is immediately followed by the length of the byte stream, then followed by 
 the raw binary values of the byte-stream **without Base64 encoding**. The same example above 
 can be stored as
