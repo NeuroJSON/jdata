@@ -4,7 +4,7 @@
 - **Status of this document**: This document is current under development.
 - **Copyright**: (C) Qianqian Fang (2015, 2019) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
-- **Version**: 0.5.1
+- **Version**: 0.6 (Draft 1)
 - **Abstract**:
 
 > JData is a general-purpose data interchange format aimed for portability,
@@ -1072,7 +1072,7 @@ A binary byte-stream of arbitrary length can be stored in the text-based JData u
 `"_ByteStream_":"..."`
 
 where the string value `"..."` shall be the Base64-encoded byte-stream binary data. For example, a string
-valued byte-stream "JData specification" shall be stored as
+valued byte-stream `"JData specification"` shall be stored as
 
 `"_ByteStream_":"SkRhdGEgc3BlY2lmaWNhdGlvbg=="`
 
