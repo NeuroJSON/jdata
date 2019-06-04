@@ -231,8 +231,8 @@ The binary JData grammar is identical to the UBJSON grammar defined in
 where `ndim` is the number of dimensions, and `nx`, `ny`, and `nz` ... are 
 all non-negative numbers specifying the dimensions of the N-dimensional array,
 `nz/ny/nz/ndim` types must be one of the UBJSON integer types (`i,U,I,l,L`), . 
-The binary data of the N-dimensional array is then serialized in the **column-major** format 
-(similar to MATLAB or FORTRAN) order.
+The binary data of the N-dimensional array is then serialized in the **row-major** format 
+(similar to C, C++, Javascript or Python) order.
 
 As a special note, all UBJSON integer types must be stored in the Big-Endian 
 format, according to the specification; the storage to the floating point types 
@@ -527,14 +527,14 @@ The following constants are supported by this version of the specification
   can be omitted); in the binary JData, they should be stored in the IEEE 754 format
 * logical `true`/`false`: A logical `true`/`false` should be represented by the JSON `true/false` 
   logical values, or `[T]`/`[F]` markers in UBJSON
-* `Null`: a `Null` (empty) value can be stored as `null` in JSON and `[Z]` in UBJSON
+* `Null`: a `Null` (empty) value shall be stored as `null` in JSON and `[Z]` in UBJSON
 
 
 #### N-Dimensional Array Storage Keywords
 
-An N-dimensional array is serialized using the column-major format (i.e. the fastest index
-is the left-most index, similar to arrays in MATLAB and FORTRAN; in comparison, C arrays
-are row-majored).
+An N-dimensional array is serialized using the **row-major** format (i.e. the fastest index
+is the right-most index, similar to arrays in C, C++ or Python; in comparison, MATLAB and 
+FORTRAN arrays are column-majored).
 
 A solid (non-sparse) N-dimensional array can be represented in two forms in JData - the 
 direct storage format and the annotated storage format.
@@ -542,18 +542,18 @@ direct storage format and the annotated storage format.
 ##### Direct storage of N-D arrays
 
 A solid N-D array can be stored directly using JSON/UBJSON nested array constructs. For example, 
-a 1-D column vector can be stored as
+a 1-D row vector shall be stored as
 
 `[1,2,11,9,2.1,10,...]`
 
-while a 1-D row-vector can be stored as
+while a 1-D column-vector shall be stored as
 
 ```
 [[1],[2],[11],[9],[2.1],[10],...]
 ```
 in the JSON-formatted JData.
 
-Below is an example of a 4x3x2 3-D array stored in JSON-formatted JData:
+Below is an example of a 2x3x4 3-D array stored in JSON-formatted JData:
 
 ```
   [
@@ -594,10 +594,10 @@ The annotated array format is shown below for a solid 2x3 array `a=[[1,2],[3,4],
 Here, the array annotation keywords are defined below:
 
 * **`"_ArrayType_"`**: (required) a case-insensitive string value to specify the type of the data, see below
-* **`"_ArraySize_"`**: (required) an integer-valued (see below) 1-D column vector, storing the dimensions 
+* **`"_ArraySize_"`**: (required) an integer-valued (see below) 1-D row vector, storing the dimensions 
   of the N-D array
-* **`"_ArrayData_"`**: (required) a 1-D column vector storing the serialized array values, using the 
-  column-major element order
+* **`"_ArrayData_"`**: (required) a 1-D row vector storing the serialized array values, using the 
+  **row-major** element order
 
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, 
 it is required that the `"_ArrayType_"` and `"_ArraySize_"` nodes must appear before 
@@ -625,11 +625,11 @@ The first 8 data types are considered "integer" types, and the last two types ar
 JData supports the storage of complex values or arrays using only the annotated N-D array storage
 format. In this case, a named node `"_ArrayIsComplex_":true` must be added into the 
 structure. In the meantime, `"_ArrayData_"` shall be defined as a 2-D array by concatenating the
-serialized real and imaginary parts of the complex array as column vectors, with the real-part 
-as the first column vector, and the imaginary-part in the 2nd column vector. The two  column 
+serialized real and imaginary parts of the complex array as row vectors, with the real-part 
+as the first row vector, and the imaginary-part in the 2nd row vector. The two row 
 vectors must have the same length.
 
-For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+9.7*i]` can be stored as
+For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+9.7*i]` shall be stored as
 
 ```
    {
@@ -648,7 +648,7 @@ JData also supports the storage of N-D sparse arrays using the annotated N-D arr
 format. In this case, a named node `"_ArrayIsSparse_":true` must be added into 
 the structure. In the meantime, the `"_ArrayData_"` shall be defined as a 2-D array by 
 concatenating the N-tuple integer indices (left-most index first, and so on), each as a
-column vector, followed by the column vector of the serialized non-zero array element 
+row vector, followed by the row vector of the serialized non-zero array element 
 values. For an N-D sparse array, each non-zero value requires an N-tuple index to specify 
 its location.
 
@@ -663,7 +663,7 @@ locations by a triplet `(i1, i2, i3)`:
       5   2   2   9.4
       2   2   3   20.5
 ```
-it can be saved as the following JSON format
+it shall be stored in the following JSON format
 ```
    {
        "_ArrayType_": "double",
@@ -680,8 +680,8 @@ Using the combination of `"_ArrayIsComplex_"` and `"_ArrayIsSparse_"`, one can s
 a complex-valued sparse array using JData. In this case, both `"_ArrayIsComplex_":true` 
 and `"_ArrayIsSparse_":true` must be presented in the structure, with `"_ArrayData_"` 
 ordered by the N-tuple non-zero element indices (left-most index first, and so on), 
-each as a column vector, followed by a column vector for the real-values of the non-zero elements, and 
-lastly the column vector for the imaginary-values of the non-zero elements. All column vectors
+each as a row vector, followed by a row vector for the real-values of the non-zero elements, and 
+lastly the row vector for the imaginary-values of the non-zero elements. All row vectors
 of `"_ArrayData_"` must have the same length.
 
 For example, if a 3-D sparse array has the following non-zero complex element at the 
@@ -692,7 +692,7 @@ specified indices `(i1, i2, i3)`
       3   1   1   9.0+11*i
       3   3   2   8.1+8.2*i
 ```
-it can be saved as the following JSON format
+it shall be stored in the following JSON format
 ```
    {
        "_ArrayType_": "double",
@@ -1017,14 +1017,14 @@ we can write this matrix using direct form
               "node3": data3
         },
         "_GraphMatrix_":[
-          [0,0,0,0],
-          [1,0,0,0],
-          [0,1,0,1],
-          [0,1,1,0]
+          [0,1,0,0],
+          [0,0,1,1],
+          [0,0,0,1],
+          [0,0,1,0]
         ]
     }
 ```
-Notice that the matrix is serialized in the column-major order in the above example. Alternatively, one
+Notice that the matrix is serialized in the **row-major** order in the above example. Alternatively, one
 can also use the annotated array format to take advantage of the sparsity of the data:
 ```
     {
@@ -1056,7 +1056,7 @@ One can also apply array compression, as explained above, to further reduce the 
 	}
   }
 ```
-here the `"_ArrayCompressedData_"` stores the column-major-serialized, byte-typecasted,
+here the `"_ArrayCompressedData_"` stores the row-major-serialized, byte-typecasted,
 zlib-compressed and finally base64-encoded adjacency matrix.
 
 
@@ -1123,7 +1123,7 @@ i.e. the child count is 1. The compact indexing vector, enclosed by double-squar
 as `[[...]]`, shall be passed to `JD_GetNode` as the 2nd input when `is_compact` is `true`.
 Using the above example, both index vectors [[2,3]] and [2,3,1] refer to 
 `"_TreeNode_(node3)": data3`. Please be aware that the compact indexing vector can not
-distinguish between row and column vectors, as the row vector in JData has a trailing 
+distinguish between row and column vectors, as the column vector in JData has a trailing 
 singlet dimension ([see N-D array section](#direct-storage-of-n-d-arrays)).
 
 An optional alternative indexing vector definition allows to replace the index within a 
