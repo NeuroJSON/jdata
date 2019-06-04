@@ -1076,20 +1076,20 @@ valued byte-stream "JData specification" shall be stored as
 
 `"_ByteStream_":"SkRhdGEgc3BlY2lmaWNhdGlvbg=="`
 
-In the binary JData, a byte-stream shall be encoded by a similar `"name":value` pair where the 
+In the binary JData, a byte-stream shall be encoded using a similar `"name":value` pair where the 
 `value` is reprented by an `[H]` marker. As specified in the UBJSON specification (Draft 12), 
 the `[H]` marker is immediately followed by the length of the byte stream, then followed by 
-the raw binary values of the byte-stream **without base64 encoding**. The same example above 
+the raw binary values of the byte-stream **without Base64 encoding**. The same example above 
 can be stored as
 
 `[U][12][_ByteStream_][H][U][19][JData specification]`
 
-The parsing and interpretation of the byte-stream data is application dependent. This is the most 
+The parsing and interpretation of the byte-stream data are application dependent. This is the most 
 generic form of data storage but contains the least data semantic information. One can use this 
 construct as containers to binary files, data segments, or encrypted data or files. In the case 
-of data encryption, additional information related to the encription and decription, if needed, 
-shall be stored as the metadata to the `"_ByteStream_"` object as specified in the 
-[Metadata section](#metadata)).
+of data encryption, additional information related to the encryption and decryption, if needed, 
+shall be stored as the metadata to the `"_ByteStream_"` object with a format specified in the 
+[Metadata section](#metadata).
 
 
 Indexing and Accessing JData
