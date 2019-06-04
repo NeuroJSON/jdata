@@ -54,7 +54,7 @@ scalability of the generated data files.
         + [Trees](#trees)
         + [Singly and doubly linked lists](#singly-and-doubly-linked-lists)
         + [Directed and undirected graphs](#directed-and-undirected-graphs)
-	+ [Generic byte-stream data](#generic-byte-stream-data)
+        + [Generic byte-stream data](#generic-byte-stream-data)
 - [Indexing and Accessing JData](#indexing-and-accessing-jdata)
     * [Index vector](#index-vector)
     * [Data query](#data-query)
