@@ -981,7 +981,8 @@ we can then store this data structure as
     }
 ```
 The data associated with each edge (edgedata) in this example is optional and can be any JData 
-structure supported in this document.
+structure supported in this document. If the edge data is a scalar, it can be interpreted as 
+weights in a weighted graph.
 
 By default, the graph is assumed to be a directed graph. If a user intends to store undirected 
 graph using the above format, one must use `"_GraphEdges_(false)"` or `"_GraphEdges_(0)"` to 
@@ -1058,6 +1059,9 @@ One can also apply array compression, as explained above, to further reduce the 
 ```
 here the `"_ArrayCompressedData_"` stores the row-major-serialized, byte-typecasted,
 zlib-compressed and finally base64-encoded adjacency matrix.
+
+In addition, a weighted graph can also be stored using the adjacency matrix by replacing
+the "1"s in the matrix by the weight value (a numerical scalar).
 
 
 Indexing and Accessing JData
