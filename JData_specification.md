@@ -223,7 +223,7 @@ The binary JData grammar is identical to the UBJSON grammar defined in the
 2. JData uses IEEE 754 binary form to store +/-Infinity, instead of converting to [Z], and
 3. optimized array container header was extended to support N-dimensional dense arrays:
 ```
-[[] [$] [type] [#] [[] [$] [nx type] [#] [ndim type] [ndim] [nx ny nz ...] [nx*ny*nz*...*sizeof(type)]
+[[] [$] [type] [#] [[] [$] [nx type] [#] [ndim] [nx ny nz ...] [nx*ny*nz*...*sizeof(type)]
 ```
    or
 ```
