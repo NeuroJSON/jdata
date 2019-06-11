@@ -223,7 +223,7 @@ The binary JData grammar is identical to the UBJSON grammar defined in the
 2. JData uses IEEE 754 binary form to store +/-Infinity, instead of converting to [Z], and
 3. optimized array container header was extended to support N-dimensional dense arrays:
 ```
-[[] [$] [type] [#] [[] [$] [nx type] [#] [ndim type] [ndim] [nx ny nz ...] [nx*ny*nz*...*sizeof(type)]
+[[] [$] [type] [#] [[] [$] [nx type] [#] [ndim] [nx ny nz ...] [nx*ny*nz*...*sizeof(type)]
 ```
    or
 ```
@@ -790,7 +790,7 @@ Such data can also be stored in JSON/UBJSON in two forms:
    [
        {"Name": "Andy",   "Age": 21, "Degree": "BS", "Height": 69.2},
        {"Name": "William","Age": 21, "Degree": "MS", "Height": 71.0},
-       {"Name": "Om",     "Age": 22, "Degree": "BE", "Height": 67.1},
+       {"Name": "Om",     "Age": 22, "Degree": "BE", "Height": 67.1}
    ]
 ```
 
@@ -857,7 +857,7 @@ can be represented by the below JSON structure
                  {"_TreeNode_(node2.2): data2.2}
              ]
          },
-         {"_TreeNode_(node3)": data3},
+         {"_TreeNode_(node3)": data3}
      ]
   }
 ```
@@ -879,7 +879,7 @@ about the tree nodes, for example
                  {"_TreeNode_(node2.2)::NodeID=5,ParentID=3": data2.2}
              ]
          },
-         {"_TreeNode_(node3)::NodeID=6,ParentID=1": data3},
+         {"_TreeNode_(node3)::NodeID=6,ParentID=1": data3}
      ]
   }
 ```
@@ -1142,7 +1142,7 @@ of each node is listed below on the right side:
          },
          {                                          <- [2,3]
              "_TreeNode_(node3)": data3             <- [2,3,1], or [[2,3]]
-         },
+         }
      ]
   }
 ```
