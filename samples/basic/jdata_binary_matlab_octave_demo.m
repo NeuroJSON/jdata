@@ -6,9 +6,9 @@ if(~exist('saveubjson','file') || ~exist('loadubjson','file'))
     error('you must install JSONLab 2.0 from https://github.com/fangq/jsonlab')
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%===================================================================
 % Binary JData encoding and decoding using saveubjson and loadubjson
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%===================================================================
 
 rngstate = rand ('state');
 randseed=hex2dec('623F9A9E');
@@ -110,20 +110,6 @@ json2data=loadubjson(ans)
 if(any(json2data(:)~=data2json(:)) || any(size(json2data)~=size(data2json)))
     warning('conversion does not preserve original data');
 end
-
-fprintf(1,'\n%%=================================================\n')
-fprintf(1,'%%  a 3-D array in nested array form (JSONLab 1.9)\n')
-fprintf(1,'%%=================================================\n\n')
-
-data2json=reshape(1:(2*4*6),[2,4,6]);
-saveubjson('',data2json,'NestArray',1,'FormatVersion',1.8)
-
-fprintf(1,'\n%%=================================================\n')
-fprintf(1,'%%  a 3-D array in annotated array form (JSONLab 1.9 or earlier)\n')
-fprintf(1,'%%=================================================\n\n')
-
-data2json=reshape(1:(2*4*6),[2,4,6]);
-saveubjson('',data2json,'NestArray',0,'FormatVersion',1.8)
 
 fprintf(1,'\n%%=================================================\n')
 fprintf(1,'%%  a complex number\n')
@@ -326,6 +312,22 @@ if(exist('istable'))
     data2json=table(Names,Age)
     saveubjson('table',table(Names,Age))
     json2data=loadubjson(ans)
+end
+
+try
+    val=zlibencode('test');
+    fprintf(1,'\n%%=================================================\n')
+    fprintf(1,'%%  a 2-D array in compressed array format\n')
+    fprintf(1,'%%=================================================\n\n')
+
+    data2json=eye(10);
+    data2json(20,1)=1;
+    saveubjson('',data2json,'Compression','zlib','CompressionSize',0)  % nestarray for 4-D or above is not working
+    json2data=loadubjson(ans)
+    if(any(json2data(:)~=data2json(:)) || any(size(json2data)~=size(data2json)))
+        warning('conversion does not preserve original data');
+    end
+catch
 end
 
 rand ('state',rngstate);

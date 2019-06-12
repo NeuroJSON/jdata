@@ -137,7 +137,8 @@ one"two
 
 ans =
 
-{UstrSUAB	CD
+{UstrSU
+AB	CD
 one"two}
 
 
@@ -173,7 +174,8 @@ json2data =
 
 ans =
 
-[[[ii	iii!i)][iiiii#i+][iiiii%i-][iiiii'i/]][[ii
+[[[ii	iii!i)][iiiii#i+][ii
+iii%i-][iiiii'i/]][[ii
 iii"i*][iiiii$i,][iiiii&i.][iiii i(i0]]]
 
 
@@ -189,7 +191,8 @@ json2data =
 
 ans =
 
-{U_ArrayType_SUdoubleU_ArraySize_[$U#UU_ArrayData_[$i#U0	!)#+%-'/
+{U_ArrayType_SUdoubleU_ArraySize_[$U#UU_ArrayData_[$i#U0	!)#+
+%-'/
 "*$,&. (0}
 
 
@@ -236,7 +239,8 @@ json2data(:,:,6) =
 
 ans =
 
-{U_ArrayType_SUdoubleU_ArraySize_[$U#UU_ArrayData_[$i#U0	!)#+%-'/
+{U_ArrayType_SUdoubleU_ArraySize_[$U#UU_ArrayData_[$i#U0	!)#+
+%-'/
 "*$,&. (0}
 
 
@@ -277,28 +281,6 @@ json2data(:,:,3,2) =
 
 
 %=================================================
-%  a 3-D array in nested array form (JSONLab 1.9)
-%=================================================
-
-
-ans =
-
-[[[ii][ii][ii][ii]][[i	i
-][ii][ii][ii]][[ii][ii][ii][ii]][[ii][ii][ii][ii ]][[i!i"][i#i$][i%i&][i'i(]][[i)i*][i+i,][i-i.][i/i0]]]
-
-
-%=================================================
-%  a 3-D array in annotated array form (JSONLab 1.9 or earlier)
-%=================================================
-
-
-ans =
-
-{U_ArrayType_SUdoubleU_ArraySize_[$U#UU_ArrayData_[$i#U0	
- !"#$%&'()*+,-./0}
-
-
-%=================================================
 %  a complex number
 %=================================================
 
@@ -336,7 +318,8 @@ data2json =
 ans =
 
 {U_ArrayType_SUdoubleU_ArraySize_[$U#UU_ArrayIsComplex_TU_ArrayData_[$i#[$U#U# 	
-!"$}
+!"
+$}
 
 
 json2data =
@@ -597,7 +580,8 @@ logical
 
 ans =
 
-{USupreme Commander[{UnameSUNexus PrimeUranki	}{UnameSUSentinel PrimeUranki	}{UnameSUOptimus PrimeUranki	}]}
+{USupreme Commander[{UnameSUNexus PrimeUranki	}{UnameSUSentinel PrimeUranki	}{UnameSU
+Optimus PrimeUranki	}]}
 
 
 json2data = 
@@ -768,4 +752,40 @@ ans =
 json2data = 
 
     table: {[1x1 struct]  [1x1 struct]  [1x1 struct]}
+
+
+%=================================================
+%  a 2-D array in compressed array format
+%=================================================
+
+
+ans =
+
+{U_ArrayType_SUdoubleU_ArraySize_[$U#U
+U_ArrayCompressionSize_[$U#UÈU_ArrayCompressionMethod_SUzlibU_ArrayCompressedData_[$U#U xc` ö4£æ;jî(P/] ÁÎ
+}
+
+
+json2data =
+
+     1     0     0     0     0     0     0     0     0     0
+     0     1     0     0     0     0     0     0     0     0
+     0     0     1     0     0     0     0     0     0     0
+     0     0     0     1     0     0     0     0     0     0
+     0     0     0     0     1     0     0     0     0     0
+     0     0     0     0     0     1     0     0     0     0
+     0     0     0     0     0     0     1     0     0     0
+     0     0     0     0     0     0     0     1     0     0
+     0     0     0     0     0     0     0     0     1     0
+     0     0     0     0     0     0     0     0     0     1
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0
+     1     0     0     0     0     0     0     0     0     0
 
