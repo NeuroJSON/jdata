@@ -340,9 +340,9 @@ also present in any branch or leaf.
 Below is a short summary of the JData data annotation/storage keywords to be introduced
 
 * **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
-* **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, 
-  `_ArrayIsSparse_`,`_ArrayData_`,`_ArrayZipType_`,`_ArrayZipSize_`, 
-  `_ArrayZipEndian_`, `_ArrayZipData_`
+* **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, `_ArrayIsSparse_`,
+  `_ArrayData_`,`_ArrayZipType_`,`_ArrayZipSize_`, `_ArrayZipData_`, `_ArrayZipEndian_`, 
+  `_ArrayZipLevel_`, `_ArrayZipOptions_`
 * **Hash/Map**: `_MapData_`
 * **Table**: `_TableData_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
