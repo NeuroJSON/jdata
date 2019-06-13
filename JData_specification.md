@@ -730,9 +730,9 @@ In addition, the following optional parameters may also be used
 * **`_ArrayZipEndian_`**: (optional) a case-insensitive string, either "little" or "big",
   indicating the endianness of the byte-stream before compression; if missing, assume
   to be "little"
-* **`_ArrayCompressionLevel_`**: (optional) a numerical value, typically an integer between
+* **`_ArrayZipLevel_`**: (optional) a numerical value, typically an integer between
   0 and 9, specifying the level of the compression (interpretation is method/library-dependent)
-* **`_ArrayCompressionOptions_`**: (optional) an array object allowing users to specify
+* **`_ArrayZipOptions_`**: (optional) an array object allowing users to specify
   additional compression-method specific parameters (interpretation is method/library-dependent)
 
 When a compressed array format is used, `"_ArrayZipType_"` and 
