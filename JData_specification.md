@@ -341,8 +341,8 @@ Below is a short summary of the JData data annotation/storage keywords to be int
 
 * **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
 * **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, 
-  `_ArrayIsSparse_`,`_ArrayData_`,`_ArrayCompressionMethod_`,`_ArrayCompressionSize_`, 
-  `_ArrayCompressionEndian_`, `_ArrayCompressedData_`
+  `_ArrayIsSparse_`,`_ArrayData_`,`_ArrayZipType_`,`_ArrayZipSize_`, 
+  `_ArrayZipEndian_`, `_ArrayZipData_`
 * **Hash/Map**: `_MapData_`
 * **Table**: `_TableData_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
@@ -713,21 +713,21 @@ files. Compressed data format is only supported in the annotated array storage f
 
 Four additional nodes are added to the annotated array structure
 
-* **`_ArrayCompressionMethod_`**: (required) a string-valued leaflet to store the compression 
+* **`_ArrayZipType_`**: (required) a string-valued leaflet to store the compression 
   method, for example, "zlib", "gzip" or "lzma"
-* **`_ArrayCompressionSize_`**: (required) the dimensions of the pre-processed array, i.e. the data
+* **`_ArrayZipSize_`**: (required) the dimensions of the pre-processed array, i.e. the data
   originally stored in `_ArrayData_` in the format specified by `"_ArrayType_"`, 
   before the array binary stream type-casted to byte stream and compression.
-* **`_ArrayCompressedData_`**: (required) in addition, the `"_ArrayData_"` node is replaced by 
-  `"_ArrayCompressedData_"`. In the case of JSON-formatted JData files, 
-  `"_ArrayCompressedData_"` has a string value storing the "Base64" encoded compressed 
+* **`_ArrayZipData_`**: (required) in addition, the `"_ArrayData_"` node is replaced by 
+  `"_ArrayZipData_"`. In the case of JSON-formatted JData files, 
+  `"_ArrayZipData_"` has a string value storing the "Base64" encoded compressed 
   byte-stream of the pre-processed array. In the case of UBJSON flavored JData, 
-  `"_ArrayCompressedData_"` directly stores the compressed byte stream of the 
+  `"_ArrayZipData_"` directly stores the compressed byte stream of the 
   pre-processed array without "Base64" encoding.
 
 In addition, the following optional parameters may also be used
 
-* **`_ArrayCompressionEndian_`**: (optional) a case-insensitive string, either "little" or "big",
+* **`_ArrayZipEndian_`**: (optional) a case-insensitive string, either "little" or "big",
   indicating the endianness of the byte-stream before compression; if missing, assume
   to be "little"
 * **`_ArrayCompressionLevel_`**: (optional) a numerical value, typically an integer between
@@ -735,8 +735,8 @@ In addition, the following optional parameters may also be used
 * **`_ArrayCompressionOptions_`**: (optional) an array object allowing users to specify
   additional compression-method specific parameters (interpretation is method/library-dependent)
 
-When a compressed array format is used, `"_ArrayCompressionMethod_"` and 
-`"_ArrayCompressionSize_"` must appear before `"_ArrayCompressedData_"`.
+When a compressed array format is used, `"_ArrayZipType_"` and 
+`"_ArrayZipSize_"` must appear before `"_ArrayZipData_"`.
 
 
 #### Associative arrays or maps
@@ -1052,14 +1052,14 @@ One can also apply array compression, as explained above, to further reduce the 
 	"_GraphMatrix_": {
 		"_ArrayType_": "uint8",
 		"_ArraySize_": [4,4],
-		"_ArrayCompressionSize_": [1,16],
-		"_ArrayCompressionMethod_": "zlib",
-		"_ArrayCompressionEndian_": "little",
-		"_ArrayCompressedData_": "eJxjYGBgYGQAE0DIyAAAAC0ABg=="
+		"_ArrayZipSize_": [1,16],
+		"_ArrayZipType_": "zlib",
+		"_ArrayZipEndian_": "little",
+		"_ArrayZipData_": "eJxjYGBgYGQAE0DIyAAAAC0ABg=="
 	}
   }
 ```
-here the `"_ArrayCompressedData_"` stores the row-major-serialized, byte-typecasted,
+here the `"_ArrayZipData_"` stores the row-major-serialized, byte-typecasted,
 zlib-compressed and finally base64-encoded adjacency matrix.
 
 In addition, a weighted graph can also be stored using the adjacency matrix by replacing

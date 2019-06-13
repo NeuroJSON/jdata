@@ -490,5 +490,5 @@ ans =
 
 ans =
 
-{U<11>_ArrayType_SU<6>doubleU<11>_ArraySize_[$U#U<2><20><10>U<22>_ArrayCompressionSize_[$U#U<2><1><200>U<24>_ArrayCompressionMethod_SU<4>zlibU<21>_ArrayCompressedData_[$U#U<32><120><156><99><96><0><129><15><246><12><52><1><163><230><142><154><59><106><238><40><24><5><131><11><80><47><93><3><0><193><206><13><6>}
+{U<11>_ArrayType_SU<6>doubleU<11>_ArraySize_[$U#U<2><20><10>U<22>_ArrayZipSize_[$U#U<2><1><200>U<24>_ArrayZipType_SU<4>zlibU<21>_ArrayZipData_[$U#U<32><120><156><99><96><0><129><15><246><12><52><1><163><230><142><154><59><106><238><40><24><5><131><11><80><47><93><3><0><193><206><13><6>}
 
