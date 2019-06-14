@@ -2,7 +2,7 @@
 
 We use this repository to gather feedback from the community regarding the 
 ["JData Format Specification"](JData_specification.md), or JData format. Such 
-feedback is crucial to finalize this file specification and help to improve
+feedback is crucial to finalize this file specification and help improve
 it in the future once disseminated. 
 
 The latest version of the JData specification can be found in the file named 
