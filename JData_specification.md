@@ -1055,7 +1055,7 @@ One can also apply array compression, as explained above, to further reduce the 
 		"_ArrayZipSize_": [1,16],
 		"_ArrayZipType_": "zlib",
 		"_ArrayZipEndian_": "little",
-		"_ArrayZipData_": "eJxjYGBgYGQAE0DIyAAAAC0ABg=="
+		"_ArrayZipData_": "eJxjYGQAAkYQyQhCAAA5AAY=="
 	}
   }
 ```
