@@ -344,7 +344,7 @@ Below is a short summary of the JData data annotation/storage keywords to be int
   `_ArrayData_`,`_ArrayZipType_`,`_ArrayZipSize_`, `_ArrayZipData_`, `_ArrayZipEndian_`, 
   `_ArrayZipLevel_`, `_ArrayZipOptions_`
 * **Hash/Map**: `_MapData_`
-* **Table**: `_TableData_`
+* **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
 * **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
 * **Graph**: `_GraphData_`,`_GraphNodes_`,`_GraphEdges_`,`_GraphMatrix_`
@@ -782,7 +782,50 @@ columns (fields) and rows (records). For example
   William 21     MS      71.0
   Om      22     BE      67.1
 ```
-Such data can also be stored in JSON/UBJSON in two forms: 
+Such data can also be stored in JSON/UBJSON using 3 dedicated keywords
+* **`"_TableCols_"`**: a 1-D array denoting the name and type for each of the column of the table, 
+     can be empty if no name or types are associated with the columns
+* **`"_TableRows_"`**: a 1-D array denoting the name and type for each of the row of the table
+     can be empty if no name or types are associated with the rows
+* **`"_TableRecords_"`**: a 2-D array storing each entry in the 2-D table.
+
+For example, the above table can be serailized using the below format
+```
+    {
+        "_TableCols_": ["Name", "Age", "Degree", "Height"],
+	"_TableRows_": [],
+	"_TableRecords_": [
+	   ["Andy",    21, "BS", 69.2],
+	   ["William", 21, "MS", 71.0],
+	   ["Om",      22, "BS", 67.1]
+	]
+    }
+```
+
+The elements in the `"_TableRows_"` and `"_TableCols_"` can be a structure to accommodate 
+additional metadata associated with the row or column. One can use `"DataName"` to specify 
+the string name of the row or column, and `"DataType"` to specify their data types.
+
+The supported `"DataType"` values are the same as those defined for `"_ArrayType_"` for 
+numerical arrays, with the addition of the below types
+
+* `"string"`: a UTF-8 encoded string
+* `"bool"`: a boolean: either `true` or `false`
+* `"blob"`: a binary byte-stream, the format of the `blob` record is described in the [Generic byte-stream data](#generic-byte-stream-data) below (without the `"_ByteStream_"` container)
+
+For example, in the above example, one can define the columns as
+```
+    "_TableCols_": [
+        {"DataName": "Name", "DataType": "string"}, 
+        {"DataName": "Age", "DataType": "uint32"}, 
+	{"DataName": "Degree", "DataType": "string"}, 
+	{"DataName": "Height", "DataType": "single"}
+    ],
+    ...
+```
+
+In addition, a table can also be converted to an array of maps if a name is associated 
+with each of the rows or columns.
 
 * **Array of structures**: the table data can be serialized by grouping records in rows, such as
 
