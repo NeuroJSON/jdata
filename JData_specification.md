@@ -840,6 +840,8 @@ The `"param1"` in the above example is optional, similar to the band-matrix
 cases. If it is not included, the parser shall read the first sub-vector in 
 `"_ArrayData_"` to determine the effective element number.
 
+##### Complex-valued special matrices
+
 The `"_ArrayShape_"` descriptor can be used with `"_ArrayIsComplex":true` to store 
 complex-valued special matrices. In such case, the data-payload stored in `"_ArrayData_"` 
 shall add an extra left-most dimension (must be 2), and store the real and imaginary 
@@ -868,17 +870,28 @@ For example, a complex-valued Toeplitz matrix of the same shape shall be stored 
 where `r` and `i` values denote the real and imaginary parts of the effective values
 in the Toeplitz matrix.
 
-For all array types supported in this specification, we want to point out that the 
-encoded data stored in the `"_ArrayData_"` container is always rectangular (1-D, 2-D, 
-or 3-D) in shape. This allows us to efficient store and parse the data payload and
-apply compression as described below. We refer to the array data stored in `"_ArrayData_"`
-as the **"pre-processed" array**.
+In addition, when `"_ArrayIsComplex":true` presents, the `"_ArrayShape_"` `"shapeid"`
+can take the below additional values to represent "Hermitian matrices"
+
+* `"upperherm"` (similar to `"uppersymm"`)
+* `"lowerherm"` (similar to `"lowersymm"`)
+* `"upperhermband"` (similar to `"uppersymmband"`)
+* `"lowerhermband"` (similar to `"lowersymmband"`)
+
+where the mirrored elements across the diagonal shall have opposite signs for the 
+imaginary parts when decoding the array.
 
 
 ##### Compressed array storage format
 
 JData supports node-based data compression to enhance space-efficiency of the generated
 files. Compressed data format is only supported in the annotated array storage format.
+
+For all array types supported in this specification, we want to point out that the 
+encoded data stored in the `"_ArrayData_"` container is always rectangular (1-D, 2-D, 
+or 3-D) in shape. This allows us to efficient store and parse the data payload and
+apply compression. We refer to the array data stored in `"_ArrayData_"` as the 
+**"pre-processed" array**.
 
 Four additional nodes are added to the annotated array structure
 
@@ -1407,7 +1420,7 @@ The type must be able to distinguish the below 3 basic types
 Combining with the `JD_GetName`, one can also query if the element is a named one or indexed one.
 
 Additionally, JData-compliant library must provide the below interface to obtain the count of
-the childrens for each data item. A leaflet, an empty structure or an empty array should return
+the children for each data item. A leaflet, an empty structure or an empty array should return
 a length of 0.
 ```
     integer length   = JD_GetLength(JD_Node item)
