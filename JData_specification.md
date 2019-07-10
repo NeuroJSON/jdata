@@ -1,10 +1,10 @@
- JData: A general-purpose data storage and interchange format
+JData: A general-purpose data storage and interchange format
 ============================================================
 
 - **Status of this document**: This document is current under development.
 - **Copyright**: (C) Qianqian Fang (2011, 2015, 2019) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
-- **Version**: 0.6 (Draft 1)
+- **Version**: 0.8 (Draft 2)
 - **Abstract**:
 
 > JData is a general-purpose data interchange format aimed for portability,
@@ -48,6 +48,7 @@ scalability of the generated data files.
             - [Complex-valued arrays](#complex-valued-arrays)
             - [Sparse arrays](#sparse-arrays)
             - [Sparse complex-valued arrays](#sparse-complex-valued-arrays)
+            - [Special matrices](#special-matrices)
             - [Compressed array storage format](#compressed-array-storage-format)
         + [Associative arrays or maps](#associative-arrays-or-maps)
         + [Tables](#tables)
@@ -341,8 +342,8 @@ Below is a short summary of the JData data annotation/storage keywords to be int
 
 * **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
 * **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, `_ArrayIsSparse_`,
-  `_ArrayData_`,`_ArrayZipType_`,`_ArrayZipSize_`, `_ArrayZipData_`, `_ArrayZipEndian_`, 
-  `_ArrayZipLevel_`, `_ArrayZipOptions_`
+  `_ArrayData_`,`_ArrayShape_`, `_ArrayZipType_`,`_ArrayZipSize_`, `_ArrayZipData_`, 
+  `_ArrayZipEndian_`, `_ArrayZipLevel_`, `_ArrayZipOptions_`
 * **Hash/Map**: `_MapData_`
 * **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
@@ -609,11 +610,11 @@ The supported data types are similar to those supported by the UBJSON format, i.
 
 * **uint8**: unsigned byte (8-bit), `[U]` in UBJSON
 * **int8**: signed byte (8-bit), `[i]` in UBJSON
-* **uint16**: unsigned short (16-bit),  no correspondance in UBJSON, map to `[I]`
+* **uint16**: unsigned short (16-bit),  no correspondence in UBJSON, map to `[I]`
 * **int16**: signed short (16-bit), `[I]` in UBJSON
-* **uint32**: unsigned integer (32-bit),  no correspondance in UBJSON, map to `[l]`
+* **uint32**: unsigned integer (32-bit),  no correspondence in UBJSON, map to `[l]`
 * **int32**: signed integer (32-bit), `[l]` in UBJSON
-* **uint64**: unsigned long long integer (64-bit), no correspondance in UBJSON, map to `[L]`
+* **uint64**: unsigned long long integer (64-bit), no correspondence in UBJSON, map to `[L]`
 * **int64**: signed long long integer (64-bit), `[L]` in UBJSON
 * **single**: single-precision floating point (32-bit), `[d]` in UBJSON
 * **double**: double-precision floating point (64-bit), `[D]` in UBJSON
@@ -706,6 +707,174 @@ it shall be stored in the following JSON format
 ```
 or the corresponding UBJSON equivalents.
 
+
+##### Special matrices
+
+JData can efficiently store a list of special matrices via the `"_ArrayShape_"` descriptor.
+
+The `"_ArrayShape_"` descriptor can be used in conjunction with `"_ArrayIsComplex_"`
+but it shall not be used when `"_ArrayIsSparse_"` is set to `true`.
+
+The `"_ArrayShape_"` field shall be either in the form of
+
+`"_ArrayShape_": "shapeid"`
+
+or
+
+`"_ArrayShape_": ["shapeid", param1, param2, ...]`
+
+Here, the `"shapeid"` tag is a case-insensitive string specifying the type of the
+special matrix. The currently supported `"shapeid"` values include
+
+* `'diag'`: a diagonal matrix, can be a non-square matrix (optional `param1` 
+  defines the length of the diagonal elements, must be less than the smallest 
+  value in the `_ArraySize_` vector)
+* `'upper'`: an upper triangular (square) matrix (2-D only)
+* `'lower'`: a lower triangular (square) matrix (2-D only)
+* `'uppersymm'`: a symmetric (square) matrix, only storing the upper triangle (2-D only)
+* `'lowersymm'`: a symmetric (square) matrix, only storing the lower triangle (2-D only)
+
+For the above array types, the array entries falling under the mask of the prescribed shape,
+referred to as the "effective elements", are serialized as a single vector in the row-major 
+order in `"_ArrayData_"`. For example, a 3x3 upper triangular matrix:
+```
+   a11  a12  a13
+    0   a22  a23
+    0    0   a33
+```
+can be stored as 
+```
+ {
+   ...
+   "_ArrayShape_": "upper",
+   "_ArrayData_": [a11, a12, a13, a22, a23, a33]
+ }
+```
+
+In addition, band matrix are supported via the below `"shapeid"` tags
+
+* `'upperband'`: an upper-band matrix (2-D only, optional `param1` defines the 
+    number of super-diagonals of the matrix)
+* `'lowerband'`: an lower-band matrix (2-D only, optional `param1` defines the 
+    number of sub-diagonals of the matrix)
+* `'uppersymmband'`: a symmetric band-matrix by storing only the upper-band 
+   (2-D only, optional `param1` defines the number of super-diagonals of the matrix)
+* `'lowersymmband'`: a symmetric band-matrix by storing only the lower-band 
+   (2-D only, optional `param1` defines the number of sub-diagonals of the matrix)
+* `'band'`: an band matrix (2-D only, optionally, if only `param1` presents, it defines 
+    both the upper and lower bandwidths, if both `param1` and `param2` are given,
+    they define the numbers of super-diagonals and sub-diagonals, respectively)
+
+The [LAPACK-styled band-matrix storage method](https://www.netlib.org/lapack/lug/node124.html) 
+is used here. In other words, for the superdiagonal band (the band above the diagonal), 
+the band data are converted into a 2-D matrix with one diagonal line per row 
+(front-padding arbitrary values if the element is outside of the matrix); a 
+sub-diagonal band is converted to a 2-D matrix with one diagonal per row 
+(rear-padding zeros if the element is outside of the matrix).
+
+For example, the below band matrix has 2 super-diagonals, and 1 sub-diagonal, 
+and 1 diagonal (thus, a total bandwidth of 2+1+1=4)
+
+```
+    a11 a12 a13  0   0   0
+    a21 a22 a23 a24  0   0
+     0  a32 a33 a34 a35  0
+     0   0  a43 a44 a45 a46
+     0   0   0  a54 a55 a56
+     0   0   0   0  a65 a66
+```
+the above matrix can be stored as
+
+```
+ {
+   ...
+   "_ArraySize_": [6, 6],
+   "_ArrayShape_": ["band", 2, 1],
+   "_ArrayData_": [
+      [0   0   a13 a24 a35 a46],
+      [0   a12 a23 a34 a45 a56],
+      [a11 a22 a33 a44 a55 a66],
+      [a21 a32 a43 a54 a65  0 ]
+   ]
+ }
+```
+
+where the "0" entries are elements outside of the matrix, and can have an arbitrary 
+value. The dimensions of the `"_ArrayData_"` (as a 2-D array) are
+`(total bandwidth)`-by-`(maximum array dimension)`, where 
+   * `total bandwidth` = `param1`+ `param2` + 1
+   * `maximum array dimension` = the largest number in the `"_ArraySize_"` vector
+
+Moreover, Toeplitz matrices are supported via the below `"shapeid"` value:
+
+* `'toeplitz'`: a Toeplitz matrix by only storing the first row and first column 
+   (padding zeros to have the same length); if the optional `param1` presents, it
+   shall denote `max(#super-diagonals+1, #sub-diagonal+1)`
+
+For example, the below non-square (5-by-6) Toeplitz matrix with 3 effective values
+in the row `[a11 a12 a13]` and 2 effective values in the column `[a11 a21]`
+```
+    a11 a12 a13  0   0   0
+    a21 a11 a12 a13  0   0
+     0  a21 a11 a12 a13  0
+     0   0  a21 a11 a12 a13
+     0   0   0  a21 a11 a12
+```
+shall be stored as
+```
+ {
+   ...
+   "_ArraySize_": [5, 6],
+   "_ArrayShape_": ["toeplitz", 3],
+   "_ArrayData_": [
+      [a11, a12, a13],
+      [a11, a21, 0]
+   ]
+ }
+```
+Notice that the first elements of the row and the column must be identical. The 2nd vector
+in `"_ArrayData_"` is padded in the rear to match the length of the first vector, keeping
+`"_ArrayData_"` in a rectangular shape.
+
+The `"param1"` in the above example is optional, similar to the band-matrix
+cases. If it is not included, the parser shall read the first sub-vector in 
+`"_ArrayData_"` to determine the effective element number.
+
+The `"_ArrayShape_"` descriptor can be used with `"_ArrayIsComplex":true` to store 
+complex-valued special matrices. In such case, the data-payload stored in `"_ArrayData_"` 
+shall add an extra left-most dimension (must be 2), and store the real and imaginary 
+parts of the effective elements in the 1st and 2nd sub-matrices (of matching size), 
+respectively.
+
+For example, a complex-valued Toeplitz matrix of the same shape shall be stored as
+```
+ {
+   ...
+   "_ArraySize_": [5, 6],
+   "_ArrayIsComplex_": true,
+   "_ArrayShape_": ["toeplitz", 3],
+   "_ArrayData_": [
+      [
+          [r11, r12, r13],
+          [r11, r21, 0]
+      ],
+      [
+          [i11, i12, i13],
+          [i11, i21, 0]
+      ]
+   ]
+ }
+```
+where `r` and `i` values denote the real and imaginary parts of the effective values
+in the Toeplitz matrix.
+
+For all array types supported in this specification, we want to point out that the 
+encoded data stored in the `"_ArrayData_"` container is always rectangular (1-D, 2-D, 
+or 3-D) in shape. This allows us to efficient store and parse the data payload and
+apply compression as described below. We refer to the array data stored in `"_ArrayData_"`
+as the **"pre-processed" array**.
+
+
 ##### Compressed array storage format
 
 JData supports node-based data compression to enhance space-efficiency of the generated
@@ -715,7 +884,7 @@ Four additional nodes are added to the annotated array structure
 
 * **`_ArrayZipType_`**: (required) a string-valued leaflet to store the compression 
   method, for example, "zlib", "gzip" or "lzma"
-* **`_ArrayZipSize_`**: (required) the dimensions of the pre-processed array, i.e. the data
+* **`_ArrayZipSize_`**: (required) the dimensions of the **pre-processed array**, i.e. the data
   originally stored in `_ArrayData_` in the format specified by `"_ArrayType_"`, 
   before the array binary stream type-casted to byte stream and compression.
 * **`_ArrayZipData_`**: (required) in addition, the `"_ArrayData_"` node is replaced by 
@@ -738,6 +907,7 @@ In addition, the following optional parameters may also be used
 When a compressed array format is used, `"_ArrayZipType_"` and 
 `"_ArrayZipSize_"` must appear before `"_ArrayZipData_"`.
 
+`"_ArrayZipData_"` and `"_ArrayData_"` can not appear under the same parent node.
 
 #### Associative arrays or maps
 
@@ -904,7 +1074,7 @@ can be represented by the below JSON structure
      ]
   }
 ```
-and the corresponding UBJSON equivalents. The notations "data0", "data1" etc are parsed
+and the corresponding UBJSON equivalents. The notations "data0", "data1" etc. are parsed
 node data in JData format according to the rules defined in this section, depending on
 the type of the data.
 
