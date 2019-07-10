@@ -49,6 +49,7 @@ scalability of the generated data files.
             - [Sparse arrays](#sparse-arrays)
             - [Sparse complex-valued arrays](#sparse-complex-valued-arrays)
             - [Special matrices](#special-matrices)
+            - [Complex-valued special matrices](#complex-valued-special-matrices)
             - [Compressed array storage format](#compressed-array-storage-format)
         + [Associative arrays or maps](#associative-arrays-or-maps)
         + [Tables](#tables)
