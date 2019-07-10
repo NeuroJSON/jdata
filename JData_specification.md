@@ -891,7 +891,7 @@ files. Compressed data format is only supported in the annotated array storage f
 
 For all array types supported in this specification, we want to point out that the 
 encoded data stored in the `"_ArrayData_"` container is always rectangular (1-D, 2-D, 
-or 3-D) in shape. This allows us to efficient store and parse the data payload and
+or 3-D) in shape. This allows us to efficiently store and parse the data payload and
 apply compression. We refer to the array data stored in `"_ArrayData_"` as the 
 **"pre-processed" array**.
 
