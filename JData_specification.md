@@ -600,8 +600,8 @@ Here, the array annotation keywords are defined below:
 * **`"_ArrayType_"`**: (required) a case-insensitive string value to specify the type of the data, see below
 * **`"_ArraySize_"`**: (required) an integer-valued (see below) 1-D row vector, storing the dimensions 
   of the N-D array
-* **`"_ArrayData_"`**: (required) a 1-D row vector storing the serialized array values, using the 
-  **row-major** element order
+* **`"_ArrayData_"`**: (required) a 1-D row vector (or a rectangular array, see below) storing the serialized 
+  array values, using the **row-major** element order
 
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, 
 it is required that the `"_ArrayType_"` and `"_ArraySize_"` nodes must appear before 
