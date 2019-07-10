@@ -728,13 +728,13 @@ or
 Here, the `"shapeid"` tag is a case-insensitive string specifying the type of the
 special matrix. The currently supported `"shapeid"` values include
 
-* `'diag'`: a diagonal matrix, can be a non-square matrix (optional `param1` 
+* `"diag"`: a diagonal matrix, can be a non-square matrix (optional `param1` 
   defines the length of the diagonal elements, must be less than the smallest 
   value in the `_ArraySize_` vector)
-* `'upper'`: an upper triangular (square) matrix (2-D only)
-* `'lower'`: a lower triangular (square) matrix (2-D only)
-* `'uppersymm'`: a symmetric (square) matrix, only storing the upper triangle (2-D only)
-* `'lowersymm'`: a symmetric (square) matrix, only storing the lower triangle (2-D only)
+* `"upper"`: an upper triangular (square) matrix (2-D only)
+* `"lower"`: a lower triangular (square) matrix (2-D only)
+* `"uppersymm"`: a symmetric (square) matrix, only storing the upper triangle (2-D only)
+* `"lowersymm"`: a symmetric (square) matrix, only storing the lower triangle (2-D only)
 
 For the above array types, the array entries falling under the mask of the prescribed shape,
 referred to as the "effective elements", are serialized as a single vector in the row-major 
@@ -755,15 +755,15 @@ can be stored as
 
 In addition, band matrix are supported via the below `"shapeid"` tags
 
-* `'upperband'`: an upper-band matrix (2-D only, optional `param1` defines the 
+* `"upperband"`: an upper-band matrix (2-D only, optional `param1` defines the 
     number of super-diagonals of the matrix)
-* `'lowerband'`: an lower-band matrix (2-D only, optional `param1` defines the 
+* `"lowerband"`: an lower-band matrix (2-D only, optional `param1` defines the 
     number of sub-diagonals of the matrix)
-* `'uppersymmband'`: a symmetric band-matrix by storing only the upper-band 
+* `"uppersymmband"`: a symmetric band-matrix by storing only the upper-band 
    (2-D only, optional `param1` defines the number of super-diagonals of the matrix)
-* `'lowersymmband'`: a symmetric band-matrix by storing only the lower-band 
+* `"lowersymmband"`: a symmetric band-matrix by storing only the lower-band 
    (2-D only, optional `param1` defines the number of sub-diagonals of the matrix)
-* `'band'`: an band matrix (2-D only, optionally, if only `param1` presents, it defines 
+* `"band"`: an band matrix (2-D only, optionally, if only `param1` presents, it defines 
     both the upper and lower bandwidths, if both `param1` and `param2` are given,
     they define the numbers of super-diagonals and sub-diagonals, respectively)
 
@@ -809,7 +809,7 @@ value. The dimensions of the `"_ArrayData_"` (as a 2-D array) are
 
 Moreover, Toeplitz matrices are supported via the below `"shapeid"` value:
 
-* `'toeplitz'`: a Toeplitz matrix by only storing the first row and first column 
+* `"toeplitz"`: a Toeplitz matrix by only storing the first row and first column 
    (padding zeros to have the same length); if the optional `param1` presents, it
    shall denote `max(#super-diagonals+1, #sub-diagonal+1)`
 
@@ -838,7 +838,7 @@ Notice that the first elements of the row and the column must be identical. The 
 in `"_ArrayData_"` is padded in the rear to match the length of the first vector, keeping
 `"_ArrayData_"` in a rectangular shape.
 
-The `"param1"` in the above example is optional, similar to the band-matrix
+The `param1` in the above example is optional, similar to the band-matrix
 cases. If it is not included, the parser shall read the first sub-vector in 
 `"_ArrayData_"` to determine the effective element number.
 
