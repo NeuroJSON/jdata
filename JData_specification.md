@@ -714,7 +714,8 @@ or the corresponding UBJSON equivalents.
 JData can efficiently store a list of special matrices via the `"_ArrayShape_"` descriptor.
 
 The `"_ArrayShape_"` descriptor can be used in conjunction with `"_ArrayIsComplex_"`
-but it shall not be used when `"_ArrayIsSparse_"` is set to `true`.
+but it shall not be used when `"_ArrayIsSparse_"` is set to `true`. The `"_ArrayShape_"` 
+node must appear before `"_ArrayData_"` if present.
 
 The `"_ArrayShape_"` field shall be either in the form of
 
