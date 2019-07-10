@@ -100,7 +100,7 @@ data structure (such as a spreadsheet); yet, its inability to encode more
 complex data forms, lack of flexibility and precision restrict it to specific 
 applications.
 
-Hierarchical Data Format (HDF) is a format targeting at the broad needs from 
+The Hierarchical Data Format (HDF) is a format targeting at the broad needs from 
 the scientific communities. It has an extensible hierarchical data model with a 
 large capacity to represent complex binary data. However, to effectively use 
 HDF requires skillful implementation and in-depth understanding to the 
