@@ -13,11 +13,11 @@ readability and simplicity. It utilizes the JavaScript Object Notation
 store complex hierarchical data in both text and binary formats. In this 
 specification, we define a list of JSON-compatible constructs to store
 a wide range of data structures, including scalars, arrays, structures, 
-tables, hashes, linked lists, trees and graphs, and support for optional data
+tables, hashes, linked lists, trees and graphs, and support optional data
 grouping and metadata for each data element. The generated data files are 
 compatible with JSON/UBJSON specifications and can be readily processed by 
 most existing parsers. Advanced features such as array compression, data 
-links and anchors were supported to greatly enhance portability and 
+linking and anchoring are supported to greatly enhance portability and 
 scalability of the generated data files.
 
 
@@ -74,84 +74,82 @@ Introduction
 
 
 Data are the digital representations of our world. Generating and processing 
-data are the essential parts of our daily lives, and are at the very 
-foundations of modern sciences, information technologies, businesses, and the 
-interactions between our global societies.
+data are essential parts of our daily lives, and form the very 
+foundations of modern sciences, information technologies, businesses, and 
+interactions between global societies.
 
-Data take many different forms. Some data can be represented by simple scalars; 
-some others have complex forms with hierarchical structures. An efficient 
-representation of data also strongly depends on the application needs. In some 
-cases, plain text files with white-space separated fields are sufficient; 
-however, for performance-sensitive applications, using binary formats can 
-significantly reduce loading and processing time. The abilities to store and 
-parse complex data structures are particularly important to the scientific 
-communities.
+Data can take many forms. Some data can be represented by simple scalars; 
+others have complex forms with hierarchical structures. An efficient 
+representation of data also strongly depends upon application-specific needs. In some 
+cases, plain text files with white-space delimited fields are sufficient; 
+however, for performance-sensitive applications, binary formats can 
+significantly reduce loading and processing time. The ability to store and 
+parse complex data structures is particularly important to the scientific 
+community.
 
-It is a challenging task to encapsulate wide varieties of data forms in a 
+It is a challenging task to encapsulate a wide variety of data forms within a 
 single data interchange format. There have been many previous efforts in 
 designing a general-purpose data storage specification. Some of them have 
-become popular choices in one or multiple categories of applications. 
+become popular choices in one or multiple applications. 
 Extensible Markup Language (XML), for example, is ubiquitously used as a 
 data-exchange format, but the verbosity of the syntax, moderate complexity for 
 parsing, impeded readability and inefficiency in expressing structured data 
-suggested room for alternative formats. Comma Separated Value (CSV), a rather 
-simple plain-text format, is used among some applications to exchange a tabular 
-data structure (such as a spreadsheet); yet, its inability to encode more 
-complex data forms, lack of flexibility and precision restrict it to specific 
+Indicate room for improvement. Comma Separated Value (CSV), a rather 
+simple plain-text format, is used among some applications to exchange tabular 
+data structures (such as spreadsheets); yet, its inability to encode more 
+complex data forms, lack of flexibility and data precision restrict it to specific 
 applications.
 
-The Hierarchical Data Format (HDF) is a format targeting at the broad needs from 
+The Hierarchical Data Format (HDF) is a format targeting the broad needs of
 the scientific communities. It has an extensible hierarchical data model with a 
 large capacity to represent complex binary data. However, to effectively use 
-HDF requires skillful implementation and in-depth understanding to the 
+HDF requires skillful implementation and an in-depth understanding of the 
 underlying data models. For small projects with non-critical performance needs, 
-using an advanced data format such as HDF may requires additional development 
-and maintenance efforts. Similar arguments can be made to the Common Data 
+using an advanced data format such as HDF may require additional development 
+and maintenance efforts. Similar arguments can be made for the Common Data 
 Format (CDF) or Network Common Data Format (netCDF) that are partly derived 
 from HDF. In addition, the MATLAB mat-file format and Tecplot data format are 
-also used among the research communities. Because of the requirement of 
-propitiatory software or libraries, these formats have also found difficulties 
-to achieve wide-spread use outside of the user communities of the associated 
-software.
+also used among the research communities. Wide-spread adoption of these formats 
+has been hindered by the need for proprietary software or libraries, and usage 
+is generally limited to the respective user communities.
 
 ### JSON and UBJSON
 
 The JavaScript Object Notation (JSON) format is a text-based data format that 
-is known for its capability of storing complex data, excellent portability and 
-human-readability. JSON is widely adopted in modern web applications, and is 
+is known for its complex data storage capability, excellent portability and 
+human-readability. JSON has been widely adopted in modern web applications, and is 
 becoming popular among local/native applications. The key advantages of JSON 
 include:
 
-* **simplicity**: JSON data are composed by a list of `"name":value` pairs; 
-  such a simple grammar greatly eases the use and parsing of the data file; free 
+* **simplicity**: JSON data are composed of lists of `"name":value` pairs; 
+  such simple syntax greatly eases the use and parsing of the data file; free 
   JSON-encoders and decoders are widely available for most popular programming 
   languages;
 * **human-readability**: the text-based nature of JSON and its clean, 
   easy-to-read format make it intuitively readable without in-depth knowledge of 
   the format itself;
 * **hierarchical data support**: JSON has a tree-like data storage paradigm 
-  which has the native capacity to support complex hierarchical data structures; 
+  which has the capacity to support complex hierarchical data structures; 
   there is no inherent data size limit imposed by the format itself;
 *  **web-readiness**: because JSON can be readily parsed by JavaScript, most 
-  JSON-encoded data file can be directly invoked (inline or load from remote 
-  site) from a JavaScript based web-application.
+  JSON-encoded data files can be directly invoked (inline or loaded from remote 
+  sites) by a JavaScript based web-application.
 
 JSON also has limitations. JSON's `"value"` fields are weakly-typed. They only 
-support strings, numbers, and Boolean types, but lack of the fine-granularity 
+support strings, numbers, and Boolean types, and lack the fine-granularity 
 to represent various numerical types of different byte-lengths (in C-language, 
 for example, short, int, long int, float, double, long double) and their signs 
 (signed and unsigned). Because JSON is a text-based format, the size of the 
-data file can be significantly larger than a binary format and requires 
+data file can be significantly larger than a respective binary file  and requires 
 additional conversion when used in an application. This introduces overhead in 
 both storage and processing.
 
 The Universal Binary JSON (UBJSON) is one of the binary counterparts to the JSON format. 
-It specifically addresses the above mentioned limitations, yet, adheres to a 
+It specifically addresses the above mentioned limitations, yet adheres to a 
 simple grammar similar to the text-based JSON. As a trade-off, it loses the 
-"human-readability" to a certain extend. Although the implemented parsers for 
-UBJSON are not as abundant as JSON, due to the simplicity of the format itself, 
-the development cost for implementing a parser for a new programming language 
-is significantly lower than other more complex data formats.
+"human-readability" to a certain extent. Although implemented parsers for 
+UBJSON are not as abundant as those for JSON, The simplicity of the format 
+significantly lowers the development cost of implementing new encoders/parsers.
 
 With the ease-of-use, superior portability and parser availability, JSON and 
 UBJSON have the potentials to serve as the main-stream data storage and 
