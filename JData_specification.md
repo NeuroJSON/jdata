@@ -1570,7 +1570,7 @@ Recommended File Specifiers
 ------------------------------
 
 For the text-based JData file, the recommended file suffix is **`".jdat"`**; for 
-the binary JData file, the recommended file suffix is **`".ubjd"`**.
+the binary JData file, the recommended file suffix is **`".jbat"`**.
 
 The MIME type for the text-based JData document is 
 **`"application/jdata-text"`**; that for the binary JData document is 
