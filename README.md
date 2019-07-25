@@ -21,13 +21,13 @@ draft of this file specification, including
     question, report a bug, provide a feature request, or simply propose
     general discussions. Please use URLs or keywords to link your discussion 
     to a specific line/section/topic in the document.
-- [Write short comments on Request for Comments (RFC) commits](https://github.com/fangq/jdata/commit/f8fc8f1b814e7a4654b7b0092de15eaafa94d3da)
+- [Write short comments on Request for Comments (RFC) commits](https://github.com/fangq/jdata/commit/6bb02c8a654938451d686c4a7c2b1b0619e7cf17)
   - A milestone version of the specification will be associated with an
     RFC (Request for comments) commit (where the entire file is removed
     and re-added so that every line appears in such commit). One can
     write short comments as well as post replies on this RFC page. 
-  - The latest RFC commit is based on **Draft 1 (version v0.6)**. Please use
-    [this link](https://github.com/fangq/jdata/commit/f8fc8f1b814e7a4654b7b0092de15eaafa94d3da) to comment.
+  - The latest RFC commit is based on **Draft 2 (version v0.8)**. Please use
+    [this link](https://github.com/fangq/jdata/commit/6bb02c8a654938451d686c4a7c2b1b0619e7cf17) to comment.
   - To add a comment, you need to first register a github account, and then 
     browse the above RFC page. When hovering your cursor over each line, a 
     "plus" icon is displayed, clicking it will allow one to comment on a 
