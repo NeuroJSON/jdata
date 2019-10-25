@@ -345,7 +345,7 @@ Below is a short summary of the JData data annotation/storage keywords that can 
 * **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
 * **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
-* **Graph**: `_GraphData_`,`_GraphNodes_`,`_GraphEdges_`,`_GraphMatrix_`
+* **Graph**: `_GraphData_`,`_GraphNodes_`,`_GraphEdges_`,`_GraphEdges0_`,`_GraphMatrix_`
 * **Byte-stream**: `_ByteStream_`
 * **Inline metadata**: `"item_name::Property1=value1,Property2=value2,...": ...`
 * **Metadata record**: `{"_DataInfo_":{...}}`
@@ -602,6 +602,12 @@ Here, the array annotation keywords are defined below:
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, 
 it is required that the `"_ArrayType_"` and `"_ArraySize_"` nodes must appear before 
 `"_ArrayData_"`.
+
+In the case of complex-valued or sparse arrays or the presence of `"_ArrayShape_"` (see below), 
+`"_ArrayData_"` may contain a 2-D rectangular array to store the pre-processed array elements. 
+One can further serialize such 2-D `"_ArrayData_"` into a 1-D vector using the **row-major** order 
+and then add `"_ArrayZipSize_": [Nx, Ny]` to store the 2-D `"_ArrayData_"` dimensions before
+1-D serialization.
 
 The supported data types are similar to those supported by the UBJSON format, i.e.
 
@@ -1211,10 +1217,10 @@ structure supported in this document. If the edge data is a scalar, it can be in
 weights in a weighted graph.
 
 By default, the graph is assumed to be a directed graph. If a user intends to store undirected 
-graphs using the above format, one must use `"_GraphEdges_(false)"` or `"_GraphEdges_(0)"` to 
+graphs using the above format, one must use `"_GraphEdges0_"` or `"_GraphEdges0_"` to 
 enclose the edge data.
 
-The above graph data can be enclosed inside an optional field, `"_GraphData_(graph_name)":{...}` 
+The above graph data can be enclosed inside an optional field, `"_GraphData_(graph_name)_":{...}` 
 (if inside a structure) or `{"_GraphData_":{...}}` (if inside an array), to inform the parser of the 
 start of the data structure.
 
