@@ -1,0 +1,3 @@
+[submodule "lib/javascript/jsdata"]
+	path = lib/javascript/jsdata
+	url = https://github.com/fangq/jsdata.git
