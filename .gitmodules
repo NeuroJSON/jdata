@@ -1,3 +1,6 @@
 [submodule "lib/javascript/jsdata"]
 	path = lib/javascript/jsdata
 	url = https://github.com/fangq/jsdata.git
+[submodule "lib/python/pyjdata"]
+	path = lib/python/pyjdata
+	url = https://github.com/fangq/pyjdata.git
