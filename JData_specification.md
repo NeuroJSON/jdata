@@ -583,7 +583,7 @@ In the annotated array storage format, one shall use a structure to store an N-D
 allows one to use additional fields to store additional information regarding the encoded 
 array.
 
-The annotated array format is shown below for a solid 2x3 array `a=[[1,2],[3,4],[5,6]]`
+The annotated array format is shown below for a solid 3x2 array `a=[[1,2],[3,4],[5,6]]`
 ```
    {
        "_ArrayType_": "typename",
