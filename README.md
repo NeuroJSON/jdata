@@ -1,3 +1,5 @@
+![](http://openjdata.org/img/openjdata_banner.png)
+
 # JData Format Specification Development Guide
 
 We use this repository to gather feedback from the community regarding the 
