@@ -1,7 +1,7 @@
 JData: A general-purpose data storage and interchange format
 ============================================================
 
-- **Status of this document**: This document is current under development.
+- **Status of this document**: This document is currently under development.
 - **Copyright**: (C) Qianqian Fang (2011, 2015, 2019) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
 - **Version**: 0.8 (Draft 2)
