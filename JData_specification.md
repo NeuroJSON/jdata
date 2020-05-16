@@ -1,10 +1,10 @@
-JData: A general-purpose data storage and interchange format
+JData: A general-purpose data annotation and interchange format
 ============================================================
 
 - **Status of this document**: This document is currently under development.
 - **Copyright**: (C) Qianqian Fang (2011, 2015, 2019) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
-- **Version**: 0.8 (Draft 2)
+- **Version**: 0.9 (Draft 3.preview)
 - **Abstract**:
 
 > JData is a general-purpose data interchange format aimed for portability,
@@ -109,9 +109,11 @@ using an advanced data format such as HDF may require additional development
 and maintenance efforts. Similar arguments can be made for the Common Data 
 Format (CDF) or Network Common Data Format (netCDF) that are partly derived 
 from HDF. In addition, the MATLAB mat-file format and Tecplot data format are 
-also used among the research communities. Wide-spread adoption of these formats has been hindered by the need for proprietary software or libraries, and usage is generally limited to the respective user communities.
+also used among the research communities. Wide-spread adoption of these 
+formats has been hindered by the need for proprietary software or libraries, 
+and usage is generally limited to the respective user communities.
 
-### JSON and UBJSON
+### JSON and Binary JData
 
 The JavaScript Object Notation (JSON) format is a text-based data format that 
 is known for its complex data storage capability, excellent portability and 
@@ -142,15 +144,23 @@ data file can be significantly larger than a respective binary file  and require
 additional conversion when used in an application. This introduces overhead in 
 both storage and processing.
 
-The Universal Binary JSON (UBJSON) is one of the binary counterparts to the JSON format. 
-It specifically addresses the above mentioned limitations, yet adheres to a 
-simple grammar similar to the text-based JSON. As a trade-off, it loses the 
-"human-readability" to a certain extent. Although implemented parsers for 
-UBJSON are not as abundant as those for JSON, the simplicity of the format 
-significantly lowers the development cost of implementing new readers/parsers.
+The [Binary JData (BJData) format](https://github.com/OpenJData/bjdata) was derived 
+from the Universal Binary JSON (UBJSON) format, which is one of the binary counterparts 
+to the JSON format. It specifically addresses the above mentioned limitations, 
+yet adheres to a simple grammar similar to the text-based JSON. Compared to other
+binary JSON-like formats, such as BSON (Binary JSON, http://bson.org), CBOR (Concise 
+Binary Object Representation, [RFC 7049], https://cbor.io) and MessagePack 
+(https://msgpack.org), BJData and UBJSON files are **"quasi-human-readable"** - 
+a unique capability that is absent from almost all other binary formats.
+Compared to UBJSON, BJData specification supports extended binary data types (such
+as unsigned integers and half-precision floating-point numbers) as well as
+optimized N-dimensional array format. The extended data constructs also allow 
+a BJData file to store binary arrays larger than 4 GB in size, which is not 
+currently possible with MessagePack (maximum data record size is limited to 
+4 GB) and BSON (maximum total file size is 4 GB).
 
 With ease-of-use, superior portability and parser availability, JSON and 
-UBJSON have the potential to serve as main-stream data storage and 
+BJData/UBJSON have the potential to serve as main-stream data storage and 
 interchange formats for general needs, especially for  the storage and interchange
 scientific data. A combination of JSON and its binary counterpart offers features 
 that are not currently available within existing data storage schemes. Although 
@@ -214,12 +224,17 @@ separated by 0 or multiple permitted white spaces, namely
 
 ### Binary JData Storage Grammar
 
-The binary JData grammar is identical to the UBJSON grammar defined in the
-[UBJSON Specification (Draft 12)](http://ubjson.org), with the following three exceptions
+The Binary JData (BJData) format used in this specification is based on 
+[BJData Specification (Draft 1)](https://github.com/OpenJData/bjdata/tree/Draft_1), 
+which is extended from the widely used [UBJSON Specification (Draft 12)](http://ubjson.org), 
+with the addition of the following features
 
-1. JData stores an `[N]` (`"no-op"`) record as `null` when saving the data in the text-format,
-2. JData uses IEEE 754 binary form to store +/-Infinity instead of converting to [Z]
-3. optimized array container header was extended to support N-dimensional dense arrays:
+1. BJData uses the respective IEEE 754 binary form to store +/-Infinity and NaN instead 
+of converting to [Z]
+2. BJData supports 4 new data type markers: `[u]: uint16`, `[m]:  uint32`, `[M]: uint64`, `[h]: float16`
+3. optimized array container header was extended to support N-dimensional dense arrays by
+attaching a 1-D integer array construct following the `#` (count) marker, for example
+
 ```
 [[] [$] [type] [#] [[] [$] [nx type] [#] [ndim type] [ndim] [nx ny nz ...] [nx*ny*nz*...*sizeof(type)]
 ```
@@ -229,13 +244,13 @@ The binary JData grammar is identical to the UBJSON grammar defined in the
 ```
 where `ndim` is the number of dimensions, and `nx`, `ny`, and `nz` ... are 
 all non-negative numbers specifying the dimensions of the N-dimensional array.
-`nz/ny/nz/ndim` types must be one of the UBJSON integer types (`i,U,I,l,L`). 
+`nz/ny/nz/ndim` types must be one of the BJData integer types (`i,U,I,u,l,m,L,M`). 
 The binary data of the N-dimensional array is then serialized in the **row-major** format 
 (similar to C, C++, Javascript or Python) order.
 
-As a special note, all UBJSON integer types must be stored in the Big-Endian 
+As a special note, all BJData/UBJSON integer types must be stored in the Big-Endian 
 format, according to the specification; the storage of floating point types 
-(`d,D`) follows the IEEE 754 specification.
+(`h,d,D`) follows the [IEEE 754 specification](https://en.wikipedia.org/wiki/IEEE_754).
 
 
 Data Models
@@ -339,8 +354,8 @@ Below is a short summary of the JData data annotation/storage keywords that can 
 
 * **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
 * **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, `_ArrayIsSparse_`,
-  `_ArrayData_`,`_ArrayShape_`, `_ArrayZipType_`,`_ArrayZipSize_`, `_ArrayZipData_`, 
-  `_ArrayZipEndian_`, `_ArrayZipLevel_`, `_ArrayZipOptions_`
+  `_ArrayData_`,`_ArrayShape_`, `_ArrayOrder_`, `_ArrayZipType_`,`_ArrayZipSize_`, 
+  `_ArrayZipData_`, `_ArrayZipEndian_`, `_ArrayZipLevel_`, `_ArrayZipOptions_`
 * **Hash/Map**: `_MapData_`
 * **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
@@ -520,14 +535,17 @@ tables, associative arrays, trees, and graphs.
 
 The following constants are supported by this version of the specification
 
-* `NaN`: An `NaN` defined by the IEEE 754 standard shall be stored as a `"_NaN_"` string 
-  leaflet in text-based JData; in binary JData, it should be stored in the IEEE 754 format
+* `NaN`: An (integer or floating-point) `NaN` defined by the [IEEE 754 standard](https://en.wikipedia.org/wiki/NaN) 
+  shall be stored as a `"_NaN_"` string leaflet in text-based JData, unless it is part of an 
+  array stored in the [annotated N-D array format](#annotated-storage-of-n-d-arrays); 
+  in binary JData, it should be stored in the respective (integer or floating-point) IEEE 754 format
 * `+/-Inf`: A `+infinity` or `-infinity` defined by the IEEE 754 standard shall be stored as 
   string leaflets `"+_Inf_"` and `"-_Inf_"`, respectively, in the text-based JData ("+" sign
-  can be omitted); in the binary JData, they should be stored in the IEEE 754 format
+  can be omitted), unless it is part of an array stored in the [annotated N-D array format](#annotated-storage-of-n-d-arrays); 
+  in the binary JData, they should be stored in the respective (integer or floating-point) IEEE 754 format
 * logical `true`/`false`: A logical `true`/`false` should be represented by the JSON `true/false` 
-  logical values, or `[T]`/`[F]` markers in UBJSON
-* `Null`: a `Null` (empty) value shall be stored as `null` in JSON and `[Z]` in UBJSON
+  logical values, or `[T]`/`[F]` markers in BJData/UBJSON
+* `Null`: a `Null` (empty) value shall be stored as `null` in JSON and `[Z]` in BJData/UBJSON
 
 
 #### N-Dimensional Array Storage Keywords
@@ -571,7 +589,7 @@ Below is an example of a 2x3x4 3-D array stored in JSON-formatted JData:
 ```
 The direct storage format of a solid N-D array does not have the ability to store information
 regarding the type of the original binary data if using the JSON (text-based) format; however, 
-such information can be stored when using the UBJSON format. 
+such information can be stored when using the BJData/UBJSON format. 
 
 Please be aware that the UBJSON format supported by JData includes an extended syntax 
 to facilitate storage and loading of N-D arrays in the binary format. Please refer to the 
@@ -596,12 +614,16 @@ Here, the array annotation keywords are defined below:
 * **`"_ArrayType_"`**: (required) a case-insensitive string value to specify the type of the data, see below
 * **`"_ArraySize_"`**: (required) an integer-valued (see below) 1-D row vector, storing the dimensions 
   of the N-D array
+* **`"_ArrayOrder_"`**: (optional) a case-insensitive string value denoting the array serialization 
+  order: `"r"` or `"row"` for "row-major" order (as in C/C++/Python) and "c", "col" or "column" for "column-major" 
+  order (as in MATLAB/FORTRAN); if missing, JData assumes the **row-major** order as default.
 * **`"_ArrayData_"`**: (required) a 1-D row vector (or a rectangular array, see below) storing the serialized 
-  array values, using the **row-major** element order
+  array values, assuming the **row-major** element order if `"_ArrayOrder_"` is not specified.
+
 
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, 
-it is required that the `"_ArrayType_"` and `"_ArraySize_"` nodes must appear before 
-`"_ArrayData_"`.
+it is required that the `"_ArrayType_"`, `"_ArraySize_"` and `"_ArrayOrder_"` (if present) 
+nodes must appear before `"_ArrayData_"`.
 
 In the case of complex-valued or sparse arrays or the presence of `"_ArrayShape_"` (see below), 
 `"_ArrayData_"` may contain a 2-D rectangular array to store the pre-processed array elements. 
@@ -609,20 +631,21 @@ One can further serialize such 2-D `"_ArrayData_"` into a 1-D vector using the *
 and then add `"_ArrayZipSize_": [Nx, Ny]` to store the 2-D `"_ArrayData_"` dimensions before
 1-D serialization.
 
-The supported data types are similar to those supported by the UBJSON format, i.e.
+The supported data types are similar to those supported by the [BJData/UBJSON format](https://github.com/OpenJData/bjdata/blob/master/Binary_JData_Specification.md#type_summary), i.e.
 
-* **uint8**: unsigned byte (8-bit), `[U]` in UBJSON
-* **int8**: signed byte (8-bit), `[i]` in UBJSON
-* **uint16**: unsigned short (16-bit),  no correspondence in UBJSON, map to `[I]`
-* **int16**: signed short (16-bit), `[I]` in UBJSON
-* **uint32**: unsigned integer (32-bit),  no correspondence in UBJSON, map to `[l]`
-* **int32**: signed integer (32-bit), `[l]` in UBJSON
-* **uint64**: unsigned long long integer (64-bit), no correspondence in UBJSON, map to `[L]`
+* **uint8**: unsigned byte (8-bit), `[U]` in BJData/UBJSON
+* **int8**: signed byte (8-bit), `[i]` in BJData/UBJSON
+* **uint16**: unsigned short (16-bit), `[u]` in BJData, no correspondence in UBJSON
+* **int16**: signed short (16-bit), `[I]` in BJData/UBJSON
+* **uint32**: unsigned integer (32-bit), `[m]` in BJData, no correspondence in UBJSON
+* **int32**: signed integer (32-bit), `[l]` in BJData/UBJSON
+* **uint64**: unsigned long long integer (64-bit), `[M]` in BJData, no correspondence in UBJSON
 * **int64**: signed long long integer (64-bit), `[L]` in UBJSON
-* **single**: single-precision floating point (32-bit), `[d]` in UBJSON
-* **double**: double-precision floating point (64-bit), `[D]` in UBJSON
+* **half**: half-precision floating point (16-bit), `[h]` in BJData, no correspondence in UBJSON
+* **single**: single-precision floating point (32-bit), `[d]` in BJData/UBJSON
+* **double**: double-precision floating point (64-bit), `[D]` in BJData/UBJSON
 
-The first 8 data types are considered "integer" types, and the last two types are considered 
+The first 8 data types are considered "integer" types, and the last three types are considered 
 "floating-point" types.
 
 
@@ -1418,6 +1441,9 @@ via `["_TreeChildren_",2,"_TreeChildren_",1]`. This alternative indexing scheme 
 sensitive to data serialization orders, but requires the parser to handle both string
 and integer inputs.
 
+The `JD_GetNode` API may also optionally provide supports to the widely used 
+[JSON Path Notations](https://github.com/json-path/JsonPath) to query individual elements
+in a JData/JSON based data structure.
 
 ### Data query
 
@@ -1457,9 +1483,9 @@ Converting Between JData Files
 
 One can choose either the text or binary format to save the raw data into
 a JData file, with the former following JSON storage requirements and the 
-latter following UBJSON storage requirements. This specification permits
+latter following BJData/BJSON storage requirements. This specification permits
 both lossless and lossy conversions between the raw data to JSON, raw data to 
-UBJSON, and JSON and UBJSON files. 
+BJData/UBJSON, and JSON and BJData/UBJSON files. 
 
 * **lossless conversion**: the input data are preserved after a save-load 
   round-trip conversion to and from one of the JData formats; type-casting 
@@ -1607,7 +1633,7 @@ The MIME type for the text-based JData document is
 Summary
 ----------
 
-The main appeals of JSON and UBJSON are their simplicity and portability, which
+The main appeals of JSON and BJData/UBJSON are their simplicity and portability, which
 are often missing from other alternatives. In this document, we aim to extend the ability
 of JSON/UBJSON to store and interchange complex data structures without needing to 
 modify the language syntax, making the generated JData files readily usable for most 
