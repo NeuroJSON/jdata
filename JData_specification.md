@@ -754,7 +754,7 @@ Here, the `"shapeid"` tag is a case-insensitive string specifying the type of th
 special matrix. The currently supported `"shapeid"` values include
 
 * `"diag"`: a diagonal matrix, can be a non-square matrix (optional `param1` 
-  defines the length of the diagonal elements, must be less than the smallest 
+  defines the length of the diagonal elements, must not be more than the smallest 
   value in the `_ArraySize_` vector)
 * `"upper"`: an upper triangular (square) matrix (2-D only)
 * `"lower"`: a lower triangular (square) matrix (2-D only)
