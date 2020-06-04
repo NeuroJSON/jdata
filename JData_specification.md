@@ -648,6 +648,14 @@ The supported data types are similar to those supported by the [BJData/UBJSON fo
 The first 8 data types are considered "integer" types, and the last three types are considered 
 "floating-point" types.
 
+In addition, the below two data types can be used as aliases to the `uint8` type in an annotated array format:
+
+* **char**: character arrays (8-bit)
+* **logical**: logical arrays (8-bit)
+
+If the above two aliases are used, a parser may optionally convert the enclosed 
+`uint8` data to character or logical arrays (1-byte).
+
 
 ##### Complex-valued arrays
 
