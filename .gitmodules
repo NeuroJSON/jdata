@@ -4,3 +4,6 @@
 [submodule "lib/python/pyjdata"]
 	path = lib/python/pyjdata
 	url = https://github.com/fangq/pyjdata.git
+[submodule "lib/python/pybj"]
+	path = lib/python/pybj
+	url = https://github.com/fangq/pybj.git
