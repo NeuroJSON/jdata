@@ -26,8 +26,8 @@ scalability of the generated data files.
 
 - [Introduction](#introduction)
     * [Background](#background)
-    * [JSON and UBJSON](#json-and-ubjson)
-    * [JData specification overview](#jdata-specification-summary)
+    * [JSON and Binarh JData](#json-and-binary-jdata)
+    * [JData specification overview](#jdata-specification-overview)
 - [Grammar](#grammar)
     * [Text-based JData storage grammar](#text-based-jdata-storage-grammar)
     * [Binary JData storage grammar](#binary-jdata-storage-grammar)
