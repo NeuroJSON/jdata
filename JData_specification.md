@@ -178,6 +178,15 @@ is designed to represent commonly used data structures, including arrays,
 structures, trees and graphs. A round-trip conversion is defined between the 
 text and binary versions of JData documents.
 
+The inception of this specification started in 2011 as part of the development
+of the [JSONLab Toolbox](http://iso2mesh.sourceforge.net/jsonlab/) - a popular 
+open-source MATLAB/GNU Octave JSON reader/writer. The majority of the 
+[annotated N-D array constructs](#annotated-storage-of-n-d-arrays) had been implemented
+in the [early releases](https://sourceforge.net/projects/iso2mesh/files/jsonlab/) 
+of JSONLab. In 2015, the initial draft of this specification
+was [developed in the Iso2Mesh Wiki](http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=history&id=jsonlab/Doc/JData);
+since 2019, the development has been migrated to Github.
+
 The purpose of this document is to define the text and binary JData format 
 specifications. This is achieved through defining a semantic layer 
 over the JSON/UBJSON data storage syntax to map various types of complex data 
