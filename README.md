@@ -1,4 +1,4 @@
-![](http://openjdata.org/img/openjdata_banner.png)
+![](https://neurojson.org/wiki/upload/neurojson_banner_long.png)
 
 # JData Format Specification Development Guide
 
