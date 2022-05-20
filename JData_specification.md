@@ -2,7 +2,7 @@ JData: A general-purpose data annotation and interchange format
 ============================================================
 
 - **Status of this document**: This document is currently under development.
-- **Copyright**: (C) Qianqian Fang (2011, 2015, 2019) <q.fang at neu.edu>
+- **Copyright**: (C) Qianqian Fang (2011, 2015, 2019, 2022) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
 - **Format Version**: 1 (Draft 3.preview)
 - **Abstract**:
@@ -144,7 +144,7 @@ data file can be significantly larger than a respective binary file  and require
 additional conversion when used in an application. This introduces overhead in 
 both storage and processing.
 
-The [Binary JData (BJData) format](https://github.com/OpenJData/bjdata) was derived 
+The [Binary JData (BJData) format](https://github.com/NeuroJSON/bjdata) was derived 
 from the Universal Binary JSON (UBJSON) format, which is one of the binary counterparts 
 to the JSON format. It specifically addresses the above mentioned limitations, 
 yet adheres to a simple grammar similar to the text-based JSON. Compared to other
@@ -173,7 +173,7 @@ efficient data sharing among general audiences.
 JData is a specification for storing, exchanging and processing general-purpose 
 data that are commonly encountered in the information technology (IT) industries and 
 research communities. It has a text/UNICODE format derived from the JSON 
-specification and a binary format derived from the UBJSON specification. JData 
+specification and a binary format derived from the BJData/UBJSON specification. JData 
 is designed to represent commonly used data structures, including arrays, 
 structures, trees and graphs. A round-trip conversion is defined between the 
 text and binary versions of JData documents.
@@ -213,7 +213,7 @@ Grammar
 ### Text-based JData Storage Grammar
 
 The text-based JData grammar is identical to the JSON grammar defined in 
-[RFC4627], with the exception that JData also accepts the Concatenated JSON (CJSON), 
+[RFC4627], with the exception that JData also accepts the Concatenated JSON (CJSON)
 streaming format, defined in the following form:
 ```
     {
@@ -234,14 +234,16 @@ separated by 0 or multiple permitted white spaces, namely
 ### Binary JData Storage Grammar
 
 The Binary JData (BJData) format used in this specification is based on 
-[BJData Specification (Draft 1)](https://github.com/OpenJData/bjdata/tree/Draft_1), 
+[BJData Specification (Draft 2)](https://github.com/NeuroJSON/bjdata/tree/Draft_2), 
 which is extended from the widely used [UBJSON Specification (Draft 12)](http://ubjson.org), 
 with the addition of the following features
 
-1. BJData uses the respective IEEE 754 binary form to store +/-Infinity and NaN instead 
+1. BJData supports 4 new data type markers: `[u]: uint16`, `[m]:  uint32`, `[M]: uint64`, `[h]: float16`
+2. BJData uses little-Endian (LE) as the default numeric (integers and floating-point numbers) data byte order
+as oppose to the big-Endinan (BE) byte order used by UBJSON
+3. BJData uses the respective IEEE 754 binary form to store +/-Infinity and NaN instead 
 of converting to [Z]
-2. BJData supports 4 new data type markers: `[u]: uint16`, `[m]:  uint32`, `[M]: uint64`, `[h]: float16`
-3. optimized array container header was extended to support N-dimensional dense arrays by
+4. optimized array container header was extended to support N-dimensional packed arrays by
 attaching a 1-D integer array construct following the `#` (count) marker, for example
 
 ```
@@ -640,7 +642,7 @@ One can further serialize such 2-D `"_ArrayData_"` into a 1-D vector using the *
 and then add `"_ArrayZipSize_": [Nx, Ny]` to store the 2-D `"_ArrayData_"` dimensions before
 1-D serialization.
 
-The supported data types are similar to those supported by the [BJData/UBJSON format](https://github.com/OpenJData/bjdata/blob/master/Binary_JData_Specification.md#type_summary), i.e.
+The supported data types are similar to those supported by the [BJData/UBJSON format](https://github.com/NeuroJSON/bjdata/blob/master/Binary_JData_Specification.md#type_summary), i.e.
 
 * **uint8**: unsigned byte (8-bit), `[U]` in BJData/UBJSON
 * **int8**: signed byte (8-bit), `[i]` in BJData/UBJSON
