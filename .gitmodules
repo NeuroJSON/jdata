@@ -7,3 +7,9 @@
 [submodule "lib/python/pybj"]
 	path = lib/python/pybj
 	url = https://github.com/NeuroJSON/pybj.git
+[submodule "lib/matlab"]
+	path = lib/matlab
+	url = https://github.com/NeuroJSON/jsonlab.git
+[submodule "lib/javascript/js-bjdata"]
+	path = lib/javascript/js-bjdata
+	url = https://github.com/NeuroJSON/js-bjdata.git
