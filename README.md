@@ -12,6 +12,24 @@ The latest version of the JData specification can be found in the file named
 in the [Markdown format](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) 
 for convenient editing and version control.
 
+## What is JData
+
+JData defines a set of **standardized**, **lightweight** and **language-neutral** annotations
+to encode and interchange general-purpose data structures between programming
+environments, such as Python, C, C++, and MATLAB. JData convers complex data structures,
+such as N-D arrays, sparse arrays, complex-valued arrays, lists, trees, and graphs,
+into a set of JSON-like `"name": value` pairs so that they can be losslessly serialized
+into JSON and binary JSON files for data sharing. Via simple annotation tags, JData also
+supports encoding strongly typed binary data as well as compressed data.
+
+JData-encoded data can be stored in human-readable JSON format, as well as in binary
+JSON format BJData/UBJSON for smaller file size and faster parsing. These data files
+are JSON/BJData compliant and can be readily read without needing one to write their
+own format. There exist numerous JSON parsers, abundant BJData/UBJSON parsers, and
+extensively developed tools in the large JSON ecosystem - including utilities like
+as `jq`, JSON-native NoSQL databases, and JSON-based standards such as JSON-schema
+for validation, JSON-Reference and JSON-LD for data linking, JSON-Path for query etc.
+
 ## How to participate
 
 You can use a number of methods to provide your feedback to the working 
