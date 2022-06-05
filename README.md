@@ -30,6 +30,8 @@ extensively developed tools in the large JSON ecosystem - including utilities li
 as `jq`, JSON-native NoSQL databases, and JSON-based standards such as JSON-schema
 for validation, JSON-Reference and JSON-LD for data linking, JSON-Path for query etc.
 
+![](./images/JData_Diagram.png)
+
 ## How to participate
 
 You can use a number of methods to provide your feedback to the working 
