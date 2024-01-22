@@ -887,7 +887,7 @@ cases. If it is not included, the parser shall read the first sub-vector in
 ##### Complex-valued special matrices
 
 The `"_ArrayShape_"` descriptor can be used with `"_ArrayIsComplex":true` to store 
-complex-valued special matrices. In such cases, the datastored in `"_ArrayData_"` 
+complex-valued special matrices. In such cases, the data stored in `"_ArrayData_"` 
 shall add an extra left-most dimension (must be 2), and store the real and imaginary 
 parts of the effective elements in the 1st and 2nd sub-matrices (of matching size), 
 respectively.
