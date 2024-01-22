@@ -16,7 +16,7 @@ for convenient editing and version control.
 
 JData defines a set of **standardized**, **lightweight** and **language-neutral** annotations
 to encode and interchange general-purpose data structures between programming
-environments, such as Python, C, C++, and MATLAB. JData convers complex data structures,
+environments, such as Python, C, C++, and MATLAB. JData converts complex data structures,
 such as N-D arrays, sparse arrays, complex-valued arrays, lists, trees, and graphs,
 into a set of JSON-like `"name": value` pairs so that they can be losslessly serialized
 into JSON and binary JSON files for data sharing. Via simple annotation tags, JData also
