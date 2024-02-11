@@ -53,6 +53,7 @@ scalability of the generated data files.
             - [Compressed array storage format](#compressed-array-storage-format)
         + [Associative arrays or maps](#associative-arrays-or-maps)
         + [Tables](#tables)
+        + [Enumerations](#enumerations)
         + [Trees](#trees)
         + [Singly and doubly linked lists](#singly-and-doubly-linked-lists)
         + [Directed and undirected graphs](#directed-and-undirected-graphs)
@@ -368,6 +369,7 @@ Below is a short summary of the JData data annotation/storage keywords that can 
   `_ArrayZipData_`, `_ArrayZipEndian_`, `_ArrayZipLevel_`, `_ArrayZipOptions_`
 * **Hash/Map**: `_MapData_`
 * **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`
+* **Enumeration**: `_EnumKey_`, `_EnumValue_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
 * **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
 * **Graph**: `_GraphData_`,`_GraphNodes_`,`_GraphEdges_`,`_GraphEdges0_`,`_GraphMatrix_`
@@ -962,7 +964,7 @@ In addition, the following optional parameters may also be used
   additional compression-method specific parameters (interpretation is method/library-dependent)
 * **`"_ArrayShuffle_"`**: (optional) if present, must be a non-zero integer; a positive integer specifying
   the number of bytes at which the serialized raw data buffer is shuffled. For example, `"_ArrayShuffle_": 4`
-  orders a byte stream [1,2,3,4,5,6,7,8,9,10,11,12] in a new order [1,5,9,2,6,10,3,17,11,4,8,12]; setting
+  orders a byte stream `[1,2,3,4,5,6,7,8,9,10,11,12]` in a new order `[1,5,9,2,6,10,3,17,11,4,8,12]`; setting
   `"_ArrayShuffle_"` to a negative integer specifies bit-wised shuffle with the absolute value as the bit-wised
   shuffle spacing. `"_ArrayShuffle_"` must be applied, if present, before compression/encoding and an
   unshuffle operation must be applied upon decompression/decoding.
@@ -1088,6 +1090,28 @@ leads to a smaller file size.
 The above JData table can be enclosed inside an optional field `"_TableData_(table_name)":{...}` 
 (if inside a structure) or `{"_TableData_":{...}}` (if inside an array) to inform the 
 parser about the start of the data structure.
+
+#### Enumerations
+
+An enumeration data structure is spatially effective when storing array data containing
+repeated values. For example, the following array
+```
+"gender": ["M","M","F","F","F","M",...,"F"]
+```
+contains only two possible values, `"M"` or `"F"`, each repeating many times. We use the following
+keywords to represent such data:
+* `"_EnumKey_"`: this is an array containing unique values that appear in an array; the unique values can have mixed data types.
+* `"_EnumValue_"`: this is an integer array with each entry denoting the index (starting from 1) of the value appearing in `"_EnumKey_"`; `"_EnumValue_"` can be an N-D array.
+
+With the above construct, we can store the above `"gender"` example as
+```
+"gender": {
+  "_EnumKey_": ["M","F"],
+  "_EnumValue_": [1,1,2,2,2,1,...,2]
+}
+```
+Because `"_EnumValue_"` is an integer array, one can further use the [N-D array annotation format](#compressed-array-storage-format) to
+compress the data and reduce the storage overhead.
 
 
 #### Trees
