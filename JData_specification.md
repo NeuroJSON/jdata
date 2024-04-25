@@ -259,9 +259,9 @@ all non-negative numbers specifying the dimensions of the N-dimensional array.
 The binary data of the N-dimensional array is then serialized in the **row-major** format 
 (similar to C, C++, Javascript or Python) order.
 
-As a special note, all BJData/UBJSON integer types must be stored in the Big-Endian 
-format, according to the specification; the storage of floating point types 
-(`h,d,D`) follows the [IEEE 754 specification](https://en.wikipedia.org/wiki/IEEE_754).
+As a special note, all BJData/UBJSON integer and floating-point types must be
+stored in the **Little-Endian** format, according to 
+[BJData Specification (Draft 2)](https://github.com/NeuroJSON/bjdata/tree/Draft_2).
 
 
 Data Models
