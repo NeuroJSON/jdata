@@ -661,11 +661,12 @@ The first 8 data types are considered "integer" types, and the last three types 
 
 In addition, the below two data types can be used as aliases to the `uint8` type in an annotated array format:
 
-* **char**: character arrays (8-bit)
-* **logical**: logical arrays (8-bit)
+* **byte**: byte arrays (8-bit), `[B]` in BJData, no correspondence in UBJSON
+* **char**: character arrays (8-bit), `[C]` in BJData/UBJSON
+* **logical**: logical arrays (8-bit), `[T]`/`[F]` in BJData/UBJSON
 
 If the above two aliases are used, a parser may optionally convert the enclosed 
-`uint8` data to character or logical arrays (1-byte).
+`uint8` data to byte, character or logical arrays (1-byte).
 
 
 ##### Complex-valued arrays
