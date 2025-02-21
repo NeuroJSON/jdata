@@ -537,6 +537,10 @@ to, the following list
   ModifiedTime
 ```
 
+In software environments where `"_DataInfo_"` can not be defined, such as the root
+level of the JSON documents in Apache CouchDB (https://couchdb.apache.org/), an alternative
+name `".datainfo"` can be used instead.
+
 ### Data Storage Keywords
 
 JData is designed to store a wide variety of data forms. The most common data structures
