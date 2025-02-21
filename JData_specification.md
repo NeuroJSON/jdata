@@ -2,7 +2,7 @@ JData: A general-purpose data annotation and interchange format
 ============================================================
 
 - **Status of this document**: This document is currently under development.
-- **Copyright**: (C) Qianqian Fang (2011, 2015-2024) <q.fang at neu.edu>
+- **Copyright**: (C) Qianqian Fang (2011, 2015-2025) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
 - **Format Version**: 1 (Draft 3.preview)
 - **Abstract**:
@@ -631,6 +631,14 @@ Here, the array annotation keywords are defined below:
   order (as in MATLAB/FORTRAN); if missing, JData assumes the **row-major** order as default.
 * **`"_ArrayData_"`**: (required) a 1-D row vector (or a rectangular array, see below) storing the serialized 
   array values, assuming the **row-major** element order if `"_ArrayOrder_"` is not specified.
+* **`"_ArrayLabel_"`**: (optional) must be a 1-D array with elements equal or less than the dimensions
+  of the array, which is the length of `"_ArraySize"`. The first element defines the name or label, in
+  the form of a string, for the 1st dimension, the 2nd element defines the name for the 2nd dimension,
+  and so on. If the label of a dimension is an empty string `""`, it is undefined. If any of the element
+  is an array, it further defines the names/labels for the array indices along this dimension. This array
+  must be in the form `[["label1", column_start1, column_width1], ["label2", column_start2, ...]]`,
+  where optional intergers `column_start_i` and `column_width_i` define the start and width, respectively,
+  of the array indices that are associated with this label.
 
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, when
 an ordered object or map is used to store an array, it is recommended that the `"_ArrayType_"`,
@@ -667,6 +675,17 @@ In addition, the below two data types can be used as aliases to the `uint8` type
 If the above two aliases are used, a parser may optionally convert the enclosed 
 `uint8` data to character or logical arrays (1-byte).
 
+The following `"_ArrayLabel_"` example defines a 4D array with the first dimension with a name of `"x"` and length of 5;
+the 2nd dimension is named as `"y"` of length 5, the 3rd dimension as `"z"` of length 6, and the 1st column of the 4th 
+dimension is `"t"`, and the 2nd column of the 4th dimension is `"v"`.
+```
+   {
+       "_ArrayType_": "double",
+       "_ArraySize_": [5, 5, 6, 2],
+       "_ArrayLabel_": ["x", "y", "z", [["t", 1], ["v", 2]]]
+       "_ArrayData_": [...]
+   }
+```
 
 ##### Complex-valued arrays
 
