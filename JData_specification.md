@@ -632,9 +632,9 @@ Here, the array annotation keywords are defined below:
 * **`"_ArrayData_"`**: (required) a 1-D row vector (or a rectangular array, see below) storing the serialized 
   array values, assuming the **row-major** element order if `"_ArrayOrder_"` is not specified.
 
-To facilitate the pre-allocation of the buffer for storage of the array in the parser, 
-it is required that the `"_ArrayType_"`, `"_ArraySize_"` and `"_ArrayOrder_"` (if present) 
-nodes must appear before `"_ArrayData_"`.
+To facilitate the pre-allocation of the buffer for storage of the array in the parser, when
+an ordered object or map is used to store an array, it is recommended that the `"_ArrayType_"`,
+`"_ArraySize_"` and `"_ArrayOrder_"` (if present) nodes must appear before `"_ArrayData_"`.
 
 In the case of complex-valued or sparse arrays or the presence of `"_ArrayShape_"` (see below), 
 `"_ArrayData_"` may contain a 2-D rectangular array to store the pre-processed array elements. 
@@ -688,7 +688,8 @@ For example, a complex double-precision 1x3 row vector `a=[2+6*i, 4+3.2*i,  1.2+
    }
 ```
 
-The `"_ArrayIsComplex_"` node must be presented before `"_ArrayData_"`.
+The `"_ArrayIsComplex_"` node is recommended to appear before `"_ArrayData_"` when an ordered 
+object or map is used to store such data.
 
 ##### Sparse arrays
 
@@ -759,7 +760,7 @@ JData can efficiently store a list of special matrices via the `"_ArrayShape_"` 
 
 The `"_ArrayShape_"` descriptor can be used in conjunction with `"_ArrayIsComplex_"`,
 but it shall not be used when `"_ArrayIsSparse_"` is set to `true`. The `"_ArrayShape_"` 
-node must appear before `"_ArrayData_"` if present.
+node is recommended to appear before `"_ArrayData_"` if present.
 
 The `"_ArrayShape_"` field shall be either in the form of
 
@@ -968,9 +969,11 @@ In addition, the following optional parameters may also be used
   `"_ArrayShuffle_"` to a negative integer specifies bit-wised shuffle with the absolute value as the bit-wised
   shuffle spacing. `"_ArrayShuffle_"` must be applied, if present, before compression/encoding and an
   unshuffle operation must be applied upon decompression/decoding.
+* **`_ArrayZipLevel_`**: (optional) a numerical value, typically an integer between
+  0 and 9, specifying the level of the compression (interpretation is method/library-dependent)
 
-When a compressed array format is used, `"_ArrayZipType_"` and 
-`"_ArrayZipSize_"` must appear before `"_ArrayZipData_"`.
+When a compressed array format is encoded in an ordered object, `"_ArrayZipType_"` and 
+`"_ArrayZipSize_"` is recommended to appear before `"_ArrayZipData_"`.
 
 `"_ArrayZipData_"` and `"_ArrayData_"` can not appear under the same parent node.
 
