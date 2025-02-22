@@ -147,3 +147,4 @@ UniqueID
 unshuffle
 URI
 zlib
+CouchDB
