@@ -365,8 +365,8 @@ Below is a short summary of the JData data annotation/storage keywords that can 
 
 * **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
 * **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, `_ArrayIsSparse_`,
-  `_ArrayData_`,`_ArrayShape_`, `_ArrayOrder_`, `_ArrayZipType_`,`_ArrayZipSize_`, 
-  `_ArrayZipData_`, `_ArrayZipEndian_`, `_ArrayZipLevel_`, `_ArrayZipOptions_`
+  `_ArrayData_`, `_ArrayLabel_`, `_ArrayShape_`, `_ArrayOrder_`, `_ArrayZipType_`,
+  `_ArrayZipSize_`, `_ArrayZipData_`, `_ArrayZipEndian_`, `_ArrayZipLevel_`, `_ArrayZipOptions_`
 * **Hash/Map**: `_MapData_`
 * **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`
 * **Enumeration**: `_EnumKey_`, `_EnumValue_`
@@ -538,7 +538,7 @@ to, the following list
 ```
 
 In software environments where `"_DataInfo_"` can not be defined, such as the root
-level of the JSON documents in Apache CouchDB (https://couchdb.apache.org/), an alternative
+level of the JSON documents in [Apache CouchDB](https://couchdb.apache.org/), an alternative
 name `".datainfo"` can be used instead.
 
 ### Data Storage Keywords
@@ -640,8 +640,8 @@ Here, the array annotation keywords are defined below:
   the form of a string, for the 1st dimension, the 2nd element defines the name for the 2nd dimension,
   and so on. If the label of a dimension is an empty string `""`, it is undefined. If any of the element
   is an array, it further defines the names/labels for the array indices along this dimension. This array
-  must be in the form `[["label1", column_start1, column_width1], ["label2", column_start2, ...]]`,
-  where optional intergers `column_start_i` and `column_width_i` define the start and width, respectively,
+  must be in the form `[["label_1", column_start_1, column_width_1], ["label_2", column_start_2, ...]]`,
+  where optional integers `column_start_i` and `column_width_i` define the start and width, respectively,
   of the array indices that are associated with this label.
 
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, when
@@ -1455,7 +1455,7 @@ and processing JData files
 * **`JD_GetType(node)`**: returns the node type
 * **`JD_GetLength(node)`**: returns the number of children of the specified node
 
-### Index vector
+### Element Referencing
 
 Essentially, JData stores a serialized version of complex data using collections 
 of sequential or nested nodes, either in the named or indexed form. To access
@@ -1463,9 +1463,11 @@ any element (a leaflet, leaf or branch) of the JData document, one should use a 
 of indices that points to the specific node. 
 
 A JData-compliant parser must be able to retrieve JData elements via the below pseudo-code 
-interface using a linear index vector
+interface using an index vector or reference string
 ```
    JD_Node item = JD_GetNode(JD_Node root, [i1, i2, i3, i4, ...], is_compact)
+      or
+   JD_Node item = JD_GetNode(JD_Node root, "key")
 ```
 where `i1` is the index of the data on the top-most level (relative to the root level of the 
 `"root"` object), `i2`, is the index along the 2nd level, and so on. Each index is an 
@@ -1473,37 +1475,53 @@ integer, starting from 1, denoting the order
 of the data element among the serialized elements of the same level. In order words, if
 the current level is an array object, the index is the count of the elements before this data
 element plus 1; if the current level is a structure, the index is the count of the named 
-nodes appearing before this data plus 1. Using the tree data structure above, the linear index
+nodes appearing before this data plus 1. 
+
+In some programming environments, such as C++ and Python, object keys may be unordered.
+As a result, referencing using integer based index vector may not be reliable. An alternative
+is [JSONPath](https://goessner.net/articles/JsonPath/). JSONPath uses a series of
+dot-separated names to locate an element inside a JSON data tree, such as
+```
+$.name1.name2.name3[0].name4
+```
+in this notation, `$` refers to the root of the JSON object, `$.name1` refers to the root-level
+sub-element `name1`; `$.name1.name2.name3[0]` specifies the `name2` child of `$.name1` has a child
+named `.name3`, which is an array; using `.name3[0]` means taking the first element of the
+array. Lastly, the first element of the `name3` array has a child named `.name4`.
+When the object names contain `.` `[`, or `]`, they must be escaped by inserting a
+`\` before. For example, `$.file.test\.json` specifies a key named `test.json` under the `$.file` object.
+
+It is worth mentioning that JSONPath supports deep-scan (`..`) and filtering operators, 
+although this specification does not require the parsers to fully support all JSONPath
+operators.
+
+Using the tree data structure above, the linear index
 of each node is listed below on the right side:
 
 ```
   {
-     "_TreeNode_(root)": data0,                     <- [1]
-     "_TreeChildren_": [                            <- [2]
-         {"_TreeNode_(node1)": data1},              <- [2,1]
-         {                                          <- [2,2]
-             "_TreeNode_(node2)": data2,            <- [2,2,1]
-             "_TreeChildren_": [                    <- [2,2,2]
-                 {"_TreeNode_(node2.1): data2.1},   <- [2,2,2,1]
-                 {"_TreeNode_(node2.2): data2.2}    <- [2,2,2,2]
+     "_TreeNode_(root)": data0,                     <- [1] or $._TreeNode_(root)
+     "_TreeChildren_": [                            <- [2] or $._TreeChildren_
+         {"_TreeNode_(node1)": data1},              <- [2,1] or $._TreeChildren_[0]
+         {                                          <- [2,2] or $._TreeChildren_[1]
+             "_TreeNode_(node2)": data2,            <- [2,2,1] or $._TreeChildren_[0]._TreeNode_(node2)
+             "_TreeChildren_": [                    <- [2,2,2] or $._TreeChildren_[0].__TreeChildren_
+                 {"_TreeNode_(node2.1): data2.1},   <- [2,2,2,1] or $._TreeChildren_[0].__TreeChildren_[0]
+                 {"_TreeNode_(node2.2): data2.2}    <- [2,2,2,2] or $._TreeChildren_[0].__TreeChildren_[1]
              ]
          },
-         {                                          <- [2,3]
-             "_TreeNode_(node3)": data3             <- [2,3,1], or [[2,3]]
+         {                                          <- [2,3] or $._TreeChildren_[2]
+             "_TreeNode_(node3)": data3             <- [2,3,1], or [[2,3]] or $._TreeChildren_[2]._TreeNode_(node3)
          }
      ]
   }
 ```
-One can insert zeros to the right-side of the indexing vector if the array storing the vector
-has a length longer than the depth of the assessed node. In this case, the first 0 scanning
-from left to right of the indexing vector is considered the termination flag of the index.
-In other words, index vectors `[2,2]`, `[2,2,0]` and `[2,2,0,0]` are equivalent. 
 
 The third parameter, `is_compact`, is a boolean flag. If set to `true`, `JD_GetNode` 
 shall skip the index if any of the dimensions along the indexing vector is a singlet, 
 i.e. the child count is 1. The compact indexing vector, enclosed by double-square-brackets 
 as `[[...]]`, shall be passed to `JD_GetNode` as the 2nd input when `is_compact` is `true`.
-Using the above example, both index vectors [[2,3]] and [2,3,1] refer to 
+Using the above example, both index vectors `[[2,3]]` and `[2,3,1]` refer to 
 `"_TreeNode_(node3)": data3`. Please be aware that the compact indexing vector can not
 distinguish between row and column vectors as the column vector in JData has a trailing 
 singlet dimension ([see N-D array section](#direct-storage-of-n-d-arrays)).
@@ -1589,11 +1607,11 @@ is the conversion from a structure to an array as shown in the below example:
 ```
    {
       "a": {
-         "name1": value1,      <- [1,1] or ["a","name1"]
-         "name2": value2,      <- [1,2] or ["a","name2"]
-         "name3": value3       <- [1,3] or ["a","name3"]
+         "name1": value1,      <- [1,1] or ["a","name1"] or $.a.name1
+         "name2": value2,      <- [1,2] or ["a","name2"] or $.a.name2
+         "name3": value3       <- [1,3] or ["a","name3"] or $.a.name3
       },
-      "b": "value4"            <- [2] or ["b"]
+      "b": "value4"            <- [2] or ["b"] or $.b
    }
 ```
 to
@@ -1601,16 +1619,16 @@ to
    {
       "a": [
          {
-             "name1": value1   <- [[1,1]] or [["a","name1"]]
+             "name1": value1   <- [[1,1]] or [["a","name1"]] or $.a[0].name1
          },
          {
-             "name2": value2   <- [[1,2]] or [["a","name2"]]
+             "name2": value2   <- [[1,2]] or [["a","name2"]] or $.a[1].name2
          },
          {
-             "name3": value3   <- [[1,3]] or [["a","name3"]]
+             "name3": value3   <- [[1,3]] or [["a","name3"]] or $.a[2].name3
          }
       ],
-      "b": "value4"            <- [2] or ["b"]
+      "b": "value4"            <- [2] or ["b"] or $.b
    }
 ```
 The only permitted "non-isometric transform" is the conversion between a direct
@@ -1631,7 +1649,7 @@ A link is defined by a named leaflet or leaf as shown in the below two styles
    "link_style2": {
        "_DataLink_": {
            "URI": "path",
-           "Parameters": [...],
+           "Parameters": "$.key1.key2...",
            "MaxRecursion": 1
        }
    }
@@ -1642,11 +1660,11 @@ by the indexing vector string to point to a specific element of the referenced d
 For example, the below link
 ```
    {
-      "_DataLink_": "file:///space/test/jdfiles/tree.jdat:[1,2,2]"
+      "_DataLink_": "file:///space/test/jdfiles/tree.jdat:$.key1.key2..."
    }
 ```
 asks the parser to read a local file located at "/space/test/jdfiles/tree.jdat" and
-load the node specified by indexing vector `[1,2,2]`, starting from the root (or super-root
+load the node specified by JSONPath string `$.key1.key2...`, starting from the root (or super-root
 if containing CJSON) to replace the `"_DataLink_"` node in the current document.
 
 If using a `"_DataLink_"` structure, additional parameters can be specified via
@@ -1678,10 +1696,10 @@ Then, the data object can be referenced as shown in the below example `"global_l
       "_DataLink_": "#a_unique_anchor_name"
    }
    "local_link2": {
-      "_DataLink_": [1,2,2]
+      "_DataLink_": "$.key1.key2..."
    }
    "local_compact_link3": {
-      "_DataLink_": [[1,2,2]]
+      "_DataLink_": [1,2,2]
    }
 ```
 A data link URI starting with "#" refers to the data anchor defined within the same document,
@@ -1691,24 +1709,6 @@ a local node, as shown in the `"local_link2"` example above. A compact indexing 
 (eliminating singlet dimensions) can be represented by a pair of double-square-brackets, 
 i.e. 1-level nested vector, as shown in the `"local_compact_link3"` example above. The 
 behaviors of other types of data link values are not specified.
-
-Instead of using the above described index vector to reference a sub-element inside an
-externally linked JData file, this specification also permit the use of 
-[JSONPath specifiers](https://goessner.net/articles/JsonPath/). JSONPath uses a series of
-dot-separated names to locate an element inside a JSON data tree, such as
-```
-$.name1.name2.name3[0].name4
-```
-in this notation, `$` refers to the root of the JSON object, `$.name1` refers to the root-level
-sub-element `name1`; `$.name1.name2.name3[0]` specifies the `name2` child of `$.name1` has a child
-named `.name3`, which is an array; using `.name3[0]` means taking the first element of the
-array. Lastly, the first element of the `name3` array has a child named `.name4`.
-When the object names contain `.` `[`, or `]`, they must be escaped by inserting a
-`\` before. For example, `$.file.test\.json` specifies a key named `test.json` under the `$.file` object.
-
-It is worth mentioning that JSONPath supports deep-scan (`..`) and filtering operators, 
-although this specification does not require the parsers to fully support all JSONPath
-operators.
 
 Recommended File Specifiers
 ------------------------------
