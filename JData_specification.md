@@ -7,7 +7,7 @@ JData: A general-purpose data annotation and interchange format
 - **URL**: https://neurojson.org/jdata/draft3
 - **Status**: Frozen on March 23, 2025. For future updates, please see the Development URL below
 - **Development**: https://github.com/NeuroJSON/jdata
-- **Acknowledgement**: This project is supported by US National Institute of Health (NIH)
+- **Acknowledgment**: This project is supported by US National Institute of Health (NIH)
   grant [U24-NS124027 (NeuroJSON)](https://neurojson.org)
 - **Abstract**:
 
