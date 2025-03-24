@@ -1,0 +1,137 @@
+= Change Log =
+
+Major updates are marked with a "*"
+
+== JData Spec Draft-3, FangQ <q.fang (a) neu.edu> ==
+
+ 2025-02-22 [8907586] Update .wordlist.txt
+ 2025-02-22 [eb7eed5] More examples using JSONPath
+ 2025-02-21 [b79b0a9] Support .datainfo in addition to _DataInfo_
+ 2025-02-21 [9eec3dd] Support _ArrayLabel_ to attach names to dimension and columns, like Xarray
+ 2025-02-21 [0b54719] Make appearance order for ND array constructs optional
+ 2024-10-05 [8d6ef7a] Added basic configuration for Dependabot for GitHub Actions
+ 2024-10-04 [4073b1a] Bumped Spellcheck action to contemporary version
+ 2024-04-25 [b888f19] Clarify endianness for binary JSON interface
+ 2024-04-05 [26b42ad] [lib] update jsonlab, pyjdata, pybj jsdata submodules
+ 2024-02-11 [69373ba] [feat] Support Enumeration data types via _EnumKey_ and _EnumValue_
+ 2024-01-22 [d8c3bfd] fix spelling action errors
+ 2024-01-22 [6b14df5] fix spelling action errors
+ 2024-01-22 [f2dbbae] add wordlist
+ 2024-01-22 [edd2da3] Add spellcheck action
+ 2024-01-22 [18dd229] Support `_ArrayShuffle_` for byte/bit-shuffle; add JSONPath, close #7
+ 2022-06-05 [6df9b65] update diagram
+ 2022-06-05 [37db600] Add synopsis diagram
+ 2022-06-05 [78145aa] add cheatsheet
+ 2022-06-04 [65f3a72] Update README.md
+ 2022-06-03 [282fa51] update mailing list url
+ 2022-06-01 [a861965] update various libraries to the latest git version
+ 2022-06-01 [4b3e0e5] update repo url to NeuroJSON org
+ 2022-02-23 [f41fd91] Update JData_specification.md
+ 2022-02-22 [39d8617] Update README.md
+ 2021-11-24 [54f339c] Add history info of this specification
+ 2021-11-17 [9de1d20] Update TOC
+ 2020-07-13 [10426fe] update python and matlab modules
+ 2020-06-14 [66e8d28] Format version fixed to 1, change draft version moving forward
+ 2020-06-04 [7aa3b03] Add "char" and "logical" as aliases to `uint8`
+ 2020-05-30 [22d6ea7] Fix the diag matrix param1 description
+ 2020-05-16 [85994de] Refer to the new BJData Draft-1 for the binary format, add _ArrayOrder_, support JSON Path
+ 2020-05-12 [40f5edb] Minor language fix before updating to Draft 3
+ 2020-05-04 [76abb9d] Add project banner to README
+ 2020-01-26 [bd80f81] Add MIME type support for ByteStream object; change preferred file suffixes
+ 2019-11-30 [34e8ae7] Update JData_specification.md
+ 2019-11-22 [e867f50] sync with pyjdata
+ 2019-11-21 [01e0360] add python jdata encoder and decoder
+ 2019-11-16 [e009ec3] update jsdata library to rev741
+ 2019-11-10 [de73e3d] add javascript parser
+ 2019-10-25 [6f3e578] Permit the use of _ArrayZipSize_ with _ArrayData_, rename _GraphEdges(0)_ to _GraphEdges0_
+ 2019-10-25 [3ae5215] jdataencode and jdatadecode update to jsonlab v1.9.8
+ 2019-08-20 [a9708dd] fix table transpose issue in jdatadecode
+
+== JData Spec Draft-2, FangQ <q.fang (a) neu.edu> ==
+
+ 2019-07-25 [f527b4a] update RFC links in README
+ 2019-07-25 [a6b350f] Change recommended binary JData suffix from ubjd to jbat
+ 2019-07-22 [7678245] Edward Xu's proof reading edits are fully merged
+ 2019-07-12 [04246cd] Partial proofreading by Edward Xu
+ 2019-07-10 [b0e2c44] update jsonlab to the latest git version
+ 2019-07-10 [be2b094] undo 0145358b, restore the missing UBJSON ND array header dimension type
+ 2019-07-10 [d6835b2] Change single quotes to double quotes
+ 2019-07-10 [671d0b8] Minor language change
+ 2019-07-10 [910aae9] Minor language update
+ 2019-07-10 [36481e4] _ArrayShape_ must appear before _ArrayData_
+ 2019-07-10 [04bc5fd] Requiring _ArrayData_ must be rectangular in shape
+ 2019-07-10 [8412dd3] Add the missing entry in TOC
+ 2019-07-10 [dc99b25] Support Hermitian matrices with "_ArrayShape_"
+ 2019-07-10 [144e61b] Add support to special matrices via "_ArrayShape_" descriptor
+ 2019-06-25 [9c181f3] support the new table syntax
+ 2019-06-25 [b3bd509] New table data format
+ 2019-06-21 [6cb6047] Update example compressed matrix using row-major element order
+ 2019-06-14 [3b898df] add jdataencode and jdatadecode
+ 2019-06-14 [bcbc005] Fix language grammar
+ 2019-06-12 [9003279] Update keyword list
+ 2019-06-12 [4b36cff] update ArrayCompression keyword names
+
+== JData Spec Draft-1, FangQ <q.fang (a) neu.edu> ==
+
+ 2019-06-12 [fbc2ec9] Merge branch 'Draft_1' of https://github.com/fangq/jdata
+ 2019-06-12 [e4836e8] update sample script outputs
+ 2019-06-12 [2d93802] shorten keywords form ArrayCompression to ArrayZip
+ 2019-06-12 [dc98eeb] show example of data compression, complete ubjson debug output
+ 2019-06-11 [8ef08e3] merge Draft_1 with master to correct UBJSON format bug and add samples
+ 2019-06-11 [c55452d] add debug output to understand the binary jdata output
+ 2019-06-11 [a83dd0f] add matlab demo script and small samples on basic features
+ 2019-06-08 [0145358] Fix the extra UBJSON optimized header field
+ 2019-06-04 [5b16687] fix typo in the README
+ 2019-06-04 [8725b85] remove extra commas
+ 2019-06-04 [341be6e] update RFC links in README
+ 2019-06-04 [b6c029d] update RFC links in README
+ 2019-06-04 [f8fc8f1] Draft 1 (v0.6) - Request for Comments
+ 2019-06-04 [d075c19] prepare for RFC commit
+ 2019-06-04 [a64dd18] Add missing keywords in the summary
+ 2019-06-04 [c29df5e] update README for Draft 1 RFC link
+ 2019-06-04 [cf54ba0] Bump version number to 0.6, name it as Draft 1
+ 2019-06-04 [1b6eba8] Add link to UBJSON [H] marker format
+ 2019-06-04 [9eff439] Fix typos in the byte-stream section
+ 2019-06-04 [91e2d4a] Fix the TOC level for Byte-stream section
+ 2019-06-04 [f4f574a] Support generic byte-stream data via _ByteStream_
+ 2019-06-04 [6caf0c1] Support weighted graphs in both _GraphEdges_ and _GraphMatrix_
+ 2019-06-04 [6f2b644] **Major change** N-D array serialization uses row-major instead of column-major
+ 2019-05-31 [3c922f2] Add optional _ArrayCompressionLevel_ and _ArrayCompressionOptions_ flags
+ 2019-05-31 [27e539c] _ArrayData_ as 2D array grouping indices; _ArrayIsComplex_/_ArrayIsSparse_ must be logical
+ 2019-05-23 [1fde391] Minor language update
+ 2019-05-23 [e3bba42] Remove incorrect enclosing square brackets in modified UBJSON array header, clarify infinity handling
+ 2019-05-21 [3fc4385] Minor wording change in the Maps section
+ 2019-05-21 [30a2dd3] Minor example changes
+ 2019-05-21 [3e851a8] Update toc for Maps section
+ 2019-05-21 [764dd65] Support non-string keyed hashes/maps
+ 2019-05-15 [3eaaa40] add rfc commit url in the README
+ 2019-05-15 [52e96b0] bump version number to v0.5, ready for public comments
+ 2019-05-15 [0fcfe98] fix isometric transform example, old example was problematic as 1st dim was singlet
+ 2019-05-15 [c915010] Plus sign in +inf can be omitted
+ 2019-05-15 [31b3ef9] Minor format change
+ 2019-05-15 [0bb3969] fine tune language for UBJSON array header format
+ 2019-05-15 [b9314ac] Clarify extended UBJSON array header syntax
+ 2019-05-14 [a37c625] Add data links and anchors in the keyword summary
+ 2019-05-14 [e598599] Add the missing closing underscores
+ 2019-05-14 [ce74db1] merge with typo corrected version
+ 2019-05-14 [8b4651f] minior format updates
+ 2019-05-14 [0cc07e4] Remove the pull-request tutorial link created for another project
+ 2019-05-13 [51b4b13] Fix typos in README
+ 2019-05-13 [a9b923f] Fix typos using autocorrect
+ 2019-05-13 [c766e88] add README and license file
+ 2019-05-13 [2a7cb29] update toc, add compression endianness
+ 2019-05-13 [05787d8] add data link, conversion, and toc, very first complete draft
+ 2019-05-10 [b3c4531] support struct, tables, graphs, add summary, add index and query interfaces
+ 2019-05-10 [07638da] complete ND array, tree and linked list
+ 2019-05-09 [42fd8c8] complete the data annotation keywords and definitions of metadata
+ 2019-05-07 [aa5d8fa] define data models using both topological names and semantic names
+ 2019-05-07 [3365b37] remove .wiki file, use .md file for the rest of the development
+ 2018-10-10 [5f4cf09] Add Markdown version of the file
+ 2018-06-10 [237ebe6] Update JData.wiki
+ 2015-01-15 [63ae46f] http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=browse&id=jsonlab/Doc/JData&revision=7.0
+ 2015-01-14 [d4f940f] http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=browse&id=jsonlab/Doc/JData&revision=6
+ 2015-01-11 [c0711ec] http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=browse&id=jsonlab/Doc/JData&revision=5
+ 2015-01-11 [6502b43] http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=browse&id=jsonlab/Doc/JData&revision=4
+ 2015-01-11 [b5f9b4e] http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=browse&id=jsonlab/Doc/JData&revision=3
+ 2015-01-10 [6490476] http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=browse&id=jsonlab/Doc/JData&revision=2
+ 2015-01-10 [62766f1] http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=browse&id=jsonlab/Doc/JData&revision=1

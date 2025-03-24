@@ -1,10 +1,14 @@
 JData: A general-purpose data annotation and interchange format
 ============================================================
 
-- **Status of this document**: This document is currently under development.
 - **Copyright**: (C) Qianqian Fang (2011, 2015-2025) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
-- **Format Version**: 1 (Draft 3.preview)
+- **Version**: V1 (Draft-3)
+- **URL**: https://neurojson.org/jdata/draft3
+- **Status**: Frozen on March 23, 2025. For future updates, please see the Development URL below
+- **Development**: https://github.com/NeuroJSON/jdata
+- **Acknowledgement**: This project is supported by US National Institute of Health (NIH)
+  grant [U24-NS124027 (NeuroJSON)](https://neurojson.org)
 - **Abstract**:
 
 > JData is a general-purpose data interchange format aimed for portability,
@@ -148,7 +152,7 @@ The [Binary JData (BJData) format](https://github.com/NeuroJSON/bjdata) was deri
 from the Universal Binary JSON (UBJSON) format, which is one of the binary counterparts 
 to the JSON format. It specifically addresses the above mentioned limitations, 
 yet adheres to a simple grammar similar to the text-based JSON. Compared to other
-binary JSON-like formats, such as BSON (Binary JSON, http://bson.org), CBOR (Concise 
+binary JSON-like formats, such as BSON (Binary JSON, https://bson.org), CBOR (Concise 
 Binary Object Representation, [RFC 7049], https://cbor.io) and MessagePack 
 (https://msgpack.org), BJData and UBJSON files are **"quasi-human-readable"** - 
 a unique capability that is absent from almost all other binary formats.
@@ -179,12 +183,12 @@ structures, trees and graphs. A round-trip conversion is defined between the
 text and binary versions of JData documents.
 
 The inception of this specification started in 2011 as part of the development
-of the [JSONLab Toolbox](http://iso2mesh.sourceforge.net/jsonlab/) - a popular 
+of the [JSONLab Toolbox](https://neurojson.org/jsonlab/) - a popular 
 open-source MATLAB/GNU Octave JSON reader/writer. The majority of the 
 [annotated N-D array constructs](#annotated-storage-of-n-d-arrays) had been implemented
 in the [early releases](https://sourceforge.net/projects/iso2mesh/files/jsonlab/) 
 of JSONLab. In 2015, the initial draft of this specification
-was [developed in the Iso2Mesh Wiki](http://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=history&id=jsonlab/Doc/JData);
+was [developed in the Iso2Mesh Wiki](https://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=history&id=jsonlab/Doc/JData);
 since 2019, the development has been migrated to Github.
 
 The purpose of this document is to define the text and binary JData format 
@@ -234,8 +238,8 @@ separated by 0 or multiple permitted white spaces, namely
 ### Binary JData Storage Grammar
 
 The Binary JData (BJData) format used in this specification is based on 
-[BJData Specification (Draft 2)](https://github.com/NeuroJSON/bjdata/tree/Draft_2), 
-which is extended from the widely used [UBJSON Specification (Draft 12)](http://ubjson.org), 
+[BJData Specification (Draft 3)](https://neurojson.org/bjdata/draft3), 
+which is extended from the widely used [UBJSON Specification (Draft 12)](https://ubjson.org), 
 with the addition of the following features
 
 1. BJData supports 4 new data type markers: `[u]: uint16`, `[m]:  uint32`, `[M]: uint64`, `[h]: float16`
@@ -257,11 +261,16 @@ where `ndim` is the number of dimensions, and `nx`, `ny`, and `nz` ... are
 all non-negative numbers specifying the dimensions of the N-dimensional array.
 `nz/ny/nz/ndim` types must be one of the BJData integer types (`i,U,I,u,l,m,L,M`). 
 The binary data of the N-dimensional array is then serialized in the **row-major** format 
-(similar to C, C++, Javascript or Python) order.
+(similar to C, C++, Javascript or Python) order, or, in the **column-major** format
+as in MATLAB for FORTRAN if using the following BJData Draft-3 syntax
+
+```
+[[] [$] [type] [#] [[] [[] [$] [nx type] [#] [ndim type] [ndim] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type)]
+```
 
 As a special note, all BJData/UBJSON integer and floating-point types must be
 stored in the **Little-Endian** format, according to 
-[BJData Specification (Draft 2)](https://github.com/NeuroJSON/bjdata/tree/Draft_2).
+[BJData Specification (Draft )](https://neurojson.org/bjdata/draft3).
 
 
 Data Models
@@ -1406,7 +1415,7 @@ valued byte-stream `"JData specification"` shall be stored as
 
 In the binary JData, a byte-stream shall be encoded using a similar `"name":value` pair where the 
 `value` is represented by an `[H]` marker. As specified in the 
-[BJData Specification (Draft 2)](https://github.com/NeuroJSON/bjdata/blob/master/Binary_JData_Specification.md#high-precision), 
+[BJData Specification (Draft 3)](https://github.com/NeuroJSON/bjdata/blob/master/Binary_JData_Specification.md#high-precision), 
 the `[H]` marker is immediately followed by the length of the byte stream, then followed by 
 the raw binary values of the byte-stream **without Base64 encoding**. The same example above 
 can be stored as
