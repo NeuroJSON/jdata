@@ -1,0 +1,669 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JData JSON Schema",
+  "description": "JSON schema for JData - a general-purpose data annotation and interchange format",
+  "type": "object",
+  "properties": {
+    "_DataGroup_": {
+      "$ref": "#/definitions/DataGroupDef"
+    },
+    "_Dataset_": {
+      "$ref": "#/definitions/DatasetDef"
+    },
+    "_DataRecord_": {
+      "$ref": "#/definitions/DataRecordDef"
+    },
+    "_DataInfo_": {
+      "$ref": "#/definitions/DataInfoDef"
+    },
+    "_DataLink_": {
+      "$ref": "#/definitions/DataLinkDef"
+    },
+    "_DataAnchor_": {
+      "type": "string",
+      "description": "Named anchor for referencing"
+    },
+    "_NaN_": {
+      "type": "string",
+      "enum": ["_NaN_"],
+      "description": "IEEE 754 NaN constant"
+    },
+    "_Inf_": {
+      "type": "string",
+      "enum": ["_Inf_", "+_Inf_"],
+      "description": "IEEE 754 positive infinity constant"
+    },
+    "-_Inf_": {
+      "type": "string",
+      "enum": ["-_Inf_"],
+      "description": "IEEE 754 negative infinity constant"
+    },
+    "_ByteStream_": {
+      "$ref": "#/definitions/ByteStreamDef"
+    }
+  },
+  "patternProperties": {
+    "^_DataGroup_\\(.+\\)$": {
+      "$ref": "#/definitions/DataGroupDef"
+    },
+    "^_Dataset_\\(.+\\)$": {
+      "$ref": "#/definitions/DatasetDef"
+    },
+    "^_DataRecord_\\(.+\\)$": {
+      "$ref": "#/definitions/DataRecordDef"
+    },
+    "^_TableData_\\(.+\\)$": {
+      "$ref": "#/definitions/TableDataDef"
+    },
+    "^_TreeData_\\(.+\\)$": {
+      "$ref": "#/definitions/TreeDataDef"
+    },
+    "^_LinkedList_\\(.+\\)$": {
+      "$ref": "#/definitions/LinkedListDef"
+    },
+    "^_GraphData_\\(.+\\)$": {
+      "$ref": "#/definitions/GraphDataDef"
+    },
+    "^_ListNode_\\(.+\\)$": {
+      "$ref": "#/definitions/ListNodeDef"
+    },
+    "^_TreeNode_\\(.+\\)$": {
+      "$ref": "#/definitions/TreeNodeDef"
+    },
+    "^[^_].*::[^:]*$": {
+      "description": "Inline metadata annotation pattern"
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "DataGroupDef": {
+      "title": "DataGroup",
+      "description": "Container for organizing logically connected datasets",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": true
+        },
+        {
+          "type": "array",
+          "items": true
+        }
+      ]
+    },
+    "DatasetDef": {
+      "title": "Dataset",
+      "description": "Container for logically connected data records",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": true
+        },
+        {
+          "type": "array",
+          "items": true
+        }
+      ]
+    },
+    "DataRecordDef": {
+      "title": "DataRecord",
+      "description": "Container for meaningful data units",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": true
+        },
+        {
+          "type": "array",
+          "items": true
+        }
+      ]
+    },
+    "DataInfoDef": {
+      "type": "object",
+      "title": "DataInfo",
+      "description": "Metadata record for data annotation",
+      "properties": {
+        "Version": {
+          "type": "string",
+          "description": "Data version"
+        },
+        "Author": {
+          "type": "string",
+          "description": "Data author"
+        },
+        "Comment": {
+          "type": "string",
+          "description": "Data comments"
+        },
+        "UniqueID": {
+          "type": "string",
+          "description": "Unique identifier"
+        },
+        "CreateTime": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "ModifiedTime": {
+          "type": "string",
+          "description": "Last modification timestamp"
+        },
+        "_DataAnchor_": {
+          "type": "string",
+          "description": "Named anchor for referencing"
+        }
+      },
+      "additionalProperties": true
+    },
+    "DataLinkDef": {
+      "title": "DataLink",
+      "description": "Reference to internal or external data",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "URI path to referenced data"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Local index vector reference"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "URI": {
+              "type": "string",
+              "description": "URI path to referenced data"
+            },
+            "Parameters": {
+              "type": "string",
+              "description": "JSONPath to specific element"
+            },
+            "MaxRecursion": {
+              "type": "integer",
+              "description": "Maximum recursion depth for link resolution"
+            }
+          },
+          "required": ["URI"],
+          "additionalProperties": true
+        }
+      ]
+    },
+    "AnnotatedArrayDef": {
+      "type": "object",
+      "title": "AnnotatedArray",
+      "description": "JData annotated N-dimensional array format",
+      "properties": {
+        "_ArrayType_": {
+          "type": "string",
+          "enum": [
+            "uint8", "int8", "uint16", "int16", "uint32", "int32",
+            "uint64", "int64", "half", "single", "double",
+            "byte", "char", "logical"
+          ],
+          "description": "Data type of array elements"
+        },
+        "_ArraySize_": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": "Dimensions of the N-D array"
+        },
+        "_ArrayOrder_": {
+          "type": "string",
+          "enum": ["r", "row", "c", "col", "column"],
+          "description": "Array serialization order (default: row-major)"
+        },
+        "_ArrayData_": {
+          "description": "Raw array data in specified order"
+        },
+        "_ArrayLabel_": {
+          "type": "array",
+          "description": "Dimension labels and metadata"
+        },
+        "_ArrayIsComplex_": {
+          "type": "boolean",
+          "description": "True if array contains complex numbers"
+        },
+        "_ArrayIsSparse_": {
+          "type": "boolean",
+          "description": "True if array is sparse"
+        },
+        "_ArrayShape_": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "diag", "upper", "lower", "uppersymm", "lowersymm",
+                "upperband", "lowerband", "uppersymmband", "lowersymmband",
+                "band", "toeplitz", "upperherm", "lowerherm",
+                "upperhermband", "lowerhermband"
+              ]
+            },
+            {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "diag", "upper", "lower", "uppersymm", "lowersymm",
+                    "upperband", "lowerband", "uppersymmband", "lowersymmband",
+                    "band", "toeplitz", "upperherm", "lowerherm",
+                    "upperhermband", "lowerhermband"
+                  ]
+                }
+              ],
+              "additionalItems": {
+                "type": "number"
+              }
+            }
+          ],
+          "description": "Special matrix shape descriptor"
+        },
+        "_ArrayZipType_": {
+          "type": "string",
+          "enum": ["zlib", "gzip", "lzma", "lz4", "blosc"],
+          "description": "Compression method"
+        },
+        "_ArrayZipSize_": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            {
+              "type": "integer",
+              "minimum": 0
+            }
+          ],
+          "description": "Dimensions of pre-processed array before compression"
+        },
+        "_ArrayZipData_": {
+          "type": "string",
+          "description": "Base64-encoded compressed byte stream"
+        },
+        "_ArrayZipEndian_": {
+          "type": "string",
+          "enum": ["little", "big"],
+          "description": "Endianness before compression (default: little)"
+        },
+        "_ArrayZipLevel_": {
+          "type": "number",
+          "description": "Compression level (0-9, method-dependent)"
+        },
+        "_ArrayZipOptions_": {
+          "type": "array",
+          "description": "Additional compression-specific parameters"
+        },
+        "_ArrayShuffle_": {
+          "type": "integer",
+          "description": "Byte shuffle spacing (positive) or bit shuffle (negative)"
+        }
+      },
+      "required": ["_ArrayType_", "_ArraySize_"],
+      "oneOf": [
+        {
+          "required": ["_ArrayData_"]
+        },
+        {
+          "required": ["_ArrayZipData_", "_ArrayZipType_"]
+        }
+      ],
+      "not": {
+        "allOf": [
+          {
+            "properties": {
+              "_ArrayData_": true
+            },
+            "required": ["_ArrayData_"]
+          },
+          {
+            "properties": {
+              "_ArrayZipData_": true
+            },
+            "required": ["_ArrayZipData_"]
+          }
+        ]
+      },
+      "additionalProperties": false
+    },
+    "MapDataDef": {
+      "type": "object",
+      "title": "MapData",
+      "description": "Associative array with non-string keys",
+      "properties": {
+        "_MapData_": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2
+          },
+          "description": "Array of [key, value, ...] pairs"
+        }
+      },
+      "required": ["_MapData_"],
+      "additionalProperties": true
+    },
+    "TableDataDef": {
+      "type": "object",
+      "title": "TableData",
+      "description": "2D table data structure",
+      "properties": {
+        "_TableCols_": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "DataName": {
+                    "type": "string"
+                  },
+                  "DataType": {
+                    "type": "string",
+                    "enum": [
+                      "uint8", "int8", "uint16", "int16", "uint32", "int32",
+                      "uint64", "int64", "half", "single", "double",
+                      "string", "bool", "blob"
+                    ]
+                  }
+                },
+                "additionalProperties": true
+              }
+            ]
+          },
+          "description": "Column names and types"
+        },
+        "_TableRows_": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "DataName": {
+                    "type": "string"
+                  },
+                  "DataType": {
+                    "type": "string",
+                    "enum": [
+                      "uint8", "int8", "uint16", "int16", "uint32", "int32",
+                      "uint64", "int64", "half", "single", "double",
+                      "string", "bool", "blob"
+                    ]
+                  }
+                },
+                "additionalProperties": true
+              }
+            ]
+          },
+          "description": "Row names and types"
+        },
+        "_TableRecords_": {
+          "type": "array",
+          "items": {
+            "type": "array"
+          },
+          "description": "2D array storing table entries"
+        }
+      },
+      "required": ["_TableRecords_"],
+      "additionalProperties": true
+    },
+    "EnumDataDef": {
+      "type": "object",
+      "title": "EnumData",
+      "description": "Enumeration data structure for repeated values",
+      "properties": {
+        "_EnumKey_": {
+          "type": "array",
+          "description": "Array of unique values"
+        },
+        "_EnumValue_": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            {
+              "$ref": "#/definitions/AnnotatedArrayDef"
+            }
+          ],
+          "description": "Indices into _EnumKey_ (1-based)"
+        }
+      },
+      "required": ["_EnumKey_", "_EnumValue_"],
+      "additionalProperties": false
+    },
+    "TreeDataDef": {
+      "type": "object",
+      "title": "TreeData",
+      "description": "Tree data structure container",
+      "patternProperties": {
+        "^_TreeNode_\\(.+\\)$": {
+          "description": "Tree node with data"
+        }
+      },
+      "properties": {
+        "_TreeChildren_": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TreeNodeContainerDef"
+          },
+          "description": "Array of child nodes"
+        }
+      },
+      "additionalProperties": true
+    },
+    "TreeNodeDef": {
+      "title": "TreeNode",
+      "description": "Individual tree node",
+      "additionalProperties": true
+    },
+    "TreeNodeContainerDef": {
+      "type": "object",
+      "title": "TreeNodeContainer",
+      "description": "Container for tree node with optional children",
+      "patternProperties": {
+        "^_TreeNode_\\(.+\\)$": {
+          "description": "Tree node data"
+        }
+      },
+      "properties": {
+        "_TreeChildren_": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TreeNodeContainerDef"
+          },
+          "description": "Array of child nodes"
+        }
+      },
+      "additionalProperties": true
+    },
+    "LinkedListDef": {
+      "type": "array",
+      "title": "LinkedList",
+      "description": "Singly or doubly linked list structure",
+      "items": {
+        "$ref": "#/definitions/ListNodeDef"
+      }
+    },
+    "ListNodeDef": {
+      "type": "object",
+      "title": "ListNode",
+      "description": "Node in a linked list",
+      "patternProperties": {
+        "^_ListNode_\\(.+\\)$": {
+          "description": "Node data with unique name"
+        }
+      },
+      "properties": {
+        "_ListNext_": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of next node (null if last)"
+        },
+        "_ListPrior_": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Name of previous node (null if first)"
+        }
+      },
+      "additionalProperties": true
+    },
+    "GraphDataDef": {
+      "type": "object",
+      "title": "GraphData",
+      "description": "Graph data structure with nodes and edges",
+      "properties": {
+        "_GraphNodes_": {
+          "type": "object",
+          "description": "Graph nodes with associated data",
+          "additionalProperties": true
+        },
+        "_GraphEdges_": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 3,
+            "items": [
+              {
+                "type": "string",
+                "description": "Start node name"
+              },
+              {
+                "type": "string",
+                "description": "End node name"
+              }
+            ],
+            "additionalItems": {
+              "description": "Optional edge data"
+            }
+          },
+          "description": "Directed graph edges"
+        },
+        "_GraphEdges0_": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 3,
+            "items": [
+              {
+                "type": "string",
+                "description": "Start node name"
+              },
+              {
+                "type": "string",
+                "description": "End node name"
+              }
+            ],
+            "additionalItems": {
+              "description": "Optional edge data"
+            }
+          },
+          "description": "Undirected graph edges"
+        },
+        "_GraphMatrix_": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "description": "Adjacency matrix (direct format)"
+            },
+            {
+              "$ref": "#/definitions/AnnotatedArrayDef"
+            }
+          ],
+          "description": "Graph adjacency matrix representation"
+        }
+      },
+      "required": ["_GraphNodes_"],
+      "oneOf": [
+        {
+          "required": ["_GraphEdges_"]
+        },
+        {
+          "required": ["_GraphEdges0_"]
+        },
+        {
+          "required": ["_GraphMatrix_"]
+        }
+      ],
+      "additionalProperties": true
+    },
+    "ByteStreamDef": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Base64-encoded byte stream (simple format)"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "_DataInfo_": {
+              "type": "object",
+              "properties": {
+                "MediaType": {
+                  "type": "string",
+                  "description": "MIME type of original data"
+                },
+                "Encoding": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Encoding steps applied in order"
+                },
+                "ByteLength": {
+                  "type": "integer",
+                  "description": "Length of encoded data"
+                }
+              },
+              "additionalProperties": true
+            },
+            "Data": {
+              "type": "string",
+              "description": "Base64-encoded byte stream data"
+            }
+          },
+          "required": ["Data"],
+          "additionalProperties": true
+        }
+      ]
+    }
+  }
+}
