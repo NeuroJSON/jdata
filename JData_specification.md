@@ -3,9 +3,9 @@ JData: A general-purpose data annotation and interchange format
 
 - **Copyright**: (C) Qianqian Fang (2011, 2015-2025) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
-- **Version**: V1 (Draft-3)
+- **Version**: V1 (Draft-4.preview)
 - **URL**: https://neurojson.org/jdata/draft3
-- **Status**: Frozen on March 23, 2025. For future updates, please see the Development URL below
+- **Status**: Under development
 - **Development**: https://github.com/NeuroJSON/jdata
 - **Acknowledgment**: This project is supported by US National Institute of Health (NIH)
   grant [U24-NS124027 (NeuroJSON)](https://neurojson.org)
@@ -238,16 +238,17 @@ separated by 0 or multiple permitted white spaces, namely
 ### Binary JData Storage Grammar
 
 The Binary JData (BJData) format used in this specification is based on 
-[BJData Specification (Draft 3)](https://neurojson.org/bjdata/draft3), 
+[BJData Specification (Draft 4)](https://neurojson.org/bjdata/), 
 which is extended from the widely used [UBJSON Specification (Draft 12)](https://ubjson.org), 
 with the addition of the following features
 
-1. BJData supports 4 new data type markers: `[u]: uint16`, `[m]:  uint32`, `[M]: uint64`, `[h]: float16`
-2. BJData uses little-Endian (LE) as the default numeric (integers and floating-point numbers) data byte order
+1. BJData supports 5 new data type markers: `[u]: uint16`, `[m]:  uint32`, `[M]: uint64`, `[h]: float16` and `[B]: byte`
+2. BJData allows extension of custom binary data types via the new Extended data type `[E]`
+3. BJData uses little-Endian (LE) as the default numeric (integers and floating-point numbers) data byte order
 as oppose to the big-Endinan (BE) byte order used by UBJSON
-3. BJData uses the respective IEEE 754 binary form to store +/-Infinity and NaN instead 
+4. BJData uses the respective IEEE 754 binary form to store +/-Infinity and NaN instead 
 of converting to [Z]
-4. optimized array container header was extended to support N-dimensional packed arrays by
+5. optimized array container header was extended to support N-dimensional packed arrays by
 attaching a 1-D integer array construct following the `#` (count) marker, for example
 
 ```
@@ -262,15 +263,17 @@ all non-negative numbers specifying the dimensions of the N-dimensional array.
 `nz/ny/nz/ndim` types must be one of the BJData integer types (`i,U,I,u,l,m,L,M`). 
 The binary data of the N-dimensional array is then serialized in the **row-major** format 
 (similar to C, C++, Javascript or Python) order, or, in the **column-major** format
-as in MATLAB for FORTRAN if using the following BJData Draft-3 syntax
+as in MATLAB for FORTRAN if using the following BJData Draft-3 (or newer) syntax
 
 ```
 [[] [$] [type] [#] [[] [[] [$] [nx type] [#] [ndim type] [ndim] [nx ny nz ...] []] [nx*ny*nz*...*sizeof(type)]
 ```
+6. optimized container for packed object storage via structure-of-array (SOA) introduced
+in Draft-4.
 
 As a special note, all BJData/UBJSON integer and floating-point types must be
 stored in the **Little-Endian** format, according to 
-[BJData Specification (Draft )](https://neurojson.org/bjdata/draft3).
+[BJData Specification (Draft-4)](https://neurojson.org/bjdata/).
 
 
 Data Models
