@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "JData JSON Schema",
-  "description": "JSON schema for JData - a general-purpose data annotation and interchange format",
+  "description": "JSON schema for JData - a general-purpose data annotation and interchange format (Draft-4)",
   "type": "object",
   "properties": {
     "_DataGroup_": {
@@ -16,12 +16,23 @@
     "_DataInfo_": {
       "$ref": "#/definitions/DataInfoDef"
     },
+    ".datainfo": {
+      "$ref": "#/definitions/DataInfoDef",
+      "description": "CouchDB-compatible alias for _DataInfo_"
+    },
+    "_DataSchema_": {
+      "$ref": "#/definitions/DataSchemaDef"
+    },
+    ".dataschema": {
+      "$ref": "#/definitions/DataSchemaDef",
+      "description": "CouchDB-compatible alias for _DataSchema_"
+    },
     "_DataLink_": {
       "$ref": "#/definitions/DataLinkDef"
     },
     "_DataAnchor_": {
       "type": "string",
-      "description": "Named anchor for referencing"
+      "description": "Named anchor for referencing by _DataLink_"
     },
     "_NaN_": {
       "type": "string",
@@ -61,7 +72,10 @@
     "^_LinkedList_\\(.+\\)$": {
       "$ref": "#/definitions/LinkedListDef"
     },
-    "^_GraphData_\\(.+\\)$": {
+    "^_LinkedList_\\(.+\\)(::.*)?$": {
+      "$ref": "#/definitions/LinkedListDef"
+    },
+    "^_GraphData_\\(.+\\)_$": {
       "$ref": "#/definitions/GraphDataDef"
     },
     "^_ListNode_\\(.+\\)$": {
@@ -71,7 +85,7 @@
       "$ref": "#/definitions/TreeNodeDef"
     },
     "^[^_].*::[^:]*$": {
-      "description": "Inline metadata annotation pattern"
+      "description": "Inline metadata annotation: item_name::Property1=value1,Property2=value2,..."
     }
   },
   "additionalProperties": true,
@@ -125,27 +139,43 @@
       "properties": {
         "Version": {
           "type": "string",
-          "description": "Data version"
+          "description": "Version string of the data or the generating software"
         },
         "Author": {
           "type": "string",
-          "description": "Data author"
+          "description": "Name(s) of the data creator(s)"
         },
         "Comment": {
           "type": "string",
-          "description": "Data comments"
+          "description": "Free-text description"
         },
         "UniqueID": {
           "type": "string",
-          "description": "Unique identifier"
+          "description": "Globally unique identifier (e.g., UUID v4)"
         },
         "CreateTime": {
           "type": "string",
-          "description": "Creation timestamp"
+          "description": "ISO 8601 creation timestamp (e.g., \"2024-03-15T14:32:00Z\")"
         },
         "ModifiedTime": {
           "type": "string",
-          "description": "Last modification timestamp"
+          "description": "ISO 8601 last-modification timestamp"
+        },
+        "License": {
+          "type": "string",
+          "description": "SPDX license identifier (e.g., \"CC-BY-4.0\", \"Apache-2.0\")"
+        },
+        "GeneratedBy": {
+          "type": "string",
+          "description": "Name and version of the software that produced the data"
+        },
+        "DerivedFrom": {
+          "type": "string",
+          "description": "URI or identifier of the source data from which this was derived"
+        },
+        "SourceFormat": {
+          "type": "string",
+          "description": "Original file format before conversion (e.g., \"NIfTI-1\", \"HDF5\")"
         },
         "_DataAnchor_": {
           "type": "string",
@@ -153,6 +183,26 @@
         }
       },
       "additionalProperties": true
+    },
+    "DataSchemaDef": {
+      "title": "DataSchema",
+      "description": "Associates a JSON Schema document with a data node for formal structure validation. The value must be either a valid JSON Schema object or a URI string pointing to an external schema document. Parsers that do not recognize _DataSchema_ must silently ignore it.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "URI pointing to an external JSON Schema document"
+        },
+        {
+          "type": "object",
+          "description": "Inline JSON Schema object",
+          "properties": {
+            "$schema": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
     },
     "DataLinkDef": {
       "title": "DataLink",
@@ -178,7 +228,7 @@
             },
             "Parameters": {
               "type": "string",
-              "description": "JSONPath to specific element"
+              "description": "JSONPath expression to a specific element"
             },
             "MaxRecursion": {
               "type": "integer",
@@ -190,19 +240,46 @@
         }
       ]
     },
+    "ArrayTypeDef": {
+      "type": "string",
+      "enum": [
+        "uint8",   "int8",
+        "uint16",  "int16",
+        "uint32",  "int32",
+        "uint64",  "int64",
+        "half",    "single",  "double",
+        "float16", "float32", "float64",
+        "byte", "char", "logical"
+      ],
+      "description": "Numeric data type. float16/float32/float64 are aliases for half/single/double (NumPy/Arrow interoperability). byte/char/logical are aliases for uint8."
+    },
+    "ArrayShapeIdDef": {
+      "type": "string",
+      "enum": [
+        "diag",
+        "upper",        "lower",
+        "uppersymm",    "lowersymm",
+        "upperband",    "lowerband",
+        "uppersymmband","lowersymmband",
+        "band",
+        "toeplitz",
+        "upperherm",    "lowerherm",
+        "upperhermband","lowerhermband",
+        "circulant",
+        "hankel",
+        "identity",
+        "zero",
+        "range"
+      ],
+      "description": "Special matrix/array shape identifier"
+    },
     "AnnotatedArrayDef": {
       "type": "object",
       "title": "AnnotatedArray",
       "description": "JData annotated N-dimensional array format",
       "properties": {
         "_ArrayType_": {
-          "type": "string",
-          "enum": [
-            "uint8", "int8", "uint16", "int16", "uint32", "int32",
-            "uint64", "int64", "half", "single", "double",
-            "byte", "char", "logical"
-          ],
-          "description": "Data type of array elements"
+          "$ref": "#/definitions/ArrayTypeDef"
         },
         "_ArraySize_": {
           "type": "array",
@@ -210,63 +287,113 @@
             "type": "integer",
             "minimum": 0
           },
+          "minItems": 1,
           "description": "Dimensions of the N-D array"
         },
         "_ArrayOrder_": {
           "type": "string",
           "enum": ["r", "row", "c", "col", "column"],
-          "description": "Array serialization order (default: row-major)"
+          "description": "Array serialization order: row-major (r/row, default) or column-major (c/col/column)"
         },
         "_ArrayData_": {
-          "description": "Raw array data in specified order"
-        },
-        "_ArrayLabel_": {
-          "type": "array",
-          "description": "Dimension labels and metadata"
+          "description": "Raw array data. When _ArrayChunks_ is present, this is a 1-D array of per-chunk payloads in row-major order."
         },
         "_ArrayIsComplex_": {
           "type": "boolean",
-          "description": "True if array contains complex numbers"
+          "description": "True if array contains complex numbers (real and imaginary parts interleaved)"
         },
         "_ArrayIsSparse_": {
           "type": "boolean",
-          "description": "True if array is sparse"
+          "description": "True if array is sparse (row-indices, col-indices, values format)"
+        },
+        "_ArrayLabel_": {
+          "type": "array",
+          "description": "Dimension labels. Each element is a string name or a [name, start, width] tuple.",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              {
+                "type": "array",
+                "items": [
+                  { "type": "string" },
+                  { "type": "integer" },
+                  { "type": "integer" }
+                ],
+                "minItems": 1
+              }
+            ]
+          }
+        },
+        "_ArrayCoords_": {
+          "type": "object",
+          "description": "Maps each dimension name (as defined in _ArrayLabel_) to a 1-D coordinate array of the same length as that dimension. Mirrors the coordinate-variable model of xarray and NetCDF.",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "array",
+                "description": "Plain 1-D coordinate array"
+              },
+              {
+                "$ref": "#/definitions/AnnotatedArrayDef",
+                "description": "Annotated JData array (preserves binary type information)"
+              }
+            ]
+          }
+        },
+        "_ArrayUnits_": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Single unit string applied uniformly to all dimensions (UDUNITS-2 convention, e.g. \"mm\", \"ms\", \"kg/m^3\"). An empty string denotes dimensionless or undefined."
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Per-dimension unit strings with length equal to length(_ArraySize_)"
+            }
+          ],
+          "description": "Physical unit(s) of the array dimensions (UDUNITS-2 convention)"
+        },
+        "_ArrayFillValue_": {
+          "type": "number",
+          "description": "Scalar sentinel for missing or invalid entries of the same numeric type as _ArrayType_. Important for integer types where IEEE 754 NaN cannot be represented. Both _ArrayFillValue_ and NaN entries (if present) are treated as missing."
         },
         "_ArrayShape_": {
           "oneOf": [
             {
-              "type": "string",
-              "enum": [
-                "diag", "upper", "lower", "uppersymm", "lowersymm",
-                "upperband", "lowerband", "uppersymmband", "lowersymmband",
-                "band", "toeplitz", "upperherm", "lowerherm",
-                "upperhermband", "lowerhermband"
-              ]
+              "$ref": "#/definitions/ArrayShapeIdDef"
             },
             {
               "type": "array",
               "items": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "diag", "upper", "lower", "uppersymm", "lowersymm",
-                    "upperband", "lowerband", "uppersymmband", "lowersymmband",
-                    "band", "toeplitz", "upperherm", "lowerherm",
-                    "upperhermband", "lowerhermband"
-                  ]
-                }
+                { "$ref": "#/definitions/ArrayShapeIdDef" }
               ],
               "additionalItems": {
                 "type": "number"
-              }
+              },
+              "description": "Shape ID followed by optional numeric parameters (e.g. bandwidth for band/toeplitz)"
             }
           ],
-          "description": "Special matrix shape descriptor"
+          "description": "Special matrix or array shape descriptor. Shapes: diag, upper/lower (triangular), uppersymm/lowersymm, band variants, toeplitz, circulant, hankel, identity, zero, range."
+        },
+        "_ArrayChunks_": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "description": "Tile (chunk) shape for partitioning the pre-processed array into independently compressible blocks. Length must equal the number of dimensions of the pre-processed array. When present, _ArrayData_ or _ArrayZipData_ becomes a 1-D array of per-chunk payloads in row-major order. The last chunk along any dimension may be smaller than the declared shape."
         },
         "_ArrayZipType_": {
           "type": "string",
-          "enum": ["zlib", "gzip", "lzma", "lz4", "blosc"],
-          "description": "Compression method"
+          "enum": [
+            "zlib", "gzip", "bz2", "lzma",
+            "zstd", "lz4",
+            "blosc2", "blosc2lz4", "blosc2lz4hc",
+            "blosc2blosclz", "blosc2zstd", "blosc2zlib",
+            "base64"
+          ],
+          "description": "Compression codec identifier following the Numcodecs registry (also used by Zarr). Note: zlib (RFC 1950) and gzip (RFC 1952) are distinct formats. Only Blosc2 (not Blosc v1) is supported. blosc2 defaults to BloscLZ internal codec."
         },
         "_ArrayZipSize_": {
           "oneOf": [
@@ -275,60 +402,69 @@
               "items": {
                 "type": "integer",
                 "minimum": 0
-              }
+              },
+              "description": "Dimensions of the pre-processed array (multi-dimensional)"
             },
             {
               "type": "integer",
-              "minimum": 0
+              "minimum": 0,
+              "description": "Total element count of the pre-processed array (scalar shorthand)"
             }
           ],
-          "description": "Dimensions of pre-processed array before compression"
+          "description": "Dimensions of the pre-processed array before compression. When _ArrayChunks_ is present, gives the shape of a full (non-boundary) chunk."
         },
         "_ArrayZipData_": {
-          "type": "string",
-          "description": "Base64-encoded compressed byte stream"
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Base64-encoded compressed byte stream (unchunked array)"
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "1-D array of Base64-encoded per-chunk compressed payloads (chunked array, when _ArrayChunks_ is present)"
+            }
+          ],
+          "description": "Compressed and Base64-encoded array data"
         },
         "_ArrayZipEndian_": {
           "type": "string",
           "enum": ["little", "big"],
-          "description": "Endianness before compression (default: little)"
+          "description": "Byte order of the array elements before compression (default: little-endian)"
         },
         "_ArrayZipLevel_": {
           "type": "number",
-          "description": "Compression level (0-9, method-dependent)"
+          "description": "Compression level (typically 0-9, interpretation is codec-dependent)"
         },
         "_ArrayZipOptions_": {
-          "type": "array",
-          "description": "Additional compression-specific parameters"
+          "type": "object",
+          "description": "Additional codec-specific parameters (e.g., for Blosc2: typesize, clevel, shuffle, nthreads)",
+          "additionalProperties": true
         },
         "_ArrayShuffle_": {
           "type": "integer",
-          "description": "Byte shuffle spacing (positive) or bit shuffle (negative)"
+          "not": { "enum": [0] },
+          "description": "Byte or bit shuffle applied before compression. A positive integer N specifies byte shuffle with stride N (e.g., 4 reorders [1,2,3,4,5,6,7,8,...] to [1,5,...,2,6,...,3,7,...,4,8,...]). A negative integer -N specifies bit-wise shuffle with spacing N. Must be applied before compression; unshuffle applied on decompression."
         }
       },
       "required": ["_ArrayType_", "_ArraySize_"],
-      "oneOf": [
-        {
-          "required": ["_ArrayData_"]
+      "if": {
+        "properties": {
+          "_ArrayShape_": { "type": "string", "enum": ["zero"] }
         },
-        {
-          "required": ["_ArrayZipData_", "_ArrayZipType_"]
-        }
-      ],
+        "required": ["_ArrayShape_"]
+      },
+      "then": {},
+      "else": {
+        "oneOf": [
+          { "required": ["_ArrayData_"] },
+          { "required": ["_ArrayZipData_", "_ArrayZipType_", "_ArrayZipSize_"] }
+        ]
+      },
       "not": {
         "allOf": [
-          {
-            "properties": {
-              "_ArrayData_": true
-            },
-            "required": ["_ArrayData_"]
-          },
-          {
-            "properties": {
-              "_ArrayZipData_": true
-            },
-            "required": ["_ArrayZipData_"]
-          }
+          { "required": ["_ArrayData_"] },
+          { "required": ["_ArrayZipData_"] }
         ]
       },
       "additionalProperties": false
@@ -336,7 +472,7 @@
     "MapDataDef": {
       "type": "object",
       "title": "MapData",
-      "description": "Associative array with non-string keys",
+      "description": "Associative array (hash/map) with non-string keys",
       "properties": {
         "_MapData_": {
           "type": "array",
@@ -350,6 +486,37 @@
       "required": ["_MapData_"],
       "additionalProperties": true
     },
+    "TableColumnDef": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Column/row name (plain string form)"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "DataName": {
+              "type": "string",
+              "description": "Column or row name"
+            },
+            "DataType": {
+              "type": "string",
+              "enum": [
+                "uint8",   "int8",
+                "uint16",  "int16",
+                "uint32",  "int32",
+                "uint64",  "int64",
+                "half",    "single",  "double",
+                "float16", "float32", "float64",
+                "string", "bool", "blob", "datetime"
+              ],
+              "description": "Data type of this column/row. datetime values are ISO 8601 strings; values without an explicit time-zone offset are interpreted as UTC."
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    },
     "TableDataDef": {
       "type": "object",
       "title": "TableData",
@@ -358,56 +525,14 @@
         "_TableCols_": {
           "type": "array",
           "items": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "DataName": {
-                    "type": "string"
-                  },
-                  "DataType": {
-                    "type": "string",
-                    "enum": [
-                      "uint8", "int8", "uint16", "int16", "uint32", "int32",
-                      "uint64", "int64", "half", "single", "double",
-                      "string", "bool", "blob"
-                    ]
-                  }
-                },
-                "additionalProperties": true
-              }
-            ]
+            "$ref": "#/definitions/TableColumnDef"
           },
           "description": "Column names and types"
         },
         "_TableRows_": {
           "type": "array",
           "items": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "DataName": {
-                    "type": "string"
-                  },
-                  "DataType": {
-                    "type": "string",
-                    "enum": [
-                      "uint8", "int8", "uint16", "int16", "uint32", "int32",
-                      "uint64", "int64", "half", "single", "double",
-                      "string", "bool", "blob"
-                    ]
-                  }
-                },
-                "additionalProperties": true
-              }
-            ]
+            "$ref": "#/definitions/TableColumnDef"
           },
           "description": "Row names and types"
         },
@@ -416,7 +541,27 @@
           "items": {
             "type": "array"
           },
-          "description": "2D array storing table entries"
+          "description": "2D array storing table entries (rows of column values)"
+        },
+        "_TableIndex_": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Single column name forming the unique row index"
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1,
+              "description": "Ordered list of column names forming a composite unique row index"
+            }
+          ],
+          "description": "Names of one or more columns in _TableCols_ that together form the unique row index (analogous to a SQL primary key or pandas DataFrame.index). If absent, the implicit index is the 1-based row position."
+        },
+        "_TableSortOrder_": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Declared sort order of the stored records. Each element is a column name; a leading \"-\" prefix denotes descending order (e.g., [\"-Age\", \"Height\"] means descending Age then ascending Height). Parsers may rely on this to skip re-sorting for binary-search or merge operations."
         }
       },
       "required": ["_TableRecords_"],
@@ -425,11 +570,11 @@
     "EnumDataDef": {
       "type": "object",
       "title": "EnumData",
-      "description": "Enumeration data structure for repeated values",
+      "description": "Enumeration (categorical) data structure for arrays with repeated values from a finite set",
       "properties": {
         "_EnumKey_": {
           "type": "array",
-          "description": "Array of unique values"
+          "description": "Array of unique category values (may have mixed data types)"
         },
         "_EnumValue_": {
           "oneOf": [
@@ -438,13 +583,19 @@
               "items": {
                 "type": "integer",
                 "minimum": 1
-              }
+              },
+              "description": "1-D integer array of 1-based indices into _EnumKey_"
             },
             {
-              "$ref": "#/definitions/AnnotatedArrayDef"
+              "$ref": "#/definitions/AnnotatedArrayDef",
+              "description": "N-D annotated integer array of 1-based indices (may use array compression)"
             }
           ],
-          "description": "Indices into _EnumKey_ (1-based)"
+          "description": "1-based indices into _EnumKey_. Note: this differs from 0-based indexing used by JSONPath and Apache Arrow DictionaryArray; subtract 1 when converting."
+        },
+        "_EnumOrdered_": {
+          "type": "boolean",
+          "description": "When true, categories in _EnumKey_ are treated as an ordered (ordinal) sequence where position defines ranking (first entry is lowest). Equivalent to ordered=True in pandas CategoricalDtype or an R ordered factor. If absent or false, the enumeration is unordered (nominal)."
         }
       },
       "required": ["_EnumKey_", "_EnumValue_"],
@@ -478,7 +629,7 @@
     "TreeNodeContainerDef": {
       "type": "object",
       "title": "TreeNodeContainer",
-      "description": "Container for tree node with optional children",
+      "description": "Container for a tree node with optional children",
       "patternProperties": {
         "^_TreeNode_\\(.+\\)$": {
           "description": "Tree node data"
@@ -498,7 +649,7 @@
     "LinkedListDef": {
       "type": "array",
       "title": "LinkedList",
-      "description": "Singly or doubly linked list structure",
+      "description": "Singly or doubly linked list structure. The container key may carry inline metadata to declare the node count: \"_LinkedList_(name)::Length=N\".",
       "items": {
         "$ref": "#/definitions/ListNodeDef"
       }
@@ -509,31 +660,23 @@
       "description": "Node in a linked list",
       "patternProperties": {
         "^_ListNode_\\(.+\\)$": {
-          "description": "Node data with unique name"
+          "description": "Node data with unique name within the list"
         }
       },
       "properties": {
         "_ListNext_": {
           "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+            { "type": "string" },
+            { "type": "null" }
           ],
-          "description": "Name of next node (null if last)"
+          "description": "Name of the next node (null if this is the last node)"
         },
         "_ListPrior_": {
           "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+            { "type": "string" },
+            { "type": "null" }
           ],
-          "description": "Name of previous node (null if first)"
+          "description": "Name of the previous node (null if this is the first node)"
         }
       },
       "additionalProperties": true
@@ -545,7 +688,7 @@
       "properties": {
         "_GraphNodes_": {
           "type": "object",
-          "description": "Graph nodes with associated data",
+          "description": "Graph nodes with their associated data",
           "additionalProperties": true
         },
         "_GraphEdges_": {
@@ -553,44 +696,42 @@
           "items": {
             "type": "array",
             "minItems": 2,
-            "maxItems": 3,
             "items": [
               {
                 "type": "string",
-                "description": "Start node name"
+                "description": "Source node name"
               },
               {
                 "type": "string",
-                "description": "End node name"
+                "description": "Destination node name"
               }
             ],
             "additionalItems": {
-              "description": "Optional edge data"
+              "description": "Optional edge data (scalar edge data is interpreted as edge weight)"
             }
           },
-          "description": "Directed graph edges"
+          "description": "Directed graph edges. Each entry is [source, destination, optional_data]."
         },
         "_GraphEdges0_": {
           "type": "array",
           "items": {
             "type": "array",
             "minItems": 2,
-            "maxItems": 3,
             "items": [
               {
                 "type": "string",
-                "description": "Start node name"
+                "description": "First node name"
               },
               {
                 "type": "string",
-                "description": "End node name"
+                "description": "Second node name"
               }
             ],
             "additionalItems": {
-              "description": "Optional edge data"
+              "description": "Optional edge data (scalar edge data is interpreted as edge weight)"
             }
           },
-          "description": "Undirected graph edges"
+          "description": "Undirected graph edges. Each entry [A, B, ...] implies the reverse edge [B, A, ...]; parsers must not double-store edge data. _GraphMatrix_ is symmetric when paired with _GraphEdges0_."
         },
         "_GraphMatrix_": {
           "oneOf": [
@@ -598,38 +739,33 @@
               "type": "array",
               "items": {
                 "type": "array",
-                "items": {
-                  "type": "number"
-                }
+                "items": { "type": "number" }
               },
-              "description": "Adjacency matrix (direct format)"
+              "description": "Adjacency matrix in direct 2-D array format"
             },
             {
-              "$ref": "#/definitions/AnnotatedArrayDef"
+              "$ref": "#/definitions/AnnotatedArrayDef",
+              "description": "Adjacency matrix in annotated JData array format (supports sparse representation)"
             }
           ],
-          "description": "Graph adjacency matrix representation"
+          "description": "Graph adjacency matrix. Interpreted as symmetric when paired with _GraphEdges0_."
         }
       },
       "required": ["_GraphNodes_"],
       "oneOf": [
-        {
-          "required": ["_GraphEdges_"]
-        },
-        {
-          "required": ["_GraphEdges0_"]
-        },
-        {
-          "required": ["_GraphMatrix_"]
-        }
+        { "required": ["_GraphEdges_"] },
+        { "required": ["_GraphEdges0_"] },
+        { "required": ["_GraphMatrix_"] }
       ],
       "additionalProperties": true
     },
     "ByteStreamDef": {
+      "title": "ByteStream",
+      "description": "Generic binary byte-stream data",
       "oneOf": [
         {
           "type": "string",
-          "description": "Base64-encoded byte stream (simple format)"
+          "description": "Base64-encoded byte stream (simple form)"
         },
         {
           "type": "object",
@@ -639,18 +775,17 @@
               "properties": {
                 "MediaType": {
                   "type": "string",
-                  "description": "MIME type of original data"
+                  "description": "MIME type of the original data (e.g., \"image/png\")"
                 },
                 "Encoding": {
                   "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "Encoding steps applied in order"
+                  "items": { "type": "string" },
+                  "description": "Ordered list of encoding steps applied to the byte stream"
                 },
                 "ByteLength": {
                   "type": "integer",
-                  "description": "Length of encoded data"
+                  "minimum": 0,
+                  "description": "Length of the encoded data in bytes"
                 }
               },
               "additionalProperties": true
