@@ -2,6 +2,23 @@
 
 Major updates are marked with a "*"
 
+== JData Spec Draft-4, FangQ <q.fang (a) neu.edu> ==
+
+ 2026-04-08 [a88fca8] [schema] update json schema
+ 2026-04-08 [e0dfdd5] [doc] update header info
+ 2026-04-08 [c8bfe9f] [spellcheck] fix errors in spellcheck ci
+ 2026-04-08 [a800056] spec: extend annotation keywords, array shapes, and fix editorial issues
+ 2026-04-08 [57de727] Update introduction
+ 2026-01-26 [3f5426e] Update .wordlist.txt
+ 2026-01-22 [7f03687] Update JData_specification.md
+ 2025-12-02 [792aa4a] Merge pull request #26 from NeuroJSON/dependabot/github_actions/actions/checkout-6
+ 2025-12-02 [c708fd7] Bump actions/checkout from 5 to 6
+ 2025-08-24 [05c6e04] [schema] add json schema for jdata annotations
+ 2025-08-17 [623807d] Merge pull request #22 from NeuroJSON/dependabot/github_actions/actions/checkout-5
+ 2025-08-12 [0875682] Bump actions/checkout from 4 to 5
+ 2025-03-24 [6c96743] Merge pull request #15 from nebkat/patch-1
+ 2025-03-24 [3ca6ab5] [typo] fix typo
+
 == JData Spec Draft-3, FangQ <q.fang (a) neu.edu> ==
 
  2025-02-22 [8907586] Update .wordlist.txt

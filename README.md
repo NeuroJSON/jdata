@@ -5,12 +5,17 @@
 We use this repository to gather feedback from the community regarding the 
 ["JData Format Specification"](JData_specification.md), or JData format. Such 
 feedback is crucial to finalize this file specification and help improve
-it in the future once disseminated. 
+it in the future once disseminated.
 
 The latest version of the JData specification can be found in the file named 
 [JData_specification.md](JData_specification.md). The specification is written
 in the [Markdown format](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) 
 for convenient editing and version control.
+
+The version and status of the current draft are indicated in the header of
+[JData_specification.md](JData_specification.md). Frozen releases are published
+at https://neurojson.org/jdata/. A formal JSON Schema for validating JData
+documents is provided in [schema/jdata_format_schema.json](schema/jdata_format_schema.json).
 
 ## What is JData
 
@@ -27,8 +32,8 @@ JSON format BJData/UBJSON for smaller file size and faster parsing. These data f
 are JSON/BJData compliant and can be readily read without needing one to write their
 own format. There exist numerous JSON parsers, abundant BJData/UBJSON parsers, and
 extensively developed tools in the large JSON ecosystem - including utilities like
-as `jq`, JSON-native NoSQL databases, and JSON-based standards such as JSON-schema
-for validation, JSON-Reference and JSON-LD for data linking, JSON-Path for query etc.
+`jq`, JSON-native NoSQL databases, and JSON-based standards such as JSON Schema
+for validation, JSON Reference and JSON-LD for data linking, JSONPath for query, etc.
 
 ![](./images/JData_Diagram.png)
 
@@ -48,8 +53,8 @@ draft of this file specification, including
     RFC (Request for comments) commit (where the entire file is removed
     and re-added so that every line appears in such commit). One can
     write short comments as well as post replies on this RFC page. 
-  - The latest RFC commit is based on **Draft 2 (version v0.8)**. Please use
-    [this link](https://github.com/NeuroJSON/jdata/commit/6bb02c8a654938451d686c4a7c2b1b0619e7cf17) to comment.
+  - For feedback on the current version, the [Issues section](https://github.com/NeuroJSON/jdata/issues)
+    is the preferred channel.
   - To add a comment, you need to first register a github account, and then 
     browse the above RFC page. When hovering your cursor over each line, a 
     "plus" icon is displayed, clicking it will allow one to comment on a 
