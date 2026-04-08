@@ -75,141 +75,101 @@ scalability of the generated data files.
 Introduction
 ------------
 
-### Background
+#### Background
 
+Open sharing of scientific data has become a cornerstone of modern research,
+driven by community standards such as the FAIR principles -- Findability,
+Accessibility, Interoperability, and Reusability -- and mandated by an
+increasing number of funding agencies and journals.  Yet while open-source
+software development has converged on widely accepted, human-readable
+"source-code" formats -- plain text files under version control, universally
+readable without specialized tools -- the sharing of complex scientific
+datasets lacks an equivalent convention.  Shared datasets today are commonly
+distributed in domain-specific binary formats whose readability and
+long-term usability depend entirely on the continued availability of
+specialized parsers and libraries.
 
-Data are the digital representations of our world. Generating and processing 
-data are essential parts of our daily lives, and form the very 
-foundations of modern sciences, information technologies, businesses, and 
-interactions between global societies.
+This tight coupling between data and its parser creates a fundamental
+fragility.  Binary formats encode data in opaque byte sequences whose
+interpretation requires an external schema -- often embedded only in the
+parser source code or a separate specification document.  As formats
+evolve, parsers are updated or retired, and the risk of datasets becoming
+unreadable grows with time.  The scientific record is consequently
+vulnerable: data carefully collected and shared today may be effectively
+inaccessible to researchers a decade from now, undermining the very
+reproducibility that data sharing is meant to support.  A durable solution
+requires a format in which the data structure is self-describing and
+human-readable -- analogous to source code -- rather than opaque and
+parser-dependent.
 
-Data can take many forms. Some data can be represented by simple scalars.
-Others have complex forms with hierarchical structures. An efficient 
-representation of data also strongly depends upon application-specific needs. In some 
-cases, plain text files with white-space delimited fields are sufficient,
-however, for performance-sensitive applications, binary formats can 
-significantly reduce loading and processing time. The ability to store and 
-parse complex data structures is particularly important to the scientific 
-community.
+#### JData as the source-code format for scientific data
 
-It is a challenging task to encapsulate a wide variety of data forms within a 
-single data interchange format. There have been many previous efforts in 
-designing a general-purpose data storage specification. Some of them have 
-become popular choices in one or multiple applications. 
-Extensible Markup Language (XML), for example, is ubiquitously used as a 
-data-exchange format, but the verbosity of the syntax, moderate complexity for 
-parsing, impeded readability and inefficiency in expressing structured data 
-Indicate room for improvement. Comma Separated Value (CSV), a rather 
-simple plain-text format, is used among some applications to exchange tabular 
-data structures (such as spreadsheets); yet, its inability to encode more 
-complex data forms, lack of flexibility and data precision restrict it to specific 
-applications.
+JData is designed to serve as the ``source-code'' format for scientific data
+exchange -- a representation that is simultaneously machine-processable and
+directly interpretable by humans, without requiring domain-specific tooling.
+By encoding data structures using self-explanatory, standardized annotation
+keywords embedded within the data file itself, JData makes the organization
+and meaning of a dataset transparent at the point of storage.  This
+human-readability also makes JData inherently compatible with modern
+artificial intelligence (AI) tools: large language models and AI-assisted
+data pipelines can parse, query, and reason about JData documents without
+bespoke adapters, enabling sophisticated data interoperation, automated
+processing, and broad reuse in ways that opaque binary formats preclude.
 
-The Hierarchical Data Format (HDF) is a format targeting the broad needs of
-the scientific communities. It has an extensible hierarchical data model with a 
-large capacity to represent complex binary data. However, to effectively use 
-HDF requires skillful implementation and an in-depth understanding of the 
-complex underlying programming interfaces. For small projects with non-critical performance needs, 
-using an advanced data format such as HDF may require additional development 
-and maintenance efforts. Similar arguments can be made for the Common Data 
-Format (CDF) or Network Common Data Format (netCDF) that are partly derived 
-from HDF. In addition, the MATLAB mat-file format and Python pickle format
-have also been used among the research communities. However, their usage 
-has been largely limited to the respective programming environments.
+In this specification, we define a set of JSON-compatible annotation
+keywords to unambiguously map the data structures most commonly encountered
+in research -- N-dimensional (N-D) arrays, associative arrays (maps),
+tables, trees, linked lists, directed and undirected graphs, and binary
+large objects (blobs) -- into standardized, self-describing JSON and binary
+JSON wrappers.  Built-in support for internal data compression is also
+provided, allowing JData files to remain compact without sacrificing
+readability or portability.
 
-### JSON and Binary JData
+#### Building on the JSON ecosystem
 
-The JavaScript Object Notation (JSON) format is a text-based data format that 
-is known for its complex data storage capability, excellent portability and 
-human-readability. JSON has been widely adopted in modern web applications, and is 
-becoming popular among local/native applications. The key advantages of JSON 
-include:
+JData is built upon the JavaScript Object Notation (JSON) format [RFC4627]
+-- an internationally standardized (ECMA-404, ISO21778:2017), text-based
+data-exchange format that has become one of the most widely adopted
+serialization standards across web and native applications.  By anchoring
+JData to JSON, the specification immediately inherits a vast and mature
+ecosystem of free parsers available for virtually every programming language,
+as well as a suite of powerful complementary technologies: JSON Schema for
+automated data validation, JSONPath for structured data queries, JSON-LD for
+semantic data linking and referencing, and NoSQL database engines -- such as
+CouchDB and MongoDB -- that natively ingest JSON documents for scalable,
+searchable data storage.  This ecosystem transforms JData from a static file
+format into an active data platform capable of supporting automated
+pipelines, cross-dataset queries, and large-scale data integration.
 
-* **simplicity**: JSON data are composed of lists of `"name":value` pairs; 
-  such simple syntax greatly eases the use and parsing of the data file; free 
-  JSON-encoders and decoders are widely available for most popular programming 
-  languages;
-* **human-readability**: the text-based nature of JSON and its clean, 
-  easy-to-read format make it intuitively readable without in-depth knowledge of 
-  the format itself;
-* **hierarchical data support**: JSON has a tree-like data storage paradigm 
-  which has the capacity to support complex hierarchical data structures; 
-  there is no inherent data size limit imposed by the format itself;
-*  **web-readiness**: because JSON can be readily parsed by JavaScript, most 
-  JSON-encoded data files can be directly invoked (inline or loaded from remote 
-  sites) by a JavaScript based web-application.
+#### Binary JData for performance-sensitive applications
 
-JSON also has limitations. JSON's `"value"` fields are weakly-typed. They only 
-support strings, numbers, and Boolean types, and lack the fine-granularity 
-to represent various numerical types of different byte-lengths (in C-language, 
-for example, short, int, long int, float, double, long double) and their signs 
-(signed and unsigned). Because JSON is a text-based format, the size of the 
-data file can be significantly larger than a respective binary file  and requires 
-additional conversion when used in an application. This introduces overhead in 
-both storage and processing.
+For applications where storage efficiency and parsing speed are critical,
+JData provides a binary representation through the Binary JData (BJData)
+format, derived from the Universal Binary JSON (UBJSON) specification.
+BJData retains a grammar closely aligned with JSON while addressing its core
+limitations for scientific use: it supports strongly typed numerical data
+across a full range of integer and floating-point precisions, enables
+storage of N-dimensional packed arrays in an optimized container format, and
+lifts the per-record and total-file size restrictions imposed by competing
+binary formats such as MessagePack and BSON.  A distinguishing property of
+BJData is that all semantic elements -- record name tags and data-type
+markers -- remain human-readable strings, placing it in a unique
+``quasi-human-readable'' category absent from almost all other binary
+formats.  Conversion between text JData and binary JData is lossless and
+fully specified, so the choice between the two representations is purely
+a performance trade-off with no loss of data fidelity or self-description.
 
-The [Binary JData (BJData) format](https://github.com/NeuroJSON/bjdata) was derived 
-from the Universal Binary JSON (UBJSON) format, which is one of the binary counterparts 
-to the JSON format. It specifically addresses the above mentioned limitations, 
-yet adheres to a simple grammar similar to the text-based JSON. Compared to other
-binary JSON-like formats, such as BSON (Binary JSON, https://bson.org), CBOR (Concise 
-Binary Object Representation, [RFC 7049], https://cbor.io) and MessagePack 
-(https://msgpack.org), BJData and UBJSON files are **"quasi-human-readable"** - 
-a unique capability that is absent from almost all other binary formats.
-Compared to UBJSON, BJData specification supports extended binary data types (such
-as unsigned integers and half-precision floating-point numbers) as well as
-optimized N-dimensional array format. The extended data constructs also allow 
-a BJData file to store binary arrays larger than 4 GB in size, which is not 
-currently possible with MessagePack (maximum data record size is limited to 
-4 GB) and BSON (maximum total file size is 4 GB).
+#### Scope of this document
 
-With ease-of-use, superior portability and parser availability, JSON and 
-BJData/UBJSON have the potential to serve as main-stream data storage and 
-interchange formats for general needs, especially for  the storage and interchange
-scientific data. A combination of JSON and its binary counterpart offers features 
-that are not currently available within existing data storage schemes. Although 
-they do not provide all of the advanced features found in more sophisticated 
-formats, their greatly simplified encoding and decoding strategies permit 
-efficient data sharing among general audiences.
-
-### JData specification overview
-
-JData is a specification for storing, exchanging and processing general-purpose 
-data that are commonly encountered in the information technology (IT) industries and 
-research communities. It has a text/UNICODE format derived from the JSON 
-specification and a binary format derived from the BJData/UBJSON specification. JData 
-is designed to represent commonly used data structures, including arrays, 
-structures, trees and graphs. A round-trip conversion is defined between the 
-text and binary versions of JData documents.
-
-The inception of this specification started in 2011 as part of the development
-of the [JSONLab Toolbox](https://neurojson.org/jsonlab/) - a popular 
-open-source MATLAB/GNU Octave JSON reader/writer. The majority of the 
-[annotated N-D array constructs](#annotated-storage-of-n-d-arrays) had been implemented
-in the [early releases](https://sourceforge.net/projects/iso2mesh/files/jsonlab/) 
-of JSONLab. In 2015, the initial draft of this specification
-was [developed in the Iso2Mesh Wiki](https://iso2mesh.sourceforge.net/cgi-bin/index.cgi?action=history&id=jsonlab/Doc/JData);
-since 2019, the development has been migrated to Github.
-
-The purpose of this document is to define the text and binary JData format 
-specifications. This is achieved through defining a semantic layer 
-over the JSON/UBJSON data storage syntax to map various types of complex data 
-structures. Such a semantic layer includes
-
-- a list of dedicated `"name"` fields, or keywords, that define the containers 
-  of various data types that are commonly used in research,
-- a list of dedicated `"name"` fields and formats to facilitate the grouping and 
-  organization of hierarchical data,
-- a list of format properties for the associated "value" field to store the 
-  specific metadata of the data points
-- a set of conversion rules between the text and binary forms.
-
-In the following sections, we will define the basic JData grammar and data models, 
-followed by the keywords for data grouping and various data types, including 
-scalars, N-dimensional arrays, sparse and complex arrays, structures, tables, 
-hashes/associative arrays, trees and graphs. The expressions for these data 
-structures in both text and binary forms are specified and exemplified, and 
-their conversion rules are defined.
+The remainder of this specification defines the text and binary JData
+grammar, the topological and semantic data models, and the complete set of
+data annotation keywords.  For each supported data structure, both the text
+and binary representations are specified and exemplified, and their mutual
+conversion rules are defined.  We first describe the basic JData grammar,
+then the data annotation keywords for data grouping, N-D arrays, maps,
+tables, trees, linked lists, graphs, and byte-stream data, followed by
+indexing and query conventions, data referencing and linking, and a
+summary of recommended file specifiers.
 
 Grammar
 ------------------------
