@@ -539,7 +539,7 @@ example:
     "Age": 30
   }
 ```
-Parsers that do not recognise `"_DataSchema_"` must silently ignore it; the keyword
+Parsers that do not recognize `"_DataSchema_"` must silently ignore it; the keyword
 carries no data payload and does not affect decoding of sibling fields.
 
 ### Data Storage Keywords
@@ -968,7 +968,7 @@ are supported via the below `"shapeid"` values:
 * `"zero"`: a zero matrix (all entries are zero); `"_ArrayData_"` must be `[0]` or
    may be omitted entirely.  No data storage is required beyond `"_ArraySize_"`.
 * `"range"`: a uniformly spaced array (or N-D grid of independent axes), stored as
-   a compact `[start, end]` pair per dimension rather than materialising all element
+   a compact `[start, end]` pair per dimension rather than materializing all element
    values.  The boundaries are **inclusive** on both ends (MATLAB convention), so
    the `i`-th reconstructed value along a dimension of size `N` is
    `start + (end - start) * i / (N - 1)` for `i = 0 ... N-1`.
