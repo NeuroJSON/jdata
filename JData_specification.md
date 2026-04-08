@@ -1,10 +1,10 @@
 JData: A general-purpose data annotation and interchange format
 ============================================================
 
-- **Copyright**: (C) Qianqian Fang (2011, 2015-2025) <q.fang at neu.edu>
+- **Copyright**: (C) Qianqian Fang (2011, 2015-2026) <q.fang at neu.edu>
 - **License**: Apache License, Version 2.0
-- **Version**: V1 (Draft-4.preview)
-- **URL**: https://neurojson.org/jdata/draft3
+- **Version**: V1 (Draft-4)
+- **URL**: https://neurojson.org/jdata/draft4
 - **Status**: Under development
 - **Development**: https://github.com/NeuroJSON/jdata
 - **Acknowledgment**: This project is supported by US National Institute of Health (NIH)
@@ -21,7 +21,7 @@ hashes, linked lists, trees and graphs, and support optional annotations
 for data grouping and metadata for each data element. The generated data files are 
 compatible with JSON/binary JSON specifications and can be readily processed by 
 most existing parsers. Advanced features such as array compression, data 
-linking and anchoring are supported to greatly enhance portability and 
+linking and anchoring are supported to enhance portability and 
 scalability of the generated data files.
 
 
@@ -690,7 +690,7 @@ Here, the array annotation keywords are defined below:
   100x100 array stored in 32x32 tiles with zlib compression:
   ```
     {
-        "_ArrayType_":   "float32",
+        "_ArrayType_":   "single",
         "_ArraySize_":   [100, 100],
         "_ArrayChunks_": [32, 32],
         "_ArrayZipType_": "zlib",
@@ -1250,8 +1250,8 @@ For example, in the above example, one can define the columns as
     "_TableCols_": [
         {"DataName": "Name", "DataType": "string"}, 
         {"DataName": "Age", "DataType": "uint32"}, 
-	{"DataName": "Degree", "DataType": "string"}, 
-	{"DataName": "Height", "DataType": "single"}
+        {"DataName": "Degree", "DataType": "string"}, 
+        {"DataName": "Height", "DataType": "single"}
     ],
     ...
 ```
@@ -1452,11 +1452,11 @@ shall be stored as
 If a node does not have a next or prior element, the `"_ListNext_"` or `"_ListPrior_"` value
 should be set to `null`.
 
-An optional `"_ListLength_"` integer annotation may be added as inline metadata on the
+An optional `"Length"` integer annotation may be added as inline metadata on the
 `"_LinkedList_"` container to declare the total number of nodes, enabling parsers to
 pre-allocate the appropriate buffer before traversal.  For example:
 ```
-"_LinkedList_(measurements)::_ListLength_=4": [...]
+"_LinkedList_(measurements)::Length=4": [...]
 ```
 
 The name label referred to in the `"_ListNext_"` or `"_ListPrior_"` fields has a scope
