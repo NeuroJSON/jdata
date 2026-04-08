@@ -337,17 +337,20 @@ Below is a short summary of the JData data annotation/storage keywords that can 
 
 * **Data grouping**: `_DataGroup_`, `_Dataset_`, `_DataRecord_`
 * **N-D Array**: `_ArrayType_`, `_ArraySize_`, `_ArrayIsComplex_`, `_ArrayIsSparse_`,
-  `_ArrayData_`, `_ArrayLabel_`, `_ArrayShape_`, `_ArrayOrder_`, `_ArrayZipType_`,
-  `_ArrayZipSize_`, `_ArrayZipData_`, `_ArrayZipEndian_`, `_ArrayZipLevel_`, `_ArrayZipOptions_`
+  `_ArrayData_`, `_ArrayLabel_`, `_ArrayCoords_`, `_ArrayUnits_`, `_ArrayFillValue_`,
+  `_ArrayShape_`, `_ArrayOrder_`, `_ArrayChunks_`, `_ArrayZipType_`,
+  `_ArrayZipSize_`, `_ArrayZipData_`, `_ArrayZipEndian_`, `_ArrayZipLevel_`,
+  `_ArrayZipOptions_`, `_ArrayShuffle_`
 * **Hash/Map**: `_MapData_`
-* **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`
-* **Enumeration**: `_EnumKey_`, `_EnumValue_`
+* **Table**: `_TableData_`, `_TableCols_`, `_TableRows_`, `_TableRecords_`,
+  `_TableIndex_`, `_TableSortOrder_`
+* **Enumeration**: `_EnumKey_`, `_EnumValue_`, `_EnumOrdered_`
 * **Tree**: `_TreeData_`,`_TreeNode_`,`_TreeChildren_`
-* **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`
+* **Linked List**: `_ListNode_`,`_ListNext_`,`_ListPrior_`,`_LinkedList_`,`_ListLength_`
 * **Graph**: `_GraphData_`,`_GraphNodes_`,`_GraphEdges_`,`_GraphEdges0_`,`_GraphMatrix_`
 * **Byte-stream**: `_ByteStream_`
 * **Inline metadata**: `"item_name::Property1=value1,Property2=value2,...": ...`
-* **Metadata record**: `{"_DataInfo_":{...}}`
+* **Metadata record**: `{"_DataInfo_":{...}}`, `{"_DataSchema_":{...}}`
 * **Data links and anchors**: `_DataLink_`, `_DataAnchor_`
 
 ### Data Group Keywords
@@ -501,17 +504,43 @@ If the data to be annotated is an array, the metadata record is an indexed leaf 
 The property names are user-defined. Recommended properties include, but are not limited
 to, the following list
 ```
-  Version
-  Author
-  Comment
-  UniqueID
-  CreateTime
-  ModifiedTime
+  Version       - version string of the data or the generating software
+  Author        - name(s) of the data creator(s)
+  Comment       - free-text description
+  UniqueID      - a globally unique identifier (e.g., UUID v4)
+  CreateTime    - ISO 8601 creation timestamp (e.g., "2024-03-15T14:32:00Z")
+  ModifiedTime  - ISO 8601 last-modification timestamp
+  License       - SPDX license identifier (e.g., "CC-BY-4.0", "Apache-2.0")
+  GeneratedBy   - name and version of the software that produced the data
+  DerivedFrom   - URI or identifier of the source data from which this was derived
+  SourceFormat  - original file format before conversion (e.g., "NIfTI-1", "HDF5")
 ```
 
-In software environments where `"_DataInfo_"` can not be defined, such as the root
-level of the JSON documents in [Apache CouchDB](https://couchdb.apache.org/), an alternative
-name `".datainfo"` can be used instead.
+In software environments where leading-underscore key names cannot be defined at the
+top level -- such as the root of a document in
+[Apache CouchDB](https://couchdb.apache.org/) -- the alternative names `".datainfo"`
+and `".dataschema"` may be used in place of `"_DataInfo_"` and `"_DataSchema_"`
+(see below), respectively.
+
+A complementary keyword `"_DataSchema_"` may optionally be added to any branch or leaf
+to associate a [JSON Schema](https://json-schema.org/) document that formally describes
+the structure and data types of the annotated node.  The value of `"_DataSchema_"` must
+be either a valid JSON Schema object or a URI string pointing to an external schema
+document.  `"_DataSchema_"` supplements `"_DataInfo_"` and the two may coexist.  For
+example:
+```
+  {
+    "_DataInfo_":   { "Version": "1.0", "Author": "Jane Doe" },
+    "_DataSchema_": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": { "Age": { "type": "integer", "minimum": 0 } }
+    },
+    "Age": 30
+  }
+```
+Parsers that do not recognise `"_DataSchema_"` must silently ignore it; the keyword
+carries no data payload and does not affect decoding of sibling fields.
 
 ### Data Storage Keywords
 
@@ -615,6 +644,66 @@ Here, the array annotation keywords are defined below:
   must be in the form `[["label_1", column_start_1, column_width_1], ["label_2", column_start_2, ...]]`,
   where optional integers `column_start_i` and `column_width_i` define the start and width, respectively,
   of the array indices that are associated with this label.
+* **`"_ArrayCoords_"`**: (optional) a structure mapping each dimension name (as defined in
+  `"_ArrayLabel_"`) to a 1-D coordinate array of the same length as the corresponding
+  dimension.  This mirrors the coordinate-variable model used by xarray and NetCDF,
+  enabling direct round-trip conversion with those formats.  Each coordinate array may
+  itself be an annotated JData array (a structure with `"_ArrayType_"` etc.) to preserve
+  binary type information.  For example:
+  ```
+    "_ArrayCoords_": {
+        "x": [0.0, 0.5, 1.0, 1.5, 2.0],
+        "t": ["2024-01-01", "2024-01-02", "2024-01-03"]
+    }
+  ```
+* **`"_ArrayUnits_"`**: (optional) a single string, or a 1-D array of strings with length
+  equal to the number of dimensions (i.e., `length(_ArraySize_)`).  Each string specifies
+  the physical unit of the corresponding dimension following the UDUNITS-2 convention
+  (e.g., `"mm"`, `"ms"`, `"kg/m^3"`).  A single string applies uniformly to all
+  dimensions.  An empty string `""` denotes a dimensionless or undefined unit.
+* **`"_ArrayFillValue_"`**: (optional) a scalar of the same numeric type as `"_ArrayType_"`
+  representing missing or invalid entries.  Parsers should treat array elements equal to
+  this value as missing data.  This supplements the IEEE 754 `NaN` convention for
+  integer-typed arrays where `NaN` cannot be represented (e.g., a sentinel value of
+  `65535` for a `uint16` array).  If both `"_ArrayFillValue_"` and `NaN` entries coexist
+  in a floating-point array, both shall be treated as missing.
+* **`"_ArrayChunks_"`**: (optional) a 1-D integer array specifying the tile (chunk) shape
+  for partitioning the **pre-processed array** -- that is, the rectangular data buffer that
+  would otherwise be stored in `"_ArrayData_"` after any sparse, complex, or shape
+  transformations have been applied (see the [Compressed array storage format](#compressed-array-storage-format)
+  section for the definition of the pre-processed array).  The length of `"_ArrayChunks_"`
+  must equal the number of dimensions of the pre-processed array (1, 2, or 3), not
+  necessarily the number of logical dimensions in `"_ArraySize_"`.
+
+  Chunking at the pre-processed level ensures that each chunk is a self-contained
+  rectangular block that can be decompressed independently, without requiring knowledge
+  of `"_ArrayIsComplex_"`, `"_ArrayIsSparse_"`, or `"_ArrayShape_"`.  Those flags apply
+  only after all chunks have been reassembled into the full pre-processed array.
+
+  When `"_ArrayChunks_"` is present, `"_ArrayData_"` (or `"_ArrayZipData_"` for
+  compressed data) becomes a 1-D JSON array whose elements are the individual chunk
+  payloads, ordered in row-major (C) sequence across the pre-processed array dimensions.
+  The last chunk along any dimension may be smaller than the declared chunk shape if the
+  array extent is not evenly divisible.  `"_ArrayZipType_"` and `"_ArrayZipSize_"`,
+  when present, apply uniformly to every chunk; `"_ArrayZipSize_"` gives the shape of
+  a **full** chunk (the last, possibly partial, chunk may differ).  For example, a
+  100x100 array stored in 32x32 tiles with zlib compression:
+  ```
+    {
+        "_ArrayType_":   "float32",
+        "_ArraySize_":   [100, 100],
+        "_ArrayChunks_": [32, 32],
+        "_ArrayZipType_": "zlib",
+        "_ArrayZipSize_": [32, 32],
+        "_ArrayZipData_": [
+            "<base64-chunk-0-0>", "<base64-chunk-0-1>", "<base64-chunk-0-2>",
+            "<base64-chunk-0-3>", "<base64-chunk-1-0>", ...
+        ]
+    }
+  ```
+  `"_ArrayChunks_"` must not be used together with `"_ArrayZipSize_"` unless
+  `"_ArrayZipType_"` is also present, since chunk boundaries are only meaningful
+  in the context of per-chunk compression.
 
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, when
 an ordered object or map is used to store an array, it is recommended that the `"_ArrayType_"`,
@@ -643,14 +732,25 @@ The supported data types are similar to those supported by the [BJData/UBJSON fo
 The first 8 data types are considered "integer" types, and the last three types are considered 
 "floating-point" types.
 
-In addition, the below two data types can be used as aliases to the `uint8` type in an annotated array format:
+In addition, the below types can be used as aliases in an annotated array format:
 
 * **byte**: byte arrays (8-bit), `[B]` in BJData, no correspondence in UBJSON
 * **char**: character arrays (8-bit), `[C]` in BJData/UBJSON
 * **logical**: logical arrays (8-bit), `[T]`/`[F]` in BJData/UBJSON
 
-If the above two aliases are used, a parser may optionally convert the enclosed 
+If the above aliases are used, a parser may optionally convert the enclosed
 `uint8` data to byte, character or logical arrays (1-byte).
+
+The following aliases are accepted for the three floating-point types to improve
+interoperability with Apache Arrow, NumPy, and related toolchains:
+
+* **float16**: alias for `half`   (16-bit floating point)
+* **float32**: alias for `single` (32-bit floating point)
+* **float64**: alias for `double` (64-bit floating point)
+
+A parser encountering `float16`, `float32`, or `float64` must treat them identically
+to `half`, `single`, and `double`, respectively.  The canonical names `half`, `single`,
+and `double` remain preferred in newly generated JData files.
 
 The following `"_ArrayLabel_"` example defines a 4D array with the first dimension with a name of `"x"` and length of 5;
 the 2nd dimension is named as `"y"` of length 5, the 3rd dimension as `"z"` of length 6, and the 1st column of the 4th 
@@ -848,11 +948,65 @@ value. The dimensions of the `"_ArrayData_"` (as a 2-D array) are
    * `total bandwidth` = `param1`+ `param2` + 1
    * `maximum array dimension` = the largest number in the `"_ArraySize_"` vector
 
-Moreover, Toeplitz matrices are supported via the below `"shapeid"` value:
+Moreover, Toeplitz and related structured matrices, as well as compact range arrays,
+are supported via the below `"shapeid"` values:
 
-* `"toeplitz"`: a Toeplitz matrix by storing only the first row and column 
-   (padding zeros to have the same length); if the optional `param1` is present , it
+* `"toeplitz"`: a Toeplitz matrix by storing only the first row and column
+   (padding zeros to have the same length); if the optional `param1` is present, it
    shall denote `max(#super-diagonals+1, #sub-diagonal+1)`
+* `"circulant"`: a circulant matrix, fully determined by its first row; `"_ArrayData_"`
+   stores only the first row as a 1-D vector.  The `k`-th row is a cyclic right-shift
+   of the first row by `k` positions.  Only square matrices are supported.
+* `"hankel"`: a Hankel matrix defined by its first row and last column;
+   `"_ArrayData_"` stores a 2-D array whose first row is the first row of the matrix
+   and whose second row is the last column, both padded with zeros at the rear to the
+   same length.  The first element of the first row and the last element of the second
+   row must coincide (they share the corner element).
+* `"identity"`: an identity (or scaled-identity) matrix; `"_ArrayData_"` must be a
+   scalar equal to the diagonal value (1 for a standard identity matrix).  The full
+   matrix is reconstructed as `scalar * I`.  Only square matrices are supported.
+* `"zero"`: a zero matrix (all entries are zero); `"_ArrayData_"` must be `[0]` or
+   may be omitted entirely.  No data storage is required beyond `"_ArraySize_"`.
+* `"range"`: a uniformly spaced array (or N-D grid of independent axes), stored as
+   a compact `[start, end]` pair per dimension rather than materialising all element
+   values.  The boundaries are **inclusive** on both ends (MATLAB convention), so
+   the `i`-th reconstructed value along a dimension of size `N` is
+   `start + (end - start) * i / (N - 1)` for `i = 0 ... N-1`.
+   The element count `N` along each dimension is given by the corresponding entry in
+   `"_ArraySize_"`, which remains required.
+
+   For a 1-D range, `"_ArrayData_"` is a 2-element vector `[start, end]`:
+   ```
+     {
+         "_ArrayType_":  "double",
+         "_ArraySize_":  [101],
+         "_ArrayShape_": "range",
+         "_ArrayData_":  [0.0, 100.0]
+     }
+   ```
+   This encodes the 101-element vector `[0, 1, 2, ..., 100]`.
+
+   For an N-D range (separable grid), `"_ArrayData_"` is an `ndim x 2` matrix
+   where row `i` is the `[start, end]` pair for the `i`-th dimension, matching
+   the order of `"_ArraySize_"`.  For example, a 5x3 2-D grid spanning
+   x in [0, 4] and y in [10, 12] is stored as:
+   ```
+     {
+         "_ArrayType_":  "double",
+         "_ArraySize_":  [5, 3],
+         "_ArrayShape_": "range",
+         "_ArrayData_":  [[0.0, 4.0], [10.0, 12.0]]
+     }
+   ```
+   This encodes a grid whose x-axis is `[0, 1, 2, 3, 4]` and y-axis is
+   `[10, 11, 12]`.  Each dimension is reconstructed independently.
+
+   When `"_ArraySize_"[i]` equals 1, `start` and `end` must be equal for that
+   dimension (a degenerate single-point axis), and the step is defined as zero.
+
+   `"range"` must not be combined with `"_ArrayIsComplex_"` or `"_ArrayIsSparse_"`.
+   It may be combined with `"_ArrayLabel_"`, `"_ArrayCoords_"`, `"_ArrayUnits_"`,
+   and `"_ArrayFillValue_"` in the usual way.
 
 For example, the below non-square (5-by-6) Toeplitz matrix with 3 effective values
 in the row `[a11 a12 a13]` and 2 effective values in the column `[a11 a21]`
@@ -938,8 +1092,35 @@ apply compression. We refer to the data stored in `"_ArrayData_"` as the
 
 Four additional nodes are added to the annotated array structure
 
-* **`_ArrayZipType_`**: (required) a string-valued leaflet to store the compression 
-  method, for example, "zlib", "gzip" or "lzma"
+* **`_ArrayZipType_`**: (required) a case-insensitive string-valued leaflet identifying
+  the compression codec.  To ensure unambiguous codec identification across parsers,
+  the normative identifiers follow the
+  [Numcodecs codec registry](https://numcodecs.readthedocs.io/en/stable/), which is
+  also adopted by Zarr.  The recommended identifiers are:
+
+  | Identifier          | Description                                        |
+  |---------------------|----------------------------------------------------|
+  | `"zlib"`            | zlib/DEFLATE stream (RFC 1950)                     |
+  | `"gzip"`            | gzip file format (RFC 1952)                        |
+  | `"bz2"`             | bzip2 compression                                  |
+  | `"lzma"`            | LZMA / XZ compression                              |
+  | `"zstd"`            | Zstandard compression (RFC 8878)                   |
+  | `"lz4"`             | LZ4 block compression                              |
+  | `"blosc2"`          | Blosc2 meta-compressor (default internal codec)    |
+  | `"blosc2lz4"`       | Blosc2 with LZ4 internal codec                     |
+  | `"blosc2lz4hc"`     | Blosc2 with LZ4-HC internal codec                  |
+  | `"blosc2blosclz"`   | Blosc2 with BloscLZ internal codec                 |
+  | `"blosc2zstd"`      | Blosc2 with Zstandard internal codec               |
+  | `"blosc2zlib"`      | Blosc2 with zlib internal codec                    |
+  | `"base64"`          | Base64 encoding only (no compression)              |
+
+  Note: `"zlib"` and `"gzip"` are distinct formats sharing the DEFLATE algorithm
+  but differing in header/trailer structure; parsers must not treat them as synonyms.
+  JData supports only Blosc2 (not the older Blosc v1 library).  When the Blosc2
+  internal codec is unspecified, `"blosc2"` defaults to the BloscLZ codec.  The
+  `"_ArrayZipOptions_"` field may be used to pass additional Blosc2 parameters such
+  as `typesize`, `clevel`, `shuffle`, and `nthreads`.  Additional codecs not listed
+  above may be used; their identifiers should follow the Numcodecs naming convention
 * **`_ArrayZipSize_`**: (required) the dimensions of the **pre-processed array**, i.e. the data
   originally stored in `_ArrayData_` in the format specified by `"_ArrayType_"`, 
   before the array binary stream is type-casted to byte stream and compressed.
@@ -959,14 +1140,14 @@ In addition, the following optional parameters may also be used
   0 and 9, specifying the level of the compression (interpretation is method/library-dependent)
 * **`_ArrayZipOptions_`**: (optional) an array object allowing users to specify
   additional compression-method specific parameters (interpretation is method/library-dependent)
-* **`"_ArrayShuffle_"`**: (optional) if present, must be a non-zero integer; a positive integer specifying
-  the number of bytes at which the serialized raw data buffer is shuffled. For example, `"_ArrayShuffle_": 4`
-  orders a byte stream `[1,2,3,4,5,6,7,8,9,10,11,12]` in a new order `[1,5,9,2,6,10,3,17,11,4,8,12]`; setting
-  `"_ArrayShuffle_"` to a negative integer specifies bit-wised shuffle with the absolute value as the bit-wised
-  shuffle spacing. `"_ArrayShuffle_"` must be applied, if present, before compression/encoding and an
-  unshuffle operation must be applied upon decompression/decoding.
-* **`_ArrayZipLevel_`**: (optional) a numerical value, typically an integer between
-  0 and 9, specifying the level of the compression (interpretation is method/library-dependent)
+* **`"_ArrayShuffle_"`**: (optional) if present, must be a non-zero integer; a positive
+  integer specifying the number of bytes at which the serialized raw data buffer is
+  shuffled before compression.  For example, `"_ArrayShuffle_": 4` reorders a
+  byte stream `[1,2,3,4,5,6,7,8,9,10,11,12]` into
+  `[1,5,9,2,6,10,3,7,11,4,8,12]`.  A negative integer specifies a bit-wise shuffle
+  with the absolute value as the bit-wise shuffle spacing.  `"_ArrayShuffle_"` must
+  be applied, if present, **before** compression/encoding; an unshuffle operation must
+  be applied upon decompression/decoding.
 
 When a compressed array format is encoded in an ordered object, `"_ArrayZipType_"` and 
 `"_ArrayZipSize_"` is recommended to appear before `"_ArrayZipData_"`.
@@ -1040,12 +1221,29 @@ The elements in the `"_TableRows_"` and `"_TableCols_"` can be a structure to ac
 additional metadata associated with the row or column. One can use `"DataName"` to specify 
 the string name of the row or column, and `"DataType"` to specify their data types.
 
-The supported `"DataType"` values are the same as those defined for `"_ArrayType_"` for 
+The supported `"DataType"` values are the same as those defined for `"_ArrayType_"` for
 numerical arrays, with the addition of the below types
 
-* `"string"`: a UTF-8 encoded string
+* `"string"`: a UTF-8 encoded string (NFC normalization recommended per Unicode Annex #15)
 * `"bool"`: a boolean: either `true` or `false`
-* `"blob"`: a binary byte-stream, the format of the `blob` record is described in the [Generic byte-stream data](#generic-byte-stream-data) below (without the `"_ByteStream_"` container)
+* `"blob"`: a binary byte-stream; the format of the `blob` record is described in the
+  [Generic byte-stream data](#generic-byte-stream-data) section (without the
+  `"_ByteStream_"` container)
+* `"datetime"`: an ISO 8601 date-time string (e.g., `"2024-03-15T14:32:00Z"`); parsers
+  should interpret values without an explicit time-zone offset as UTC
+
+Two additional optional keywords are defined for tables:
+
+* **`"_TableIndex_"`**: (optional) a string or 1-D array of strings naming one or more
+  columns in `"_TableCols_"` that together form the unique row index (analogous to a
+  primary key in SQL or `DataFrame.index` in pandas).  For example,
+  `"_TableIndex_": "Name"` or `"_TableIndex_": ["LastName", "FirstName"]`.
+  If absent, the implicit row index is the 1-based row position.
+* **`"_TableSortOrder_"`**: (optional) a 1-D array of column name strings declaring the
+  sort order of the stored records.  A column name prefixed with `"-"` denotes
+  descending order (e.g., `"_TableSortOrder_": ["Age", "-Height"]` declares ascending
+  `Age`, then descending `Height`).  Parsers may rely on this annotation to skip
+  re-sorting for binary-search or merge operations.
 
 For example, in the above example, one can define the columns as
 ```
@@ -1097,10 +1295,20 @@ repeated values. For example, the following array
 ```
 "gender": ["M","M","F","F","F","M",...,"F"]
 ```
-contains only two possible values, `"M"` or `"F"`, each repeating many times. We use the following
-keywords to represent such data:
-* `"_EnumKey_"`: this is an array containing unique values that appear in an array; the unique values can have mixed data types.
-* `"_EnumValue_"`: this is an integer array with each entry denoting the index (starting from 1) of the value appearing in `"_EnumKey_"`; `"_EnumValue_"` can be an N-D array.
+contains only two possible values, `"M"` or `"F"`, each repeating many times. We use the following keywords to represent such data:
+
+* `"_EnumKey_"`: an array containing the unique values (categories) that appear in the
+  data; values may have mixed data types.
+* `"_EnumValue_"`: an integer array with each entry denoting the **1-based** index of
+  the corresponding value in `"_EnumKey_"` (the first entry of `"_EnumKey_"` has index 1);
+  `"_EnumValue_"` can be an N-D array.  Note that this 1-based convention differs from
+  the 0-based indexing used by JSONPath and Apache Arrow `DictionaryArray`; parsers
+  converting to those formats must subtract 1 from each `"_EnumValue_"` entry.
+* `"_EnumOrdered_"`: (optional) a boolean flag; when `true`, the categories in
+  `"_EnumKey_"` are treated as an **ordered** (ordinal) sequence, where the position in
+  `"_EnumKey_"` defines the ranking (first entry is lowest).  This is equivalent to
+  `ordered=True` in a pandas `CategoricalDtype` or an R ordered factor.  If absent or
+  `false`, the enumeration is unordered (nominal).
 
 With the above construct, we can store the above `"gender"` example as
 ```
@@ -1109,8 +1317,17 @@ With the above construct, we can store the above `"gender"` example as
   "_EnumValue_": [1,1,2,2,2,1,...,2]
 }
 ```
-Because `"_EnumValue_"` is an integer array, one can further use the [N-D array annotation format](#compressed-array-storage-format) to
-compress the data and reduce the storage overhead.
+An ordered categorical (e.g., severity levels) is stored as
+```
+"severity": {
+  "_EnumKey_":     ["low", "medium", "high"],
+  "_EnumOrdered_": true,
+  "_EnumValue_":   [1,3,2,1,...,3]
+}
+```
+Because `"_EnumValue_"` is an integer array, one can further use the
+[N-D array annotation format](#compressed-array-storage-format) to compress the data
+and reduce the storage overhead.
 
 
 #### Trees
@@ -1232,11 +1449,18 @@ shall be stored as
      }
   ]
 ```
-If a node does not have a next or prior element, the `"_LinkNext_"` or `"_LinkPrior_"` value 
+If a node does not have a next or prior element, the `"_ListNext_"` or `"_ListPrior_"` value
 should be set to `null`.
 
-The name label referred in the `"_LinkNext_"` or `"_LinkPrior_"` fields has a scope limited to 
-the current list, i.e. the parent array one-level above the node. Multiple linked lists can 
+An optional `"_ListLength_"` integer annotation may be added as inline metadata on the
+`"_LinkedList_"` container to declare the total number of nodes, enabling parsers to
+pre-allocate the appropriate buffer before traversal.  For example:
+```
+"_LinkedList_(measurements)::_ListLength_=4": [...]
+```
+
+The name label referred to in the `"_ListNext_"` or `"_ListPrior_"` fields has a scope
+limited to the current list, i.e. the parent array one-level above the node. Multiple linked lists can 
 share the same names if they are stored in a parallel or nested fashion.
 
 The above linked list can be enclosed inside an optional field, `"_LinkedList_(list_name)":[...]` 
@@ -1285,9 +1509,12 @@ The data associated with each edge (edgedata) in this example is optional and ca
 structure supported in this document. If the edge data is a scalar, it can be interpreted as 
 weights in a weighted graph.
 
-By default, the graph is assumed to be a directed graph. If a user intends to store undirected 
-graphs using the above format, one must use `"_GraphEdges0_"` or `"_GraphEdges0_"` to 
-enclose the edge data.
+By default, the graph is assumed to be a directed graph. If a user intends to store an
+undirected graph, the edge list must be enclosed in `"_GraphEdges0_"` instead of
+`"_GraphEdges_"`.  When `"_GraphEdges0_"` is used, each edge `[A, B, ...]` implies the
+reverse edge `[B, A, ...]`; parsers must not double-store the edge data.  The adjacency
+matrix stored in `"_GraphMatrix_"` is interpreted as symmetric when paired with
+`"_GraphEdges0_"`.
 
 The above graph data can be enclosed inside an optional field, `"_GraphData_(graph_name)_":{...}` 
 (if inside a structure) or `{"_GraphData_":{...}}` (if inside an array), to inform the parser of the 
@@ -1337,9 +1564,9 @@ can also use the annotated array format to take advantage of the sparsity of the
               "node3": data3
         },
         "_GraphMatrix_":{
-             "_ArrayTye_": "uint8",
-             "_ArraySize": [4,4],
-             "_ArrayIsSparse": true,
+             "_ArrayType_": "uint8",
+             "_ArraySize_": [4,4],
+             "_ArrayIsSparse_": true,
              "_ArrayData_": [1,2,2,3,4, 2,3,4,4,2, 1,1,1,1,1]
         }
     }
