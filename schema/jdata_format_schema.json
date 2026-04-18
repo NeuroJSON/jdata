@@ -394,7 +394,7 @@
             "blosc2blosclz", "blosc2zstd", "blosc2zlib",
             "base64"
           ],
-          "description": "Compression codec identifier. Note: zlib (RFC 1950) and gzip (RFC 1952) are distinct formats. Only Blosc2 (not Blosc v1) is supported. 'blosc2' defaults to the BloscLZ internal codec; 'blosc2lz4' selects LZ4, 'blosc2lz4hc' LZ4-HC, 'blosc2zstd' Zstandard, 'blosc2zlib' zlib. Additional codec-specific parameters (typesize, clevel, shuffle, nthreads) may be passed via _ArrayZipOptions_. Note: some implementations use a slash separator (e.g. 'blosc2/lz4') as an alternative to the concatenated form ('blosc2lz4'); both refer to the same codec."
+          "description": "Compression codec identifier. Note: zlib (RFC 1950) and gzip (RFC 1952) are distinct formats. Only Blosc2 (not Blosc v1) is supported. 'blosc2' defaults to the BloscLZ internal codec; 'blosc2lz4' selects LZ4, 'blosc2lz4hc' LZ4-HC, 'blosc2zstd' Zstandard, 'blosc2zlib' zlib. Additional codec-specific parameters (typesize, clevel, shuffle, nthreads) may be passed via _ArrayZipOptions_."
         },
         "_ArrayZipSize_": {
           "oneOf": [
