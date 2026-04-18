@@ -300,7 +300,7 @@
         },
         "_ArrayIsComplex_": {
           "type": "boolean",
-          "description": "True if array contains complex numbers (real and imaginary parts interleaved)"
+          "description": "True if array contains complex numbers. _ArrayData_ is a 2-D array whose first row holds the serialized real part and second row holds the serialized imaginary part of the complex array (separate rows, not byte-interleaved)."
         },
         "_ArrayIsSparse_": {
           "type": "boolean",
@@ -382,7 +382,8 @@
             "type": "integer",
             "minimum": 1
           },
-          "description": "Tile (chunk) shape for partitioning the pre-processed array into independently compressible blocks. Length must equal the number of dimensions of the pre-processed array. When present, _ArrayData_ or _ArrayZipData_ becomes a 1-D array of per-chunk payloads in row-major order. The last chunk along any dimension may be smaller than the declared shape."
+          "minItems": 1,
+          "description": "Tile (chunk) shape for partitioning the pre-processed array into independently compressible blocks. Length must equal the number of dimensions of the pre-processed array. When present, _ArrayData_ or _ArrayZipData_ becomes a 1-D array of per-chunk payloads in row-major order. The last chunk along any dimension may be smaller than the declared shape. _ArrayZipSize_ must also be present and stores the shape of the full pre-processed array (not the chunk shape)."
         },
         "_ArrayZipType_": {
           "type": "string",
@@ -393,7 +394,7 @@
             "blosc2blosclz", "blosc2zstd", "blosc2zlib",
             "base64"
           ],
-          "description": "Compression codec identifier following the Numcodecs registry (also used by Zarr). Note: zlib (RFC 1950) and gzip (RFC 1952) are distinct formats. Only Blosc2 (not Blosc v1) is supported. blosc2 defaults to BloscLZ internal codec."
+          "description": "Compression codec identifier. Note: zlib (RFC 1950) and gzip (RFC 1952) are distinct formats. Only Blosc2 (not Blosc v1) is supported. 'blosc2' defaults to the BloscLZ internal codec; 'blosc2lz4' selects LZ4, 'blosc2lz4hc' LZ4-HC, 'blosc2zstd' Zstandard, 'blosc2zlib' zlib. Additional codec-specific parameters (typesize, clevel, shuffle, nthreads) may be passed via _ArrayZipOptions_. Note: some implementations use a slash separator (e.g. 'blosc2/lz4') as an alternative to the concatenated form ('blosc2lz4'); both refer to the same codec."
         },
         "_ArrayZipSize_": {
           "oneOf": [
@@ -403,15 +404,16 @@
                 "type": "integer",
                 "minimum": 0
               },
-              "description": "Dimensions of the pre-processed array (multi-dimensional)"
+              "minItems": 1,
+              "description": "Shape of the pre-processed array (multi-dimensional form)"
             },
             {
               "type": "integer",
               "minimum": 0,
-              "description": "Total element count of the pre-processed array (scalar shorthand)"
+              "description": "Total element count of the pre-processed array (scalar shorthand for 1-D case)"
             }
           ],
-          "description": "Dimensions of the pre-processed array before compression. When _ArrayChunks_ is present, gives the shape of a full (non-boundary) chunk."
+          "description": "Shape of the full pre-processed array before compression. When _ArrayChunks_ is present, this field MUST store the shape of the complete pre-processed array (NOT the chunk shape). The decoder uses ceil(_ArrayZipSize_ / _ArrayChunks_) to determine the number of chunks per dimension and the size of boundary tiles."
         },
         "_ArrayZipData_": {
           "oneOf": [
@@ -421,11 +423,22 @@
             },
             {
               "type": "array",
-              "items": { "type": "string" },
-              "description": "1-D array of Base64-encoded per-chunk compressed payloads (chunked array, when _ArrayChunks_ is present)"
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Base64-encoded compressed payload for one chunk"
+                  },
+                  {
+                    "$ref": "#/definitions/DataLinkDef",
+                    "description": "_DataLink_ reference to an externally stored chunk payload (enables distributed/lazy-loaded chunk storage)"
+                  }
+                ]
+              },
+              "description": "1-D array of per-chunk compressed payloads in row-major order (when _ArrayChunks_ is present). Each element is either a Base64-encoded string or a _DataLink_ pointing to an external chunk."
             }
           ],
-          "description": "Compressed and Base64-encoded array data"
+          "description": "Compressed and Base64-encoded array data, or a 1-D cell of per-chunk payloads when _ArrayChunks_ is present"
         },
         "_ArrayZipEndian_": {
           "type": "string",
