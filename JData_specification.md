@@ -684,26 +684,29 @@ Here, the array annotation keywords are defined below:
   compressed data) becomes a 1-D JSON array whose elements are the individual chunk
   payloads, ordered in row-major (C) sequence across the pre-processed array dimensions.
   The last chunk along any dimension may be smaller than the declared chunk shape if the
-  array extent is not evenly divisible.  `"_ArrayZipType_"` and `"_ArrayZipSize_"`,
-  when present, apply uniformly to every chunk; `"_ArrayZipSize_"` gives the shape of
-  a **full** chunk (the last, possibly partial, chunk may differ).  For example, a
+  array extent is not evenly divisible.  `"_ArrayZipType_"`, when present, applies
+  uniformly to every chunk.  `"_ArrayZipSize_"` **must** be present alongside
+  `"_ArrayChunks_"` and stores the shape of the **full pre-processed array** (not the
+  chunk shape); the decoder uses it together with `"_ArrayChunks_"` to determine the
+  number of chunks per dimension (`ceil(_ArrayZipSize_ / _ArrayChunks_)`) and the
+  actual shape of each tile, including partial boundary tiles.  For example, a
   100x100 array stored in 32x32 tiles with zlib compression:
   ```
     {
-        "_ArrayType_":   "single",
-        "_ArraySize_":   [100, 100],
-        "_ArrayChunks_": [32, 32],
+        "_ArrayType_":    "single",
+        "_ArraySize_":    [100, 100],
+        "_ArrayChunks_":  [32, 32],
         "_ArrayZipType_": "zlib",
-        "_ArrayZipSize_": [32, 32],
+        "_ArrayZipSize_": [100, 100],
         "_ArrayZipData_": [
             "<base64-chunk-0-0>", "<base64-chunk-0-1>", "<base64-chunk-0-2>",
             "<base64-chunk-0-3>", "<base64-chunk-1-0>", ...
         ]
     }
   ```
-  `"_ArrayChunks_"` must not be used together with `"_ArrayZipSize_"` unless
-  `"_ArrayZipType_"` is also present, since chunk boundaries are only meaningful
-  in the context of per-chunk compression.
+  The total number of chunks is `prod(ceil(_ArrayZipSize_ ./ _ArrayChunks_))` = 16
+  (4×4 tiles); the boundary tiles in the last row and column each have extent 4
+  (`100 - 3×32`) along the respective dimension.
 
 To facilitate the pre-allocation of the buffer for storage of the array in the parser, when
 an ordered object or map is used to store an array, it is recommended that the `"_ArrayType_"`,
