@@ -644,17 +644,23 @@ Here, the array annotation keywords are defined below:
   must be in the form `[["label_1", column_start_1, column_width_1], ["label_2", column_start_2, ...]]`,
   where optional integers `column_start_i` and `column_width_i` define the start and width, respectively,
   of the array indices that are associated with this label.
-* **`"_ArrayCoords_"`**: (optional) a structure mapping each dimension name (as defined in
-  `"_ArrayLabel_"`) to a 1-D coordinate array of the same length as the corresponding
-  dimension.  This mirrors the coordinate-variable model used by xarray and NetCDF,
-  enabling direct round-trip conversion with those formats.  Each coordinate array may
-  itself be an annotated JData array (a structure with `"_ArrayType_"` etc.) to preserve
-  binary type information.  For example:
+* **`"_ArrayCoords_"`**: (optional) a 1-D JSON array whose length equals the length of
+  `"_ArrayLabel_"` (which must be present when `"_ArrayCoords_"` is used).  Element `i`
+  is the coordinate vector for the `i`-th dimension (in `"_ArrayLabel_"` order) and must
+  have a length equal to `"_ArraySize_"[i]`.  Each element may be either:
+  1. a plain 1-D JSON array of numeric or string values; or
+  2. an annotated JData array object (with `"_ArrayType_"`, `"_ArraySize_"`, etc.).
+     When `"_ArrayShape_":"range"` is used, `"_ArrayData_"` must be a 2-element vector
+     `[start, end]` (inclusive on both ends) and `"_ArraySize_"` must equal the
+     dimension size.
+
+  For example:
   ```
-    "_ArrayCoords_": {
-        "x": [0.0, 0.5, 1.0, 1.5, 2.0],
-        "t": ["2024-01-01", "2024-01-02", "2024-01-03"]
-    }
+    "_ArrayLabel_": ["x", "t"],
+    "_ArrayCoords_": [
+        [0.0, 0.5, 1.0, 1.5, 2.0],
+        ["2024-01-01", "2024-01-02", "2024-01-03"]
+    ]
   ```
 * **`"_ArrayUnits_"`**: (optional) a single string, or a 1-D array of strings with length
   equal to the number of dimensions (i.e., `length(_ArraySize_)`).  Each string specifies
@@ -1211,12 +1217,12 @@ For example, the above table can be serialized using the below format
 ```
     {
         "_TableCols_": ["Name", "Age", "Degree", "Height"],
-	"_TableRows_": [],
-	"_TableRecords_": [
-	   ["Andy",    21, "BS", 69.2],
-	   ["William", 21, "MS", 71.0],
-	   ["Om",      22, "BS", 67.1]
-	]
+        "_TableRows_": [],
+        "_TableRecords_": [
+           ["Andy",    21, "BS", 69.2],
+           ["William", 21, "MS", 71.0],
+           ["Om",      22, "BS", 67.1]
+        ]
     }
 ```
 

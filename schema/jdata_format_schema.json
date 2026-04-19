@@ -325,9 +325,9 @@
           }
         },
         "_ArrayCoords_": {
-          "type": "object",
-          "description": "Maps each dimension name (as defined in _ArrayLabel_) to a 1-D coordinate array of the same length as that dimension. Mirrors the coordinate-variable model of xarray and NetCDF.",
-          "additionalProperties": {
+          "type": "array",
+          "description": "Positional coordinate array, one element per dimension in _ArrayLabel_ order (requires _ArrayLabel_). Each element's length must equal the corresponding _ArraySize_ entry. Elements may be plain 1-D arrays or annotated JData array objects; when _ArrayShape_:\"range\" is used, _ArrayData_ must be a 2-element [start, end] vector and _ArraySize_ must equal the dimension size.",
+          "items": {
             "oneOf": [
               {
                 "type": "array",
@@ -383,7 +383,7 @@
             "minimum": 1
           },
           "minItems": 1,
-          "description": "Tile (chunk) shape for partitioning the pre-processed array into independently compressible blocks. Length must equal the number of dimensions of the pre-processed array. When present, _ArrayData_ or _ArrayZipData_ becomes a 1-D array of per-chunk payloads in row-major order. The last chunk along any dimension may be smaller than the declared shape. _ArrayZipSize_ must also be present and stores the shape of the full pre-processed array (not the chunk shape)."
+          "description": "Tile (chunk) shape for partitioning an array into independently compressible blocks. Two modes depending on array type: (1) Dense real/complex arrays: _ArrayChunks_ is in _ArraySize_ (original) order; the decoder computes tile counts as ceil(_ArraySize_ / _ArrayChunks_) and tiles the row-major permuted intermediate. (2) Non-dense arrays (sparse, complex-sparse, shaped, complex-shaped): _ArrayChunks_ is in _ArrayZipSize_ (processed) coordinate space; the decoder computes tile counts as ceil(_ArrayZipSize_ / _ArrayChunks_). When present, _ArrayZipData_ becomes a 1-D array of per-chunk payloads in row-major tile order. The last chunk along any dimension may be smaller than the declared shape."
         },
         "_ArrayZipType_": {
           "type": "string",
@@ -413,7 +413,7 @@
               "description": "Total element count of the pre-processed array (scalar shorthand for 1-D case)"
             }
           ],
-          "description": "Shape of the full pre-processed array before compression. When _ArrayChunks_ is present, this field MUST store the shape of the complete pre-processed array (NOT the chunk shape). The decoder uses ceil(_ArrayZipSize_ / _ArrayChunks_) to determine the number of chunks per dimension and the size of boundary tiles."
+          "description": "Shape of the full pre-processed array before compression. For dense real arrays: [1, N] where N = total elements. For dense complex arrays: [2, N] where N = total elements. For non-dense arrays (sparse, shaped): the logical 2-D processed-array shape (e.g. [3, K] for a real sparse matrix with K nonzeros). When _ArrayChunks_ is absent, the decoder uses this shape to reconstruct the flat byte stream. When _ArrayChunks_ is present for dense arrays, tile counts are ceil(_ArraySize_ / _ArrayChunks_); for non-dense arrays, tile counts are ceil(_ArrayZipSize_ / _ArrayChunks_)."
         },
         "_ArrayZipData_": {
           "oneOf": [
